@@ -1,4 +1,4 @@
-# WalletLogin
+# WalletLogin Plugin
 
 A Minecraft Spigot plugin that integrates wallet authentication with Minecraft login. This plugin allows players to connect their blockchain wallets (Ethereum, Solana, etc.) to their Minecraft accounts.
 
@@ -80,3 +80,8 @@ messages:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+If you have any questions or need help, please feel free to open an issue or contact us at [NFTLogin](https://nftlogin.com).
+
