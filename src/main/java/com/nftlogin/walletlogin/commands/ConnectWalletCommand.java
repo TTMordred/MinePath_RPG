@@ -1,6 +1,7 @@
 package com.nftlogin.walletlogin.commands;
 
-import com.nftlogin.walletlogin.WalletLogin;
+import com.nftlogin.walletlogin.SolanaLogin;
+import com.nftlogin.walletlogin.utils.PasswordUtils;
 import com.nftlogin.walletlogin.utils.WalletValidator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,12 +10,13 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class ConnectWalletCommand implements CommandExecutor {
 
-    private final WalletLogin plugin;
+    private final SolanaLogin plugin;
 
-    public ConnectWalletCommand(WalletLogin plugin) {
+    public ConnectWalletCommand(SolanaLogin plugin) {
         this.plugin = plugin;
     }
 
@@ -26,16 +28,6 @@ public class ConnectWalletCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        UUID playerUuid = player.getUniqueId();
-
-        // Check if player already has a wallet connected
-        Optional<String> existingWallet = plugin.getDatabaseManager().getWalletAddress(playerUuid);
-        if (existingWallet.isPresent()) {
-            String message = plugin.getConfig().getString("messages.already-connected", 
-                    "You already have a wallet connected. Use /disconnectwallet first.");
-            player.sendMessage(plugin.formatMessage(message));
-            return true;
-        }
 
         // Check if the command has the correct number of arguments
         if (args.length != 1) {
@@ -44,28 +36,69 @@ public class ConnectWalletCommand implements CommandExecutor {
         }
 
         String walletAddress = args[0];
+        return connectWallet(player, walletAddress);
+    }
 
-        // Validate wallet address if validation is enabled
-        if (plugin.getConfig().getBoolean("settings.wallet-validation", true)) {
-            if (!WalletValidator.isValidWalletAddress(walletAddress)) {
-                String message = plugin.getConfig().getString("messages.invalid-wallet", 
-                        "The wallet address you provided is invalid.");
-                player.sendMessage(plugin.formatMessage(message));
-                return true;
-            }
+    /**
+     * Connect a wallet to a player's account.
+     *
+     * @param player The player
+     * @param walletAddress The wallet address to connect
+     * @return true if the wallet was connected successfully, false otherwise
+     */
+    private boolean connectWallet(Player player, String walletAddress) {
+        UUID playerUuid = player.getUniqueId();
+
+        // Check if player is logged in
+        if (!plugin.getSessionManager().hasSession(playerUuid) ||
+                !plugin.getSessionManager().getSession(playerUuid).isAuthenticated()) {
+            String message = plugin.getConfig().getString("messages.not-logged-in",
+                    "You must be logged in to use this command!");
+            player.sendMessage(plugin.formatMessage(message));
+            return true;
         }
 
-        // Connect the wallet
-        boolean success = plugin.getDatabaseManager().connectWallet(playerUuid, walletAddress);
-        if (success) {
-            String message = plugin.getConfig().getString("messages.wallet-connected", 
-                    "Your wallet has been successfully connected!");
+        // Check if player already has a wallet connected
+        Optional<String> existingWallet = plugin.getDatabaseManager().getWalletAddress(playerUuid);
+        if (existingWallet.isPresent()) {
+            String message = plugin.getConfig().getString("messages.already-connected",
+                    "You already have a wallet connected. Use /disconnectwallet first.");
             player.sendMessage(plugin.formatMessage(message));
-            
+            return true;
+        }
+
+        // Validate wallet address if validation is enabled
+        if (plugin.getConfig().getBoolean("settings.wallet-validation", true) &&
+                !WalletValidator.isValidWalletAddress(walletAddress)) {
+            String message = plugin.getConfig().getString("messages.invalid-wallet",
+                    "The wallet address you provided is not a valid Solana address.");
+            player.sendMessage(plugin.formatMessage(message));
+            return true;
+        }
+
+        // Get wallet type
+        String walletType = WalletValidator.getWalletType(walletAddress);
+
+        // Connect the wallet
+        boolean success = plugin.getDatabaseManager().connectWallet(playerUuid, walletAddress, walletType);
+        if (success) {
+            // Generate verification code
+            String verificationCode = PasswordUtils.generateVerificationCode(6);
+            plugin.getSessionManager().storeVerificationCode(playerUuid, verificationCode);
+
+            String message = plugin.getConfig().getString("messages.wallet-connected",
+                    "Your Solana wallet has been successfully connected!");
+            player.sendMessage(plugin.formatMessage(message));
+
+            // Send verification instructions
+            player.sendMessage(plugin.formatMessage("&eTo verify your wallet ownership, use the code: &6" + verificationCode));
+            player.sendMessage(plugin.formatMessage("&eYou can verify through the website or use /verifycode <code>"));
+
             // Log the wallet connection
-            String blockchainType = WalletValidator.getBlockchainType(walletAddress);
-            plugin.getLogger().info("Player " + player.getName() + " connected a " + 
-                    blockchainType + " wallet: " + walletAddress);
+            if (plugin.getLogger().isLoggable(Level.INFO)) {
+                plugin.getLogger().info(String.format("Player %s connected a %s wallet: %s",
+                        player.getName(), walletType, walletAddress));
+            }
         } else {
             player.sendMessage(plugin.formatMessage("&cFailed to connect your wallet. Please try again later."));
         }
