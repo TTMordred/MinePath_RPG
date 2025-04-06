@@ -1,37 +1,46 @@
 package com.nftlogin.walletlogin;
 
-import com.nftlogin.walletlogin.commands.ConnectWalletCommand;
-import com.nftlogin.walletlogin.commands.DisconnectWalletCommand;
-import com.nftlogin.walletlogin.commands.WalletInfoCommand;
+import com.nftlogin.walletlogin.commands.*;
 import com.nftlogin.walletlogin.database.DatabaseManager;
 import com.nftlogin.walletlogin.listeners.PlayerLoginListener;
+import com.nftlogin.walletlogin.session.SessionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-public final class WalletLogin extends JavaPlugin {
+public final class SolanaLogin extends JavaPlugin {
 
     private DatabaseManager databaseManager;
+    private SessionManager sessionManager;
 
     @Override
     public void onEnable() {
         // Save default config if it doesn't exist
         saveDefaultConfig();
-        
+
+        // Initialize session manager
+        sessionManager = new SessionManager(this);
+
         // Initialize database
         initDatabase();
-        
+
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerLoginListener(this), this);
-        
+
         // Register commands
+        getCommand("register").setExecutor(new RegisterCommand(this));
+        getCommand("login").setExecutor(new LoginCommand(this));
+        getCommand("changepassword").setExecutor(new ChangePasswordCommand(this));
+        getCommand("logout").setExecutor(new LogoutCommand(this));
         getCommand("connectwallet").setExecutor(new ConnectWalletCommand(this));
         getCommand("disconnectwallet").setExecutor(new DisconnectWalletCommand(this));
         getCommand("walletinfo").setExecutor(new WalletInfoCommand(this));
-        
-        getLogger().info("WalletLogin plugin has been enabled!");
+        getCommand("verifycode").setExecutor(new VerifyCodeCommand(this));
+        getCommand("solanalogin").setExecutor(new AdminCommand(this));
+
+        getLogger().info("SolanaLogin plugin has been enabled!");
     }
 
     @Override
@@ -45,10 +54,16 @@ public final class WalletLogin extends JavaPlugin {
                 getLogger().log(Level.SEVERE, "Error closing database connection", e);
             }
         }
-        
-        getLogger().info("WalletLogin plugin has been disabled!");
+
+        getLogger().info("SolanaLogin plugin has been disabled!");
     }
-    
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        getLogger().info("Configuration reloaded.");
+    }
+
     private void initDatabase() {
         try {
             databaseManager = new DatabaseManager(this);
@@ -60,13 +75,17 @@ public final class WalletLogin extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
     }
-    
+
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
-    
+
+    public SessionManager getSessionManager() {
+        return sessionManager;
+    }
+
     public String formatMessage(String message) {
-        String prefix = getConfig().getString("messages.prefix", "&8[&6WalletLogin&8] &r");
+        String prefix = getConfig().getString("messages.prefix", "&8[&6SolanaLogin&8] &r");
         return ChatColor.translateAlternateColorCodes('&', prefix + message);
     }
 }
