@@ -3,6 +3,7 @@
 A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentication with Minecraft login, supporting both premium and cracked Minecraft accounts.
 
 ## Table of Contents
+
 1. [Development Setup](#development-setup)
 2. [Server Administrator Guide](#server-administrator-guide)
 3. [User Guide](#user-guide)
@@ -13,6 +14,7 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 ## Development Setup
 
 ### Prerequisites
+
 - Java Development Kit (JDK) 8 or higher
 - Maven
 - Git
@@ -22,15 +24,18 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 ### Setting Up the Development Environment
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/SolanaLogin.git
    cd SolanaLogin
    ```
 
 2. **Build the project with Maven**
+
    ```bash
    mvn clean package
    ```
+
    This will generate a JAR file in the `target` directory.
 
 3. **Set up a test server**
@@ -40,6 +45,7 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 4. **Set up the database**
    - Create a MySQL database for the plugin
+
    ```sql
    CREATE DATABASE minecraft;
    CREATE USER 'minecraft'@'localhost' IDENTIFIED BY 'yourpassword';
@@ -59,15 +65,18 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
    - Follow the existing code structure and patterns
 
 2. **Run tests**
+
    ```bash
    ./run-test.bat  # On Windows
    ./run-test.sh   # On Linux/Mac
    ```
 
 3. **Build and deploy**
+
    ```bash
    mvn clean package
    ```
+
    Then copy the JAR file to your test server's plugins folder.
 
 4. **Test on a local server**
@@ -75,6 +84,7 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
    - Test the functionality in-game
 
 5. **Commit and push changes**
+
    ```bash
    git add .
    git commit -m "Description of changes"
@@ -147,12 +157,14 @@ solana:
 ### Commands and Permissions
 
 #### Admin Commands
+
 - `/solanalogin reload` - Reload the plugin configuration
   - Permission: `solanalogin.admin`
 - `/solanalogin info` - View plugin information
   - Permission: `solanalogin.admin`
 
 #### Authentication Commands
+
 - `/register <password> <confirmPassword>` - Register an account
   - Permission: `solanalogin.register` (default: true)
 - `/login <password>` - Login to your account
@@ -163,6 +175,7 @@ solana:
   - Permission: `solanalogin.logout` (default: true)
 
 #### Wallet Commands
+
 - `/connectwallet <wallet_address>` - Connect your Solana wallet to your Minecraft account
   - Permission: `solanalogin.wallet.connect` (default: true)
 - `/disconnectwallet` - Disconnect your Solana wallet from your Minecraft account
