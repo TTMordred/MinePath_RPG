@@ -1,0 +1,25 @@
+# Database Configuration
+database:
+  host: localhost
+  port: 3306
+  database: minecraft
+  username: root
+  password: password
+  table-prefix: walletlogin_
+
+# Plugin Settings
+settings:
+  require-wallet-login: false  # If true, players must connect a wallet to play
+  login-timeout: 60  # Time in seconds for players to connect their wallet after joining
+  wallet-validation: true  # Whether to validate wallet addresses format
+
+# Messages
+messages:
+  prefix: "&8[&6WalletLogin&8] &r"
+  wallet-connected: "&aYour wallet has been successfully connected!"
+  wallet-disconnected: "&cYour wallet has been disconnected."
+  wallet-required: "&cYou need to connect a wallet to play on this server. Use /connectwallet <address>"
+  invalid-wallet: "&cThe wallet address you provided is invalid."
+  already-connected: "&cYou already have a wallet connected. Use /disconnectwallet first."
+  not-connected: "&cYou don't have a wallet connected."
+  wallet-info: "&aYour connected wallet is: &6%wallet%"

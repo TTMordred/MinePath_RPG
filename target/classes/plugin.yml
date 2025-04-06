@@ -1,0 +1,29 @@
+name: WalletLogin
+version: '1.0-SNAPSHOT'
+main: com.nftlogin.walletlogin.WalletLogin
+api-version: '1.19'
+authors: [NFTLogin]
+description: A plugin that integrates Minecraft login with wallet connection
+commands:
+  connectwallet:
+    description: Connect your wallet to your Minecraft account
+    usage: /connectwallet <wallet_address>
+    permission: walletlogin.connect
+  disconnectwallet:
+    description: Disconnect your wallet from your Minecraft account
+    usage: /disconnectwallet
+    permission: walletlogin.disconnect
+  walletinfo:
+    description: View your wallet information
+    usage: /walletinfo
+    permission: walletlogin.info
+permissions:
+  walletlogin.connect:
+    description: Allows players to connect their wallet
+    default: true
+  walletlogin.disconnect:
+    description: Allows players to disconnect their wallet
+    default: true
+  walletlogin.info:
+    description: Allows players to view their wallet information
+    default: true
