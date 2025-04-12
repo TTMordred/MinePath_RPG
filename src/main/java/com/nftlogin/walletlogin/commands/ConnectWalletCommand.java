@@ -3,6 +3,10 @@ package com.nftlogin.walletlogin.commands;
 import com.nftlogin.walletlogin.SolanaLogin;
 import com.nftlogin.walletlogin.utils.PasswordUtils;
 import com.nftlogin.walletlogin.utils.WalletValidator;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -201,6 +205,12 @@ public class ConnectWalletCommand implements CommandExecutor {
      * @return Array containing [sessionId, webServerUrl, loginUrl]
      */
     private String[] generateAuthData(UUID playerUuid) {
+        // Get player name
+        String playerName = plugin.getServer().getOfflinePlayer(playerUuid).getName();
+        if (playerName == null) {
+            playerName = playerUuid.toString();
+        }
+
         // Generate a nonce for secure authentication
         String nonce = plugin.getSessionManager().generateAuthNonce(playerUuid);
 
@@ -212,7 +222,7 @@ public class ConnectWalletCommand implements CommandExecutor {
         String webServerUrl = plugin.getConfig().getString("web-server.url", "http://localhost:3000");
 
         // Create login URL
-        String loginUrl = webServerUrl + "/login?session=" + sessionId + "&nonce=" + nonce + "&player=" + playerUuid;
+        String loginUrl = webServerUrl + "/login?session=" + sessionId + "&nonce=" + nonce + "&player=" + playerName;
 
         return new String[] {sessionId, webServerUrl, loginUrl};
     }
@@ -223,14 +233,27 @@ public class ConnectWalletCommand implements CommandExecutor {
      * @param player The player
      * @param loginUrl The login URL
      */
+    @SuppressWarnings("deprecation") // Using deprecated methods for clickable links
     private void sendLoginInstructions(Player player, String loginUrl) {
         // Send clickable link to player
         player.sendMessage(plugin.formatMessage("&a=== Solana Wallet Connection ==="));
         player.sendMessage(plugin.formatMessage("&eConnect your Solana wallet using one of these methods:"));
 
-        // Send URLs directly
-        player.sendMessage(plugin.formatMessage("&6➤ &bBrowser extension link: &e" + loginUrl));
-        player.sendMessage(plugin.formatMessage("&6➤ &bQR code link: &e" + loginUrl + "&qr=true"));
+        // Create clickable links
+        // Note: We're using deprecated methods because they're the only way to create clickable links
+        // in Minecraft chat. These will be updated when a better alternative becomes available.
+        // @SuppressWarnings("deprecation")
+        TextComponent browserLink = new TextComponent(plugin.formatMessage("&6➤ &bClick here to connect via browser extension"));
+        browserLink.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, loginUrl));
+        browserLink.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("Open wallet connection page in your browser").create()));
+        player.spigot().sendMessage(browserLink);
+
+        TextComponent qrLink = new TextComponent(plugin.formatMessage("&6➤ &bClick here to show QR code for mobile wallet"));
+        qrLink.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, loginUrl + "&qr=true"));
+        qrLink.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("Show QR code to scan with your mobile wallet").create()));
+        player.spigot().sendMessage(qrLink);
 
         player.sendMessage(plugin.formatMessage("&eThe connection link will expire in 5 minutes."));
     }

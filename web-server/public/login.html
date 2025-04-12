@@ -20,30 +20,30 @@
           <div class="spinner"></div>
           <p>Loading...</p>
         </div>
-        
+
         <div id="content" style="display: none;">
           <div class="wallet-info">
             <p>Player: <span id="player-id">Loading...</span></p>
           </div>
-          
+
           <div class="connect-options">
             <button id="connect-button" class="btn btn-primary">Connect with Phantom</button>
-            
+
             <div class="divider">
               <span>OR</span>
             </div>
-            
+
             <a href="#" id="show-qr-button" class="btn btn-secondary">Scan QR Code with Mobile Wallet</a>
           </div>
         </div>
-        
+
         <div id="success" style="display: none;">
           <div class="success-icon">✓</div>
           <h2>Wallet Connected!</h2>
           <p>You can now return to Minecraft.</p>
           <div class="wallet-address" id="wallet-address"></div>
         </div>
-        
+
         <div id="error" style="display: none;">
           <div class="error-icon">✗</div>
           <h2>Connection Failed</h2>
@@ -53,14 +53,14 @@
       </div>
     </div>
   </div>
-  
+
   <script>
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session');
     const nonce = urlParams.get('nonce');
     const playerId = urlParams.get('player');
-    
+
     // Elements
     const loadingEl = document.getElementById('loading');
     const contentEl = document.getElementById('content');
@@ -72,29 +72,29 @@
     const connectButton = document.getElementById('connect-button');
     const showQrButton = document.getElementById('show-qr-button');
     const retryButton = document.getElementById('retry-button');
-    
+
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
       if (!sessionId || !nonce || !playerId) {
         showError('Missing required parameters');
         return;
       }
-      
+
       playerIdEl.textContent = playerId;
-      
+
       // Check if session exists
       try {
         const response = await fetch(`/api/session/${sessionId}`);
         if (!response.ok) {
           throw new Error('Session not found');
         }
-        
+
         const data = await response.json();
         if (data.connected) {
           showSuccess(data.walletAddress);
           return;
         }
-        
+
         // Show content
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
@@ -102,27 +102,27 @@
         showError(error.message);
       }
     });
-    
+
     // Connect with Phantom
     connectButton.addEventListener('click', async () => {
       try {
         // Check if Phantom is installed
-        const provider = window.solana;
+        const provider = window.phantom?.solana;
         if (!provider) {
           showError('Phantom extension not found. Please install it first.');
           return;
         }
-        
+
         // Connect to wallet
         await provider.connect();
         const publicKey = provider.publicKey.toString();
-        
+
         // Sign message
         const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
         const encodedMessage = new TextEncoder().encode(message);
         const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
         const signature = bs58.encode(signatureBytes);
-        
+
         // Verify signature on server
         const response = await fetch('/api/verify', {
           method: 'POST',
@@ -134,7 +134,7 @@
             message
           })
         });
-        
+
         const result = await response.json();
         if (result.success) {
           showSuccess(publicKey);
@@ -145,35 +145,35 @@
         showError(error.message);
       }
     });
-    
+
     // Show QR code
     showQrButton.addEventListener('click', (e) => {
       e.preventDefault();
       window.location.href = `${window.location.pathname}?session=${sessionId}&nonce=${nonce}&player=${playerId}&qr=true`;
     });
-    
+
     // Retry button
     retryButton.addEventListener('click', () => {
       window.location.reload();
     });
-    
+
     // Show success
     function showSuccess(walletAddress) {
       loadingEl.style.display = 'none';
       contentEl.style.display = 'none';
       errorEl.style.display = 'none';
       successEl.style.display = 'block';
-      
+
       walletAddressEl.textContent = walletAddress;
     }
-    
+
     // Show error
     function showError(message) {
       loadingEl.style.display = 'none';
       contentEl.style.display = 'none';
       successEl.style.display = 'none';
       errorEl.style.display = 'block';
-      
+
       errorMessageEl.textContent = message;
     }
   </script>
