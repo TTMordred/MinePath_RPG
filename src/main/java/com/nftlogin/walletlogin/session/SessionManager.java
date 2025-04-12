@@ -1,6 +1,7 @@
 package com.nftlogin.walletlogin.session;
 
 import com.nftlogin.walletlogin.SolanaLogin;
+import com.nftlogin.walletlogin.utils.PasswordUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -17,6 +18,8 @@ public class SessionManager {
     private final Map<UUID, LoginAttempt> loginAttempts;
     private final Map<String, Integer> ipRegistrations;
     private final Map<UUID, String> verificationCodes;
+    private final Map<UUID, String> authNonces;
+    private final Map<UUID, String> authSessions;
 
     public SessionManager(SolanaLogin plugin) {
         this.plugin = plugin;
@@ -24,6 +27,8 @@ public class SessionManager {
         this.loginAttempts = new ConcurrentHashMap<>();
         this.ipRegistrations = new ConcurrentHashMap<>();
         this.verificationCodes = new ConcurrentHashMap<>();
+        this.authNonces = new ConcurrentHashMap<>();
+        this.authSessions = new ConcurrentHashMap<>();
     }
 
     /**
@@ -189,6 +194,63 @@ public class SessionManager {
      */
     public void removeVerificationCode(UUID uuid) {
         verificationCodes.remove(uuid);
+    }
+
+    /**
+     * Generates a secure nonce for wallet authentication.
+     *
+     * @param uuid The player's UUID
+     * @return The generated nonce
+     */
+    public String generateAuthNonce(UUID uuid) {
+        String nonce = PasswordUtils.generateVerificationCode(12);
+        authNonces.put(uuid, nonce);
+        return nonce;
+    }
+
+    /**
+     * Verifies an authentication nonce.
+     *
+     * @param uuid The player's UUID
+     * @param nonce The nonce to verify
+     * @return true if the nonce is valid, false otherwise
+     */
+    public boolean verifyAuthNonce(UUID uuid, String nonce) {
+        String storedNonce = authNonces.get(uuid);
+        if (storedNonce != null && storedNonce.equals(nonce)) {
+            authNonces.remove(uuid);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Stores an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     * @param sessionId The session ID
+     */
+    public void storeAuthSession(UUID uuid, String sessionId) {
+        authSessions.put(uuid, sessionId);
+    }
+
+    /**
+     * Gets an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     * @return The session ID, or null if not found
+     */
+    public String getAuthSession(UUID uuid) {
+        return authSessions.get(uuid);
+    }
+
+    /**
+     * Removes an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     */
+    public void removeAuthSession(UUID uuid) {
+        authSessions.remove(uuid);
     }
 
     /**

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting - SolanaLogin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/dist/index.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>Connecting Wallet</h1>
+        <p>Please wait while we connect your wallet</p>
+      </div>
+      <div class="card-body">
+        <div id="loading">
+          <div class="spinner"></div>
+          <p>Connecting to Phantom...</p>
+        </div>
+        
+        <div id="success" style="display: none;">
+          <div class="success-icon">✓</div>
+          <h2>Wallet Connected!</h2>
+          <p>You can now return to Minecraft.</p>
+          <div class="wallet-address" id="wallet-address"></div>
+        </div>
+        
+        <div id="error" style="display: none;">
+          <div class="error-icon">✗</div>
+          <h2>Connection Failed</h2>
+          <p id="error-message">Something went wrong. Please try again.</p>
+          <button id="retry-button" class="btn btn-primary">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session');
+    
+    // Elements
+    const loadingEl = document.getElementById('loading');
+    const successEl = document.getElementById('success');
+    const errorEl = document.getElementById('error');
+    const walletAddressEl = document.getElementById('wallet-address');
+    const errorMessageEl = document.getElementById('error-message');
+    const retryButton = document.getElementById('retry-button');
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!sessionId) {
+        showError('Missing session parameter');
+        return;
+      }
+      
+      try {
+        // Get session data
+        const sessionResponse = await fetch(`/api/session/${sessionId}`);
+        if (!sessionResponse.ok) {
+          throw new Error('Session not found');
+        }
+        
+        const sessionData = await sessionResponse.json();
+        if (sessionData.connected) {
+          showSuccess(sessionData.walletAddress);
+          return;
+        }
+        
+        // Connect to Phantom
+        await connectPhantom(sessionId, sessionData.player);
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+    
+    // Connect to Phantom
+    async function connectPhantom(sessionId, playerId) {
+      try {
+        // Check if Phantom is available
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          showError('Phantom wallet not found. Please make sure you have the Phantom app installed.');
+          return;
+        }
+        
+        // Connect to wallet
+        const connection = await provider.connect();
+        const publicKey = connection.publicKey.toString();
+        
+        // Get session data to get the nonce
+        const sessionResponse = await fetch(`/api/session/${sessionId}`);
+        if (!sessionResponse.ok) {
+          throw new Error('Session not found');
+        }
+        
+        const sessionData = await sessionResponse.json();
+        
+        // Get nonce from server
+        const nonceResponse = await fetch(`/api/nonce/${sessionId}`);
+        if (!nonceResponse.ok) {
+          throw new Error('Failed to get nonce');
+        }
+        
+        const { nonce } = await nonceResponse.json();
+        
+        // Sign message
+        const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
+        const encodedMessage = new TextEncoder().encode(message);
+        const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
+        const signature = bs58.encode(signatureBytes);
+        
+        // Verify signature on server
+        const verifyResponse = await fetch('/api/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session: sessionId,
+            publicKey,
+            signature,
+            message
+          })
+        });
+        
+        const result = await verifyResponse.json();
+        if (result.success) {
+          showSuccess(publicKey);
+        } else {
+          showError(result.error || 'Failed to verify wallet. Please try again.');
+        }
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    // Retry button
+    retryButton.addEventListener('click', () => {
+      window.location.reload();
+    });
+    
+    // Show success
+    function showSuccess(walletAddress) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      successEl.style.display = 'block';
+      
+      walletAddressEl.textContent = walletAddress;
+    }
+    
+    // Show error
+    function showError(message) {
+      loadingEl.style.display = 'none';
+      successEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      
+      errorMessageEl.textContent = message;
+    }
+  </script>
+</body>
+</html>

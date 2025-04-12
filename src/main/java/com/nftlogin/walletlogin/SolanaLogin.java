@@ -88,4 +88,13 @@ public final class SolanaLogin extends JavaPlugin {
         String prefix = getConfig().getString("messages.prefix", "&8[&6SolanaLogin&8] &r");
         return ChatColor.translateAlternateColorCodes('&', prefix + message);
     }
+
+    /**
+     * Get the web server URL from the config.
+     *
+     * @return The web server URL
+     */
+    public String getWebServerUrl() {
+        return getConfig().getString("web-server.url", "http://localhost:3000");
+    }
 }

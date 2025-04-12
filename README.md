@@ -2,6 +2,29 @@
 
 A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentication with Minecraft login, supporting both premium and cracked Minecraft accounts.
 
+## Changelog
+
+### Version 1.1
+
+- Added QR code and browser extension wallet connection support
+- Added web server component for Solana wallet authentication
+- Added proper API version in plugin.yml
+- Fixed code structure in command classes by extracting methods
+- Improved logging with level checks for better performance
+- Added proper null checks and error handling
+- Fixed potential memory leaks in database connections
+- Improved wallet validation for Phantom wallets
+- Enhanced code documentation and comments
+- Updated comprehensive documentation
+
+### Version 1.0
+
+- Initial release
+- Basic authentication system
+- Solana wallet integration
+- MySQL database support
+- Session management
+
 ## Table of Contents
 
 1. [Development Setup](#development-setup)
@@ -152,6 +175,14 @@ solana:
   network: "mainnet"       # mainnet, testnet, or devnet
   rpc-url: "https://api.mainnet-beta.solana.com"  # RPC URL for Solana network
   verification-message: "I confirm that I own this wallet and authorize its use on the Minecraft server."  # Message to sign for verification
+
+# Web Server Settings
+web-server:
+  enabled: true            # Whether to enable the web server for QR code login
+  url: "http://localhost:3000"  # URL of the web server
+  port: 3000               # Port of the web server
+  qr-code-timeout: 300     # Time in seconds for QR code to expire (5 minutes)
+  check-interval: 5        # Time in seconds to check for wallet connection status
 ```
 
 ### Commands and Permissions
@@ -227,16 +258,22 @@ solana:
 
 ### Wallet Integration
 
-1. **Connecting your Solana wallet**
+1. **Connecting your Solana wallet (Manual Method)**
    - Get your Solana wallet address (from Phantom or another wallet)
    - Use `/connectwallet <wallet_address>` to connect your wallet
    - You'll receive a verification code
 
-2. **Verifying your wallet**
+2. **Connecting your Solana wallet (QR Code/Link Method)**
+   - Use `/connectwallet` or `/connectwallet qr` to get connection options
+   - Click on the link to open the web interface or scan the QR code with your mobile wallet
+   - Approve the connection request in your wallet
+   - Your wallet will be automatically verified
+
+3. **Verifying your wallet (Manual Method Only)**
    - Use `/verifycode <code>` to verify your wallet ownership
    - This proves you own the wallet you're connecting
 
-3. **Managing your wallet**
+4. **Managing your wallet**
    - Use `/walletinfo` to view your connected wallet information
    - Use `/disconnectwallet` to disconnect your wallet if needed
 
@@ -261,10 +298,10 @@ solana:
 5. Player uses `/login password`
 6. Player is authenticated and can now play
 7. Player decides to connect their Solana wallet
-8. Player uses `/connectwallet <wallet_address>`
-9. Server generates a verification code
-10. Player uses `/verifycode <code>` to verify wallet ownership
-11. Player's wallet is now connected and verified
+8. Player can choose one of two methods:
+   - **Method 1 (Manual):** Player uses `/connectwallet <wallet_address>`, receives a verification code, and uses `/verifycode <code>` to verify
+   - **Method 2 (QR/Link):** Player uses `/connectwallet`, clicks a link or scans QR code, and approves the connection in their wallet
+9. Player's wallet is now connected and verified
 
 ### Returning Player Login
 
@@ -282,9 +319,12 @@ solana:
 3. Server checks if player has a connected wallet
 4. If not, server prompts player to connect a wallet
 5. Player has a limited time to connect a wallet before being kicked
-6. Player connects wallet with `/connectwallet <wallet_address>`
-7. Player verifies wallet with `/verifycode <code>`
-8. Player can now play on the server
+6. Player connects wallet using one of two methods:
+   - **Method 1:** Player uses `/connectwallet <wallet_address>` and then verifies with `/verifycode <code>`
+   - **Method 2:** Player uses `/connectwallet` or `/connectwallet qr` to get QR code/link options
+7. Player scans QR code with mobile wallet or clicks link to connect via browser extension
+8. Wallet is automatically verified through direct signature verification
+9. Player can now play on the server
 
 ## Technical Architecture
 
