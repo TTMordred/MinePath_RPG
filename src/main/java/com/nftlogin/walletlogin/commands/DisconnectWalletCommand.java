@@ -1,6 +1,7 @@
 package com.nftlogin.walletlogin.commands;
 
 import com.nftlogin.walletlogin.SolanaLogin;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,20 +23,20 @@ public class DisconnectWalletCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(plugin.formatMessage("&cOnly players can use this command."));
-            return true;
+            return false;
         }
 
         Player player = (Player) sender;
-        return disconnectWallet(player);
+        disconnectWallet(player);
+        return true;
     }
 
     /**
      * Disconnect a player's wallet.
      *
      * @param player The player
-     * @return true if the wallet was disconnected successfully, false otherwise
      */
-    private boolean disconnectWallet(Player player) {
+    private void disconnectWallet(Player player) {
         UUID playerUuid = player.getUniqueId();
 
         // Check if player is logged in
@@ -44,7 +45,7 @@ public class DisconnectWalletCommand implements CommandExecutor {
             String message = plugin.getConfig().getString("messages.not-logged-in",
                     "You must be logged in to use this command!");
             player.sendMessage(plugin.formatMessage(message));
-            return true;
+            return;
         }
 
         // Check if player has a wallet connected
@@ -53,7 +54,7 @@ public class DisconnectWalletCommand implements CommandExecutor {
             String message = plugin.getConfig().getString("messages.not-connected",
                     "You don't have a wallet connected.");
             player.sendMessage(plugin.formatMessage(message));
-            return true;
+            return;
         }
 
         // Disconnect the wallet
@@ -76,8 +77,6 @@ public class DisconnectWalletCommand implements CommandExecutor {
         } else {
             player.sendMessage(plugin.formatMessage("&cFailed to disconnect your wallet. Please try again later."));
         }
-
-        return true;
     }
 
     /**
@@ -99,7 +98,8 @@ public class DisconnectWalletCommand implements CommandExecutor {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 // Check if the player is still online and hasn't connected a wallet
                 if (player.isOnline() && !plugin.getDatabaseManager().hasWalletConnected(playerUuid)) {
-                    player.kickPlayer(plugin.formatMessage(requiredMessage));
+                    // Using the modern kick API with Component
+                    player.kick(Component.text(plugin.formatMessage(requiredMessage)));
                 }
             }, timeout * 20L); // Convert seconds to ticks
         }
