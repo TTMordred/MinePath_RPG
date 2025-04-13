@@ -4,6 +4,16 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 ## Changelog
 
+### Version 1.3
+
+- **Added Solana blockchain storage** for wallet links and verification status
+- **Implemented hybrid storage model** combining SQL and Solana blockchain
+- **Added Solana Program** for secure on-chain storage of Minecraft-wallet links
+- **Enhanced web server** with Solana Program integration
+- **Improved security** by storing critical data on the blockchain
+- **Added configuration options** for storage modes (SQL, Solana, or hybrid)
+- **Added fallback mechanisms** for improved reliability
+
 ### Version 1.2
 
 - **Removed manual wallet connection method** for improved security and user experience
@@ -111,7 +121,14 @@ This project includes comprehensive documentation split across multiple files:
 5. **Configure the plugin**
    - Start the server once to generate the config.yml
    - Stop the server
-   - Edit the config.yml to set up your database connection
+   - Edit the config.yml to set up your database connection and Solana settings
+
+6. **Set up the Solana Program** (optional, for blockchain storage)
+   - Navigate to the web-server/solana-program directory
+   - Install dependencies: `yarn install`
+   - Build the program: `yarn build`
+   - Deploy to Solana devnet: `yarn deploy`
+   - Update the program ID in config.yml
 
 ### Development Workflow
 
@@ -298,16 +315,19 @@ web-server:
    - Connect your Phantom wallet through the browser extension
    - Approve the connection request in your wallet
    - Your wallet will be automatically verified
+   - Your wallet link will be securely stored on the Solana blockchain (if enabled)
 
 2. **Connecting your Solana wallet via QR Code**
    - Use `/connectwallet qr` to get a QR code
    - Scan the QR code with your mobile wallet
    - Approve the connection request in your wallet
    - Your wallet will be automatically verified
+   - Your wallet link will be securely stored on the Solana blockchain (if enabled)
 
 3. **Managing your wallet**
    - Use `/walletinfo` to view your connected wallet information
    - Use `/disconnectwallet` to disconnect your wallet if needed
+   - Your wallet data is securely stored on the Solana blockchain (if enabled)
 
 > For more information about the web interface, see our [Web Interface Guide](docs/WEB_INTERFACE.md).
 
@@ -384,9 +404,13 @@ web-server:
    - Permission checking
    - Response formatting
 
-### Database Schema
+### Storage Architecture
 
-The plugin uses three main tables:
+The plugin supports three storage modes: SQL, Solana, and hybrid.
+
+#### SQL Database Schema
+
+The plugin uses three main tables in SQL mode:
 
 1. **players**
    - `uuid` (Primary Key): Player's UUID
@@ -407,6 +431,25 @@ The plugin uses three main tables:
    - `uuid` (Primary Key, Foreign Key to players): Player's UUID
    - `ip`: Player's IP address
    - `last_login`: Timestamp of last login
+
+#### Solana Blockchain Storage
+
+In Solana mode, wallet links are stored on the Solana blockchain:
+
+1. **MinecraftAccount** (Solana Program Account)
+   - `minecraft_uuid`: Player's UUID
+   - `wallet_address`: Solana wallet address
+   - `is_verified`: Whether the wallet is verified
+   - `verification_time`: Timestamp of verification
+   - `authority`: Authority that can modify this account
+
+#### Hybrid Storage
+
+In hybrid mode, the plugin uses both SQL and Solana storage:
+
+- Player data and sessions are stored in SQL
+- Wallet links and verification status are stored on Solana
+- Automatic fallback to SQL if Solana is unavailable
 
 ### Security Features
 

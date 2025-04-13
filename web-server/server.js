@@ -5,12 +5,16 @@ const QRCode = require('qrcode');
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
 const { PublicKey } = require('@solana/web3.js');
+const fs = require('fs');
 
 // Set development mode for testing
 process.env.NODE_ENV = 'development';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Solana configuration - disabled for now
+// In the future, we'll implement Solana blockchain storage
 
 // In-memory storage for sessions and nonces
 // In a production environment, use Redis or a database
@@ -307,6 +311,9 @@ app.post('/api/verify', (req, res) => {
       sessionData.walletAddress = publicKey;
       sessionData.verifiedAt = Date.now();
       sessions.set(session, sessionData);
+
+      // Solana blockchain storage is disabled for now
+      // In the future, we'll implement storing wallet connections on Solana
 
       console.log('Session updated successfully, wallet connected');
       return res.json({ success: true });

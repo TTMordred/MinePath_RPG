@@ -2,6 +2,7 @@ package com.nftlogin.walletlogin;
 
 import com.nftlogin.walletlogin.commands.*;
 import com.nftlogin.walletlogin.database.DatabaseManager;
+import com.nftlogin.walletlogin.database.SQLDatabaseManager;
 import com.nftlogin.walletlogin.listeners.PlayerLoginListener;
 import com.nftlogin.walletlogin.session.SessionManager;
 import org.bukkit.ChatColor;
@@ -65,7 +66,13 @@ public final class SolanaLogin extends JavaPlugin {
 
     private void initDatabase() {
         try {
-            databaseManager = new DatabaseManager(this);
+            // Storage mode is currently fixed to SQL
+
+            // For now, we'll just use SQL storage mode
+            // In the future, we can implement Solana and hybrid storage modes
+            databaseManager = new SQLDatabaseManager(this);
+            getLogger().info("Using SQL storage mode");
+
             databaseManager.connect();
             databaseManager.createTables();
             getLogger().info("Database connection established successfully.");

@@ -4,7 +4,7 @@ main: com.nftlogin.walletlogin.SolanaLogin
 api-version: '1.18'
 api: '4.0.0'
 authors: [NFTLogin]
-description: A plugin that integrates Minecraft login with Solana wallet connection
+description: A plugin that integrates Minecraft login with Solana wallet connection and blockchain storage
 commands:
   # Authentication commands
   register:

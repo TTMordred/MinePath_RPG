@@ -30,9 +30,18 @@ auth:
 
 # Solana Settings
 solana:
+  enabled: true
   network: "devnet"  # mainnet, testnet, or devnet
   rpc-url: "https://api.devnet.solana.com"  # RPC URL for Solana network
+  program-id: "YOUR_PROGRAM_ID"  # Program ID of the deployed Solana program
+  storage-mode: "hybrid"  # sql, solana, or hybrid
   verification-message: "I confirm that I own this wallet and authorize its use on the Minecraft server."  # Message to sign for verification
+
+# Storage Configuration
+storage:
+  wallet-links: "solana"  # Lưu liên kết ví trên Solana
+  user-data: "sql"        # Lưu dữ liệu người dùng trên SQL
+  sessions: "sql"         # Lưu phiên trên SQL
 
 # Web Server Settings
 web-server:

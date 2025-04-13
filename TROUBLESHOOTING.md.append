@@ -1,0 +1,79 @@
+## Solana Integration Issues
+
+### Solana Program Deployment Fails
+
+**Symptoms:**
+
+- Error messages during program deployment
+- "Program ID not found" errors
+
+**Solutions:**
+
+1. Ensure you have the Solana CLI tools installed correctly
+2. Verify you have enough SOL in your wallet for deployment
+3. Check that you're using the correct Solana network (devnet/mainnet)
+4. Try running `solana logs` to see detailed error messages
+
+### Wallet Data Not Storing on Solana
+
+**Symptoms:**
+
+- Wallet connections work but aren't stored on Solana
+- "Error connecting wallet on Solana" messages in logs
+
+**Solutions:**
+
+1. Verify that `solana.enabled` is set to `true` in config.yml
+2. Check that `solana.program-id` matches your deployed program
+3. Ensure `storage.wallet-links` is set to `solana` or `hybrid`
+4. Check the web server logs for detailed error messages
+5. Verify the Solana RPC endpoint is accessible
+
+### Solana Transaction Errors
+
+**Symptoms:**
+
+- "Transaction simulation failed" errors
+- "Blockhash not found" errors
+- Transactions time out
+
+**Solutions:**
+
+1. Check that your wallet has enough SOL for transaction fees
+2. Verify the RPC endpoint is responsive
+3. Increase `performance.retry-attempts` in config.yml
+4. Try a different RPC endpoint
+5. Check if the Solana network is experiencing high load
+
+### Solana Client Initialization Fails
+
+**Symptoms:**
+
+- "Failed to initialize Solana client" error in logs
+- Plugin falls back to SQL storage despite Solana being enabled
+
+**Solutions:**
+
+1. Verify the Solana Program client is built correctly
+2. Check that the web server has access to the Solana network
+3. Ensure all dependencies are installed
+4. Try rebuilding the Solana Program client:
+   ```bash
+   cd web-server/solana-program
+   yarn install
+   yarn build
+   ```
+
+### Data Inconsistency Between SQL and Solana
+
+**Symptoms:**
+
+- Different wallet information shown in different contexts
+- Wallet appears connected in-game but not on the web interface
+
+**Solutions:**
+
+1. Set `storage-mode` to `hybrid` to use both storage systems
+2. Enable `fallback-to-sql` in performance settings
+3. Restart both the web server and Minecraft server
+4. Reconnect your wallet to update both storage systems
