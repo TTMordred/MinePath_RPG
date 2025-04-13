@@ -164,13 +164,15 @@ public class SessionManager {
      * Stores a verification code for a player.
      *
      * @deprecated This method is used for the manual wallet connection method which is being phased out.
-     *             It is kept for backward compatibility but will be removed in a future version.
+     *             It is kept for backward compatibility but will be removed in version 1.4.
      *             Use the QR code or browser extension connection methods instead.
+     *             For new code, use {@link #generateAuthNonce(UUID)} and {@link #storeAuthSession(UUID, String)} instead.
      *
      * @param uuid The player's UUID
      * @param code The verification code
      */
     @Deprecated
+    @SuppressWarnings("java:S1133") // Suppressing "Do not forget to remove this deprecated code someday" as we have a plan to remove it in v1.4
     public void storeVerificationCode(UUID uuid, String code) {
         verificationCodes.put(uuid, code);
     }
@@ -179,14 +181,16 @@ public class SessionManager {
      * Verifies a code for a player.
      *
      * @deprecated This method is used for the manual wallet connection method which is being phased out.
-     *             It is kept for backward compatibility but will be removed in a future version.
+     *             It is kept for backward compatibility but will be removed in version 1.4.
      *             Use the QR code or browser extension connection methods instead.
+     *             For new code, use {@link #verifyAuthNonce(UUID, String)} instead.
      *
      * @param uuid The player's UUID
      * @param code The code to verify
      * @return true if the code is valid, false otherwise
      */
     @Deprecated
+    @SuppressWarnings("java:S1133") // Suppressing "Do not forget to remove this deprecated code someday" as we have a plan to remove it in v1.4
     public boolean verifyCode(UUID uuid, String code) {
         String storedCode = verificationCodes.get(uuid);
         if (storedCode != null && storedCode.equals(code)) {
@@ -200,12 +204,14 @@ public class SessionManager {
      * Removes a verification code for a player.
      *
      * @deprecated This method is used for the manual wallet connection method which is being phased out.
-     *             It is kept for backward compatibility but will be removed in a future version.
+     *             It is kept for backward compatibility but will be removed in version 1.4.
      *             Use the QR code or browser extension connection methods instead.
+     *             For new code, there is no direct replacement as nonces are automatically removed after verification.
      *
      * @param uuid The player's UUID
      */
     @Deprecated
+    @SuppressWarnings("java:S1133") // Suppressing "Do not forget to remove this deprecated code someday" as we have a plan to remove it in v1.4
     public void removeVerificationCode(UUID uuid) {
         verificationCodes.remove(uuid);
     }

@@ -2,7 +2,6 @@ package com.nftlogin.walletlogin.database;
 
 import com.nftlogin.walletlogin.SolanaLogin;
 import com.nftlogin.walletlogin.solana.SolanaClient;
-import com.nftlogin.walletlogin.solana.models.MinecraftAccount;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;

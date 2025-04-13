@@ -2,7 +2,6 @@ package com.nftlogin.walletlogin.solana;
 
 import com.nftlogin.walletlogin.SolanaLogin;
 import com.nftlogin.walletlogin.solana.models.MinecraftAccount;
-import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,9 +13,6 @@ import java.util.logging.Level;
 public class SolanaClient {
 
     private final SolanaLogin plugin;
-    private final SolanaConfig config;
-    private final String rpcUrl;
-    private final String programId;
 
     /**
      * Creates a new SolanaClient instance.
@@ -26,9 +22,8 @@ public class SolanaClient {
      */
     public SolanaClient(SolanaLogin plugin, SolanaConfig config) {
         this.plugin = plugin;
-        this.config = config;
-        this.rpcUrl = config.getRpcUrl();
-        this.programId = config.getProgramId();
+        // Note: We're not storing config, rpcUrl, or programId as they're not used in this implementation
+        // In a real implementation, these would be used to connect to Solana
     }
 
     /**
@@ -43,9 +38,12 @@ public class SolanaClient {
         try {
             // In a real implementation, this would create a transaction to call the Solana program
             // For now, we'll just log the attempt and return true
-            plugin.getLogger().info(String.format(
-                    "Connecting wallet %s to player %s via Solana (type: %s)",
-                    walletAddress, minecraftUuid, walletType));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Connecting wallet %s to player %s via Solana (type: %s)",
+                        walletAddress, minecraftUuid, walletType));
+            }
 
             // This would be replaced with actual Solana transaction code
             return true;
@@ -65,9 +63,12 @@ public class SolanaClient {
         try {
             // In a real implementation, this would create a transaction to call the Solana program
             // For now, we'll just log the attempt and return true
-            plugin.getLogger().info(String.format(
-                    "Disconnecting wallet from player %s via Solana",
-                    minecraftUuid));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Disconnecting wallet from player %s via Solana",
+                        minecraftUuid));
+            }
 
             // This would be replaced with actual Solana transaction code
             return true;
@@ -83,13 +84,20 @@ public class SolanaClient {
      * @param minecraftUuid The player's UUID
      * @return The wallet address, or empty if the player doesn't have a wallet connected
      */
+    @SuppressWarnings("java:S3516") // Suppress warning about always returning the same value
     public Optional<String> getWalletAddress(UUID minecraftUuid) {
+        // Note: This is a stub implementation
+        // In a real implementation, this would query the Solana blockchain
+        // The warning about always returning the same value is suppressed because this is a stub
         try {
             // In a real implementation, this would query the Solana program for the account data
             // For now, we'll just return an empty Optional
-            plugin.getLogger().info(String.format(
-                    "Getting wallet address for player %s via Solana",
-                    minecraftUuid));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Getting wallet address for player %s via Solana",
+                        minecraftUuid));
+            }
 
             // This would be replaced with actual Solana query code
             return Optional.empty();
@@ -105,13 +113,20 @@ public class SolanaClient {
      * @param minecraftUuid The player's UUID
      * @return The wallet type, or empty if the player doesn't have a wallet connected
      */
+    @SuppressWarnings("java:S3516") // Suppress warning about always returning the same value
     public Optional<String> getWalletType(UUID minecraftUuid) {
+        // Note: This is a stub implementation
+        // In a real implementation, this would query the Solana blockchain
+        // The warning about always returning the same value is suppressed because this is a stub
         try {
             // In a real implementation, this would query the Solana program for the account data
             // For now, we'll just return an empty Optional
-            plugin.getLogger().info(String.format(
-                    "Getting wallet type for player %s via Solana",
-                    minecraftUuid));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Getting wallet type for player %s via Solana",
+                        minecraftUuid));
+            }
 
             // This would be replaced with actual Solana query code
             return Optional.empty();
@@ -132,9 +147,12 @@ public class SolanaClient {
         try {
             // In a real implementation, this would create a transaction to call the Solana program
             // For now, we'll just log the attempt and return true
-            plugin.getLogger().info(String.format(
-                    "Setting wallet verification for player %s to %s via Solana",
-                    minecraftUuid, verified));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Setting wallet verification for player %s to %s via Solana",
+                        minecraftUuid, verified));
+            }
 
             // This would be replaced with actual Solana transaction code
             return true;
@@ -150,13 +168,20 @@ public class SolanaClient {
      * @param minecraftUuid The player's UUID
      * @return true if the wallet is verified, false otherwise
      */
+    @SuppressWarnings("java:S3516") // Suppress warning about always returning the same value
     public boolean isWalletVerified(UUID minecraftUuid) {
+        // Note: This is a stub implementation
+        // In a real implementation, this would query the Solana blockchain
+        // The warning about always returning the same value is suppressed because this is a stub
         try {
             // In a real implementation, this would query the Solana program for the account data
             // For now, we'll just return false
-            plugin.getLogger().info(String.format(
-                    "Checking wallet verification for player %s via Solana",
-                    minecraftUuid));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Checking wallet verification for player %s via Solana",
+                        minecraftUuid));
+            }
 
             // This would be replaced with actual Solana query code
             return false;
@@ -172,13 +197,20 @@ public class SolanaClient {
      * @param minecraftUuid The player's UUID
      * @return The MinecraftAccount, or empty if not found
      */
+    @SuppressWarnings("java:S3516") // Suppress warning about always returning the same value
     public Optional<MinecraftAccount> getMinecraftAccount(UUID minecraftUuid) {
+        // Note: This is a stub implementation
+        // In a real implementation, this would query the Solana blockchain
+        // The warning about always returning the same value is suppressed because this is a stub
         try {
             // In a real implementation, this would query the Solana program for the account data
             // For now, we'll just return an empty Optional
-            plugin.getLogger().info(String.format(
-                    "Getting Minecraft account for player %s via Solana",
-                    minecraftUuid));
+            // Log the attempt at FINE level to avoid conditional logging warnings
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format(
+                        "Getting Minecraft account for player %s via Solana",
+                        minecraftUuid));
+            }
 
             // This would be replaced with actual Solana query code
             return Optional.empty();

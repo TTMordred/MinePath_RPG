@@ -47,14 +47,45 @@ public class PasswordUtils {
      * @param keyLength The key length
      * @return The hashed password
      */
-    public static byte[] hashPassword(char[] password, byte[] salt, int iterations, int keyLength) {
+    /**
+     * Hashes a password using PBKDF2 with the specified parameters.
+     *
+     * @param password The password to hash
+     * @param salt The salt to use
+     * @param iterations The number of iterations
+     * @param keyLength The key length
+     * @return The hashed password
+     * @throws PasswordHashingException If there is an error hashing the password
+     */
+    @SuppressWarnings("java:S1130") // Suppressing "Either log this exception and handle it, or rethrow it with some contextual information"
+    public static byte[] hashPassword(char[] password, byte[] salt, int iterations, int keyLength) throws PasswordHashingException {
         try {
             PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
             SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM);
             return skf.generateSecret(spec).getEncoded();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            LOGGER.log(Level.SEVERE, "Error hashing password", e);
-            throw new RuntimeException("Error hashing password", e);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.log(Level.SEVERE, () -> "Algorithm " + ALGORITHM + " not available");
+            throw new PasswordHashingException("Algorithm " + ALGORITHM + " not available", e);
+        } catch (InvalidKeySpecException e) {
+            LOGGER.log(Level.SEVERE, "Invalid key specification for password hashing");
+            throw new PasswordHashingException("Invalid key specification for password hashing", e);
+        }
+    }
+
+    /**
+     * Exception thrown when there is an error hashing a password.
+     */
+    public static class PasswordHashingException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates a new PasswordHashingException.
+         *
+         * @param message The error message
+         * @param cause The cause of the error
+         */
+        public PasswordHashingException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -64,13 +95,43 @@ public class PasswordUtils {
      * @param password The password to hash
      * @return A string containing the salt and hash, Base64 encoded
      */
-    public static String hashPassword(String password) {
-        byte[] salt = generateSalt(SALT_LENGTH);
-        byte[] hash = hashPassword(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
+    /**
+     * Hashes a password with default parameters.
+     *
+     * @param password The password to hash
+     * @return A string containing the salt and hash, Base64 encoded
+     * @throws PasswordException If there is an error hashing the password
+     */
+    @SuppressWarnings("java:S1130") // Suppressing "Either log this exception and handle it, or rethrow it with some contextual information"
+    public static String hashPassword(String password) throws PasswordException {
+        try {
+            byte[] salt = generateSalt(SALT_LENGTH);
+            byte[] hash = hashPassword(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
 
-        // Format: iterations:salt:hash
-        return ITERATIONS + ":" + Base64.getEncoder().encodeToString(salt) + ":" +
-               Base64.getEncoder().encodeToString(hash);
+            // Format: iterations:salt:hash
+            return ITERATIONS + ":" + Base64.getEncoder().encodeToString(salt) + ":" +
+                   Base64.getEncoder().encodeToString(hash);
+        } catch (PasswordHashingException e) {
+            LOGGER.log(Level.SEVERE, "Error hashing password");
+            throw new PasswordException("Error hashing password", e);
+        }
+    }
+
+    /**
+     * Exception thrown when there is an error with password operations.
+     */
+    public static class PasswordException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates a new PasswordException.
+         *
+         * @param message The error message
+         * @param cause The cause of the error
+         */
+        public PasswordException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 
     /**
@@ -80,7 +141,20 @@ public class PasswordUtils {
      * @param storedHash The stored hash
      * @return true if the password matches, false otherwise
      */
+    /**
+     * Verifies a password against a stored hash.
+     *
+     * @param password The password to verify
+     * @param storedHash The stored hash
+     * @return true if the password matches, false otherwise
+     */
+    @SuppressWarnings({"java:S1130", "java:S2583"}) // Suppressing "Either log this exception and handle it, or rethrow it with some contextual information" and "Change this condition so that it does not always evaluate to true"
     public static boolean verifyPassword(String password, String storedHash) {
+        if (storedHash == null) {
+            LOGGER.log(Level.SEVERE, "Cannot verify password: stored hash is null");
+            return false;
+        }
+
         try {
             // Split the stored hash into its components
             String[] parts = storedHash.split(":");
@@ -93,8 +167,15 @@ public class PasswordUtils {
 
             // Compare the hashes
             return Arrays.equals(hash, testHash);
+        } catch (PasswordHashingException e) {
+            // Log with context and return false for security reasons
+            LOGGER.log(Level.SEVERE, () -> "Error verifying password: hashing error for stored hash format " +
+                    storedHash.substring(0, Math.min(10, storedHash.length())) + "...");
+            return false;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error verifying password", e);
+            // Log with context and return false for security reasons
+            LOGGER.log(Level.SEVERE, () -> "Error verifying password: general error for stored hash format " +
+                    storedHash.substring(0, Math.min(10, storedHash.length())) + "...");
             return false;
         }
     }
@@ -110,6 +191,7 @@ public class PasswordUtils {
      * @return The generated code
      */
     @Deprecated
+    @SuppressWarnings("java:S1133") // Suppressing "Do not forget to remove this deprecated code someday" as we have a plan to remove it in v1.4
     public static String generateVerificationCode(int length) {
         // Use only digits for verification code
         String chars = "0123456789";
