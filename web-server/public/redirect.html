@@ -132,16 +132,72 @@
         const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
         const encodedMessage = new TextEncoder().encode(message);
         console.log('Requesting signature for message:', message);
-        const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
 
-        // Use a fallback method if bs58 is not available
-        let signature;
-        if (typeof bs58 !== 'undefined' && bs58.encode) {
-          signature = bs58.encode(signatureBytes);
-        } else {
-          // Fallback to base64 encoding
-          signature = btoa(String.fromCharCode.apply(null, signatureBytes));
-          console.log('Using base64 fallback for signature');
+        // Initialize signature variable
+        let signature = '';
+
+        try {
+          // Get signature from Phantom
+          console.log('Requesting signature from Phantom...');
+          const signResult = await provider.signMessage(encodedMessage, 'utf8');
+          console.log('Received signature response from Phantom');
+
+          // Inspect what we got back
+          console.log('Signature result type:', typeof signResult);
+          if (typeof signResult === 'object') {
+            console.log('Signature result keys:', Object.keys(signResult).join(', '));
+          }
+
+          // Different ways to handle the signature based on what Phantom returns
+          let signatureBytes;
+
+          if (signResult instanceof Uint8Array) {
+            // Case 1: Phantom returned a Uint8Array directly
+            signatureBytes = signResult;
+            console.log('Got Uint8Array signature of length', signatureBytes.length);
+          } else if (typeof signResult === 'object' && signResult.signature) {
+            // Case 2: Phantom returned an object with a signature property
+            signatureBytes = signResult.signature;
+            console.log('Got signature from result.signature property');
+          } else if (typeof signResult === 'string') {
+            // Case 3: Phantom returned a string
+            signature = signResult;
+            console.log('Got string signature of length', signature.length);
+          } else {
+            // Case 4: Unknown format, try to stringify it
+            console.log('Unknown signature format:', JSON.stringify(signResult));
+            signature = JSON.stringify(signResult);
+          }
+
+          // If we have signature bytes, convert them to a string
+          if (signatureBytes && !signature) {
+            try {
+              // Try bs58 encoding if available
+              if (typeof bs58 !== 'undefined' && bs58.encode) {
+                signature = bs58.encode(signatureBytes);
+                console.log('Converted signature using bs58');
+              } else {
+                // Try to convert to base64
+                signature = btoa(Array.from(signatureBytes).map(b => String.fromCharCode(b)).join(''));
+                console.log('Converted signature to base64, length:', signature.length);
+              }
+            } catch (e) {
+              console.error('Error converting signature:', e);
+              // Fallback to hex
+              signature = Array.from(signatureBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+              console.log('Fallback: Converted signature to hex, length:', signature.length);
+            }
+          }
+
+          // Ensure we have a signature
+          if (!signature) {
+            throw new Error('Failed to get a valid signature from Phantom');
+          }
+
+          console.log('Final signature length:', signature.length);
+        } catch (error) {
+          console.error('Error signing message:', error);
+          throw error; // Re-throw to be caught by the outer try/catch
         }
 
         // Verify signature on server
