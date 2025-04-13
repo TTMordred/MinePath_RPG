@@ -14,10 +14,13 @@ This is the web server component of the SolanaLogin project, handling Solana wal
 
 1. Install Node.js (version 14 or higher)
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
 3. Start the server:
+
    ```bash
    npm start
    ```
@@ -37,7 +40,7 @@ The server will run on port 3000 by default. You can change this by setting the 
 The web server includes several test pages to help debug wallet connection issues:
 
 1. **Test Flow**: `/test-flow.html`
-   Access http://localhost:3000/test-flow.html
+   Access [http://localhost:3000/test-flow.html](http://localhost:3000/test-flow.html)
    - Test the complete wallet connection flow
    - Create session, connect wallet, and verify connection
 
@@ -76,6 +79,7 @@ process.env.NODE_ENV = 'development';
 ```
 
 In development mode:
+
 - Missing parameters will be auto-filled with test values
 - Signature verification is more lenient
 - More detailed logging is enabled

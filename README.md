@@ -448,8 +448,6 @@ For a detailed roadmap of future features and improvements, see our [Project Roa
    - Implement NFT-based permissions and features
    - Create in-game representation of NFTs
 
-
-
 ### Implementation Plan
 
 1. **Phase 1: Core Functionality (Current)**

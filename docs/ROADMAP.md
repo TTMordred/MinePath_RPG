@@ -13,7 +13,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 
 ## Current Status
 
-**Version 1.2 (Current Release)**
+### Version 1.2 (Current Release)
 
 - Solana wallet authentication via QR code and browser extension
 - Integration with Solana devnet
@@ -29,6 +29,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Redesigned web interface with improved user experience
 - Mobile-responsive design for better QR code scanning
 - Dark mode support
@@ -36,6 +37,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Internationalization support (starting with English and Vietnamese)
 
 **Technical Improvements**:
+
 - Refactor web server code for better maintainability
 - Add unit tests for critical components
 - Improve logging and monitoring
@@ -46,12 +48,14 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Basic NFT ownership verification
 - Display owned NFTs in player profile
 - NFT-based permissions (grant permissions based on NFT ownership)
 - Simple NFT viewer in web interface
 
 **Technical Improvements**:
+
 - Integration with Solana NFT standards
 - Caching system for NFT metadata
 - Performance optimizations for NFT queries
@@ -63,6 +67,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Support for multiple wallets per player
 - Support for additional wallet providers beyond Phantom
 - Wallet management interface in-game
@@ -70,6 +75,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Cross-chain support (starting with Ethereum)
 
 **Technical Improvements**:
+
 - Modular wallet provider architecture
 - Abstraction layer for blockchain interactions
 - Enhanced security measures for wallet verification
@@ -79,6 +85,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Comprehensive web portal for account management
 - Player dashboard with wallet and NFT information
 - Admin dashboard for server management
@@ -86,6 +93,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Integration with server economy
 
 **Technical Improvements**:
+
 - Secure API for web portal communication
 - Authentication system with JWT
 - Real-time updates with WebSockets
@@ -96,6 +104,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Integration with server economy
 - Token-based transactions in-game
 - Rewards for in-game activities
@@ -103,6 +112,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Marketplace for in-game items using tokens
 
 **Technical Improvements**:
+
 - Smart contract integration for token transactions
 - Transaction verification and security
 - Anti-fraud measures
@@ -115,6 +125,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Decentralized identity system
 - Cross-server authentication
 - Reputation system
@@ -122,6 +133,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Privacy-preserving authentication options
 
 **Technical Improvements**:
+
 - Integration with decentralized identity standards
 - Zero-knowledge proof implementation
 - Enhanced security and privacy measures
@@ -131,6 +143,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Comprehensive API for developers
 - SDK for plugin integration
 - Documentation and examples
@@ -138,6 +151,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Developer portal
 
 **Technical Improvements**:
+
 - API versioning and backward compatibility
 - Rate limiting and security measures
 - Comprehensive documentation
@@ -148,6 +162,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 **Target Release Date**: [Month Year]
 
 **Features**:
+
 - Deep integration with blockchain games
 - Cross-game asset portability
 - Game-specific NFT functionality
@@ -155,6 +170,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 - Virtual land ownership
 
 **Technical Improvements**:
+
 - Standardized asset format
 - Cross-chain asset verification
 - Performance optimizations for complex assets
@@ -165,12 +181,14 @@ This document outlines the planned features and improvements for the SolanaLogin
 ### Enhanced Web Interface (v1.4)
 
 **Frontend Technologies**:
+
 - React.js for component-based UI
 - Tailwind CSS for styling
 - Responsive design with mobile-first approach
 - Internationalization with i18next
 
 **Implementation Steps**:
+
 1. Create wireframes and design mockups
 2. Develop component library
 3. Implement responsive layouts
@@ -183,11 +201,13 @@ This document outlines the planned features and improvements for the SolanaLogin
 ### NFT Integration (v1.5)
 
 **Technologies**:
+
 - Metaplex for Solana NFT standards
 - NFT metadata caching system
 - Image optimization for NFT display
 
 **Implementation Steps**:
+
 1. Research Solana NFT standards and best practices
 2. Develop NFT verification system
 3. Create NFT metadata cache
@@ -200,11 +220,13 @@ This document outlines the planned features and improvements for the SolanaLogin
 ### Multi-wallet Support (v2.0)
 
 **Architecture**:
+
 - Modular wallet provider system
 - Abstract blockchain interaction layer
 - Database schema updates for multiple wallets
 
 **Implementation Steps**:
+
 1. Design modular wallet provider architecture
 2. Implement Phantom wallet provider
 3. Add support for additional wallet providers

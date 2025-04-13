@@ -36,16 +36,20 @@ This guide will help you set up and install the SolanaLogin plugin for your Mine
 ### Option 2: Building from Source
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/SolanaLogin.git
    cd SolanaLogin
    ```
 
 2. Build using Maven:
+
    ```bash
    mvn clean package
    ```
+
    Or use the provided scripts:
+
    ```bash
    # On Windows
    build.bat
@@ -62,11 +66,13 @@ This guide will help you set up and install the SolanaLogin plugin for your Mine
 ### Database Setup
 
 1. Create a MySQL database for the plugin:
+
    ```sql
    CREATE DATABASE minecraft;
    ```
 
 2. Create a user with appropriate permissions:
+
    ```sql
    CREATE USER 'minecraft'@'localhost' IDENTIFIED BY 'your_password';
    GRANT ALL PRIVILEGES ON minecraft.* TO 'minecraft'@'localhost';
@@ -78,6 +84,7 @@ This guide will help you set up and install the SolanaLogin plugin for your Mine
 1. Start your Minecraft server once to generate the default configuration files
 2. Stop the server
 3. Edit the `plugins/SolanaLogin/config.yml` file to set your database credentials:
+
    ```yaml
    database:
      host: localhost
@@ -94,14 +101,19 @@ This guide will help you set up and install the SolanaLogin plugin for your Mine
 
 1. Navigate to the `web-server` directory
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
 3. Start the web server:
+
    ```bash
    npm start
    ```
+
    Or use the provided scripts:
+
    ```bash
    # On Windows
    start-web-server.bat
@@ -111,6 +123,7 @@ This guide will help you set up and install the SolanaLogin plugin for your Mine
    ```
 
 4. Update the `web-server.url` in the plugin's config.yml to match your server's address:
+
    ```yaml
    web-server:
      enabled: true
@@ -187,6 +200,7 @@ web-server:
 For detailed troubleshooting information, please refer to the [TROUBLESHOOTING.md](TROUBLESHOOTING.md) file.
 
 Common issues:
+
 - **Database Connection Issues**: Ensure your MySQL server is running and accessible, and that the credentials in the config file are correct
 - **Plugin Not Loading**: Check the server logs for any error messages related to the plugin
 - **Web Server Connection Issues**: Ensure the web server is running and accessible from the Minecraft server
@@ -195,6 +209,7 @@ Common issues:
 ## Support
 
 If you encounter any issues or have questions, please:
+
 1. Check the [README.md](README.md) file for documentation
 2. Review the [TROUBLESHOOTING.md](TROUBLESHOOTING.md) file for common issues and solutions
 3. Open an issue on the [GitHub repository](https://github.com/yourusername/SolanaLogin/issues)
