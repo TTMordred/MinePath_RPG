@@ -67,9 +67,9 @@ public class PasswordUtils {
     public static String hashPassword(String password) {
         byte[] salt = generateSalt(SALT_LENGTH);
         byte[] hash = hashPassword(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
-        
+
         // Format: iterations:salt:hash
-        return ITERATIONS + ":" + Base64.getEncoder().encodeToString(salt) + ":" + 
+        return ITERATIONS + ":" + Base64.getEncoder().encodeToString(salt) + ":" +
                Base64.getEncoder().encodeToString(hash);
     }
 
@@ -87,10 +87,10 @@ public class PasswordUtils {
             int iterations = Integer.parseInt(parts[0]);
             byte[] salt = Base64.getDecoder().decode(parts[1]);
             byte[] hash = Base64.getDecoder().decode(parts[2]);
-            
+
             // Hash the input password with the same salt and iterations
             byte[] testHash = hashPassword(password.toCharArray(), salt, iterations, hash.length * 8);
-            
+
             // Compare the hashes
             return Arrays.equals(hash, testHash);
         } catch (Exception e) {
@@ -102,9 +102,14 @@ public class PasswordUtils {
     /**
      * Generates a random verification code.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param length The length of the code
      * @return The generated code
      */
+    @Deprecated
     public static String generateVerificationCode(int length) {
         // Use only digits for verification code
         String chars = "0123456789";

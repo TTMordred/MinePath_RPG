@@ -17,6 +17,8 @@ public class SessionManager {
     private final Map<UUID, LoginAttempt> loginAttempts;
     private final Map<String, Integer> ipRegistrations;
     private final Map<UUID, String> verificationCodes;
+    private final Map<UUID, String> authNonces;
+    private final Map<UUID, String> authSessions;
 
     public SessionManager(SolanaLogin plugin) {
         this.plugin = plugin;
@@ -24,6 +26,8 @@ public class SessionManager {
         this.loginAttempts = new ConcurrentHashMap<>();
         this.ipRegistrations = new ConcurrentHashMap<>();
         this.verificationCodes = new ConcurrentHashMap<>();
+        this.authNonces = new ConcurrentHashMap<>();
+        this.authSessions = new ConcurrentHashMap<>();
     }
 
     /**
@@ -159,9 +163,14 @@ public class SessionManager {
     /**
      * Stores a verification code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      * @param code The verification code
      */
+    @Deprecated
     public void storeVerificationCode(UUID uuid, String code) {
         verificationCodes.put(uuid, code);
     }
@@ -169,10 +178,15 @@ public class SessionManager {
     /**
      * Verifies a code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      * @param code The code to verify
      * @return true if the code is valid, false otherwise
      */
+    @Deprecated
     public boolean verifyCode(UUID uuid, String code) {
         String storedCode = verificationCodes.get(uuid);
         if (storedCode != null && storedCode.equals(code)) {
@@ -185,10 +199,80 @@ public class SessionManager {
     /**
      * Removes a verification code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      */
+    @Deprecated
     public void removeVerificationCode(UUID uuid) {
         verificationCodes.remove(uuid);
+    }
+
+    /**
+     * Generates a secure nonce for wallet authentication.
+     *
+     * @param uuid The player's UUID
+     * @return The generated nonce
+     */
+    public String generateAuthNonce(UUID uuid) {
+        // Generate a random nonce (12 characters)
+        StringBuilder nonce = new StringBuilder();
+        String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        for (int i = 0; i < 12; i++) {
+            nonce.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        String nonceStr = nonce.toString();
+        authNonces.put(uuid, nonceStr);
+        return nonceStr;
+    }
+
+    /**
+     * Verifies an authentication nonce.
+     *
+     * @param uuid The player's UUID
+     * @param nonce The nonce to verify
+     * @return true if the nonce is valid, false otherwise
+     */
+    public boolean verifyAuthNonce(UUID uuid, String nonce) {
+        String storedNonce = authNonces.get(uuid);
+        if (storedNonce != null && storedNonce.equals(nonce)) {
+            authNonces.remove(uuid);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Stores an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     * @param sessionId The session ID
+     */
+    public void storeAuthSession(UUID uuid, String sessionId) {
+        authSessions.put(uuid, sessionId);
+    }
+
+    /**
+     * Gets an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     * @return The session ID, or null if not found
+     */
+    public String getAuthSession(UUID uuid) {
+        return authSessions.get(uuid);
+    }
+
+    /**
+     * Removes an authentication session ID.
+     *
+     * @param uuid The player's UUID
+     */
+    public void removeAuthSession(UUID uuid) {
+        authSessions.remove(uuid);
     }
 
     /**

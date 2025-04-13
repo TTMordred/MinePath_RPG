@@ -30,9 +30,17 @@ auth:
 
 # Solana Settings
 solana:
-  network: "mainnet"  # mainnet, testnet, or devnet
-  rpc-url: "https://api.mainnet-beta.solana.com"  # RPC URL for Solana network
+  network: "devnet"  # mainnet, testnet, or devnet
+  rpc-url: "https://api.devnet.solana.com"  # RPC URL for Solana network
   verification-message: "I confirm that I own this wallet and authorize its use on the Minecraft server."  # Message to sign for verification
+
+# Web Server Settings
+web-server:
+  enabled: true  # Whether to enable the web server for QR code login
+  url: "http://localhost:3000"  # URL of the web server
+  port: 3000  # Port of the web server
+  qr-code-timeout: 300  # Time in seconds for QR code to expire (5 minutes)
+  check-interval: 5  # Time in seconds to check for wallet connection status
 
 # Messages
 messages:

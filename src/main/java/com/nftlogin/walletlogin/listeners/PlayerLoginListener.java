@@ -1,6 +1,7 @@
 package com.nftlogin.walletlogin.listeners;
 
 import com.nftlogin.walletlogin.SolanaLogin;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,7 +100,8 @@ public class PlayerLoginListener implements Listener {
             public void run() {
                 // Check if the player is still online and hasn't registered
                 if (player.isOnline() && !plugin.getDatabaseManager().isPlayerRegistered(playerUuid)) {
-                    player.kickPlayer(plugin.formatMessage(message));
+                    // Using the modern kick API with Component
+                    player.kick(Component.text(plugin.formatMessage(message)));
                 }
             }
         }.runTaskLater(plugin, timeout * 20L); // Convert seconds to ticks
@@ -127,7 +129,8 @@ public class PlayerLoginListener implements Listener {
                 if (player.isOnline() && !isPlayerAuthenticated(playerUuid)) {
                     String timeoutMessage = plugin.getConfig().getString("messages.login-timeout",
                             "You took too long to login. Please reconnect.");
-                    player.kickPlayer(plugin.formatMessage(timeoutMessage));
+                    // Using the modern kick API with Component
+                    player.kick(Component.text(plugin.formatMessage(timeoutMessage)));
                 }
             }
         }.runTaskLater(plugin, timeout * 20L); // Convert seconds to ticks
@@ -170,7 +173,8 @@ public class PlayerLoginListener implements Listener {
             public void run() {
                 // Check if the player is still online and hasn't connected a wallet
                 if (player.isOnline() && !plugin.getDatabaseManager().hasWalletConnected(playerUuid)) {
-                    player.kickPlayer(plugin.formatMessage(message));
+                    // Using the modern kick API with Component
+                    player.kick(Component.text(plugin.formatMessage(message)));
                 }
             }
         }.runTaskLater(plugin, timeout * 20L); // Convert seconds to ticks

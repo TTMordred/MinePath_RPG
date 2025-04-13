@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code - SolanaLogin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>Scan QR Code</h1>
+        <p>Connect your Solana wallet to Minecraft</p>
+      </div>
+      <div class="card-body">
+        <div id="loading">
+          <div class="spinner"></div>
+          <p>Generating QR code...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+          <div class="wallet-info">
+            <p>Player: <span id="player-id">Loading...</span></p>
+          </div>
+
+          <div class="qr-container">
+            <div id="qrcode"></div>
+            <p>Scan this QR code with your Phantom mobile app</p>
+          </div>
+
+          <div class="instructions">
+            <p>1. Open Phantom app on your mobile device</p>
+            <p>2. Scan this QR code</p>
+            <p>3. Approve the connection request</p>
+          </div>
+
+          <div class="status">
+            <p id="status-message">Waiting for wallet connection...</p>
+          </div>
+
+          <div class="actions">
+            <a href="#" id="back-button" class="btn btn-secondary">Back to Login Options</a>
+          </div>
+        </div>
+
+        <div id="success" style="display: none;">
+          <div class="success-icon">✓</div>
+          <h2>Wallet Connected!</h2>
+          <p>You can now return to Minecraft.</p>
+          <div class="wallet-address" id="wallet-address"></div>
+        </div>
+
+        <div id="error" style="display: none;">
+          <div class="error-icon">✗</div>
+          <h2>Connection Failed</h2>
+          <p id="error-message">Something went wrong. Please try again.</p>
+          <button id="retry-button" class="btn btn-primary">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script>
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session');
+    const nonce = urlParams.get('nonce');
+    const playerId = urlParams.get('player');
+
+    // Debug info
+    console.log('QR page loaded with parameters:', { sessionId, nonce, playerId });
+
+    // Elements
+    const loadingEl = document.getElementById('loading');
+    const contentEl = document.getElementById('content');
+    const successEl = document.getElementById('success');
+    const errorEl = document.getElementById('error');
+    const playerIdEl = document.getElementById('player-id');
+    const qrcodeEl = document.getElementById('qrcode');
+    const statusMessageEl = document.getElementById('status-message');
+    const walletAddressEl = document.getElementById('wallet-address');
+    const errorMessageEl = document.getElementById('error-message');
+    const backButton = document.getElementById('back-button');
+    const retryButton = document.getElementById('retry-button');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('QR page DOM loaded');
+
+      if (!sessionId || !nonce || !playerId) {
+        console.warn('Missing parameters in QR page, will try to continue anyway');
+        // We'll try to continue and let the server handle it
+      }
+
+      playerIdEl.textContent = playerId;
+
+      try {
+        // Generate QR code
+        const response = await fetch(`/api/qr?session=${sessionId}&nonce=${nonce}&player=${playerId}`);
+        if (!response.ok) {
+          throw new Error('Failed to generate QR code');
+        }
+
+        const data = await response.json();
+
+        // Display QR code
+        qrcodeEl.innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
+
+        // Show content
+        showContent();
+
+        // Start polling for connection status
+        startPolling();
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    // Back button
+    backButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = `/login?session=${sessionId}&nonce=${nonce}&player=${playerId}`;
+    });
+
+    // Retry button
+    retryButton.addEventListener('click', () => {
+      window.location.reload();
+    });
+
+    // Poll for connection status
+    function startPolling() {
+      const pollInterval = 2000; // 2 seconds
+      let attempts = 0;
+      const maxAttempts = 150; // 5 minutes (150 * 2 seconds)
+
+      const poll = async () => {
+        attempts++;
+
+        try {
+          const response = await fetch(`/status?session=${sessionId}`);
+          if (!response.ok) {
+            throw new Error('Failed to check connection status');
+          }
+
+          const data = await response.json();
+          if (data.connected) {
+            showSuccess(data.walletAddress);
+            return;
+          }
+
+          // Update status message
+          if (attempts % 15 === 0) { // Every 30 seconds
+            statusMessageEl.textContent = `Still waiting for wallet connection... (${Math.floor(attempts / 30)} minute${Math.floor(attempts / 30) !== 1 ? 's' : ''})`;
+          }
+
+          // Check if max attempts reached
+          if (attempts >= maxAttempts) {
+            showError('Connection timed out. Please try again.');
+            return;
+          }
+
+          // Continue polling
+          setTimeout(poll, pollInterval);
+        } catch (error) {
+          // If there's an error, try again a few times
+          if (attempts < maxAttempts) {
+            setTimeout(poll, pollInterval);
+          } else {
+            showError(error.message);
+          }
+        }
+      };
+
+      // Start polling
+      setTimeout(poll, pollInterval);
+    }
+
+    // UI utility functions
+    function showSuccess(walletAddress) {
+      UIUtils.showSuccess(walletAddress, successEl, walletAddressEl, loadingEl, contentEl, errorEl);
+    }
+
+    function showError(message) {
+      UIUtils.showError(message, errorEl, errorMessageEl, loadingEl, contentEl, successEl);
+    }
+
+    function showLoading() {
+      UIUtils.showLoading(loadingEl, contentEl, errorEl, successEl);
+    }
+
+    function showContent() {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+      contentEl.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

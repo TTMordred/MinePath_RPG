@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Redirect Test - SolanaLogin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background-color: #512da8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .log {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Redirect Test</h1>
+  <p>This page tests the redirect functionality from Phantom wallet.</p>
+  
+  <div>
+    <button id="check-params">Check Parameters</button>
+    <button id="connect-phantom">Connect Phantom</button>
+    <button id="clear-log">Clear Log</button>
+  </div>
+  
+  <div class="log" id="log"></div>
+  
+  <script>
+    // Elements
+    const logEl = document.getElementById('log');
+    const checkParamsBtn = document.getElementById('check-params');
+    const connectPhantomBtn = document.getElementById('connect-phantom');
+    const clearLogBtn = document.getElementById('clear-log');
+    
+    // Log function
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${type}] ${message}`);
+    }
+    
+    // Check URL parameters
+    checkParamsBtn.addEventListener('click', () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        const errorCode = urlParams.get('errorCode');
+        const errorMessage = urlParams.get('errorMessage');
+        
+        log('URL Parameters:');
+        log(`- session: ${sessionId || 'not set'}`);
+        log(`- errorCode: ${errorCode || 'not set'}`);
+        log(`- errorMessage: ${errorMessage || 'not set'}`);
+        
+        if (sessionId) {
+          log(`Session ID detected: ${sessionId}`, 'success');
+        } else {
+          log('No session ID found in URL.', 'error');
+        }
+        
+        if (errorCode || errorMessage) {
+          log(`Error detected: ${errorMessage} (${errorCode})`, 'error');
+        }
+      } catch (error) {
+        log(`Error checking parameters: ${error.message}`, 'error');
+      }
+    });
+    
+    // Connect to Phantom
+    connectPhantomBtn.addEventListener('click', async () => {
+      try {
+        if (!window.phantom) {
+          log('Phantom extension not detected. Please install it first.', 'error');
+          return;
+        }
+        
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          log('Phantom Solana provider not found.', 'error');
+          return;
+        }
+        
+        // Get session from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        
+        if (!sessionId) {
+          log('No session ID found in URL. Creating a demo session...', 'error');
+          // Create a demo session
+          const demoSession = 'demo-' + Date.now();
+          log(`Created demo session: ${demoSession}`);
+          
+          // Redirect to this page with the demo session
+          window.location.href = `${window.location.pathname}?session=${demoSession}`;
+          return;
+        }
+        
+        log(`Connecting to Phantom with session: ${sessionId}...`);
+        
+        // Connect to wallet
+        let publicKey;
+        try {
+          // Try to get the current connection first
+          const resp = await provider.request({ method: 'connect' });
+          publicKey = resp.publicKey.toString();
+          log(`Already connected to wallet: ${publicKey}`, 'success');
+        } catch (e) {
+          // If not connected, connect to wallet
+          log('Not connected yet, requesting connection...');
+          const connection = await provider.connect();
+          publicKey = connection.publicKey.toString();
+          log(`Connected to wallet: ${publicKey}`, 'success');
+        }
+        
+        // Get nonce from server or create a demo one
+        let nonce;
+        try {
+          const nonceResponse = await fetch(`/api/nonce/${sessionId}`);
+          if (nonceResponse.ok) {
+            const nonceData = await nonceResponse.json();
+            nonce = nonceData.nonce;
+            log(`Got nonce from server: ${nonce}`);
+          } else {
+            nonce = 'demo-nonce-' + Date.now();
+            log(`Created demo nonce: ${nonce}`);
+          }
+        } catch (error) {
+          nonce = 'demo-nonce-' + Date.now();
+          log(`Error getting nonce, using demo: ${nonce}`, 'error');
+        }
+        
+        // Sign message
+        const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
+        log(`Signing message: "${message}"`);
+        
+        const encodedMessage = new TextEncoder().encode(message);
+        const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
+        
+        // Convert signature to base64 for display
+        const signature = btoa(String.fromCharCode.apply(null, signatureBytes));
+        log(`Message signed successfully!`, 'success');
+        log(`Signature (base64): ${signature.substring(0, 20)}...`);
+        
+        // Verify on server
+        try {
+          const verifyResponse = await fetch('/api/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              session: sessionId,
+              publicKey,
+              signature,
+              message
+            })
+          });
+          
+          if (verifyResponse.ok) {
+            const result = await verifyResponse.json();
+            if (result.success) {
+              log('Signature verified successfully!', 'success');
+            } else {
+              log(`Verification failed: ${result.error || 'Unknown error'}`, 'error');
+            }
+          } else {
+            log(`Server error: ${verifyResponse.status} ${verifyResponse.statusText}`, 'error');
+          }
+        } catch (error) {
+          log(`Error verifying signature: ${error.message}`, 'error');
+        }
+      } catch (error) {
+        log(`Error connecting to Phantom: ${error.message}`, 'error');
+      }
+    });
+    
+    // Clear log
+    clearLogBtn.addEventListener('click', () => {
+      logEl.innerHTML = '';
+      log('Log cleared.');
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Page loaded. Click "Check Parameters" to start.');
+      
+      // Auto-check parameters
+      checkParamsBtn.click();
+    });
+  </script>
+</body>
+</html>

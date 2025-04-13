@@ -1,6 +1,7 @@
 package com.nftlogin.walletlogin.commands;
 
 import com.nftlogin.walletlogin.SolanaLogin;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,28 +19,27 @@ public class LogoutCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(plugin.formatMessage("&cOnly players can use this command."));
-            return true;
+            return false;
         }
 
         Player player = (Player) sender;
-
-        return handleLogout(player);
+        handleLogout(player);
+        return true;
     }
 
     /**
      * Handle the logout process for a player.
      *
      * @param player The player to log out
-     * @return true if the logout was successful, false otherwise
      */
-    private boolean handleLogout(Player player) {
+    private void handleLogout(Player player) {
         // Check if player is logged in
         if (!plugin.getSessionManager().hasSession(player.getUniqueId()) ||
                 !plugin.getSessionManager().getSession(player.getUniqueId()).isAuthenticated()) {
             String message = plugin.getConfig().getString("messages.not-logged-in",
                     "You must be logged in to use this command!");
             player.sendMessage(plugin.formatMessage(message));
-            return true;
+            return;
         }
 
         // Remove session
@@ -50,9 +50,8 @@ public class LogoutCommand implements CommandExecutor {
 
         // If login is required, kick the player
         if (plugin.getConfig().getBoolean("settings.require-login", true)) {
-            player.kickPlayer(plugin.formatMessage("&aYou have been logged out."));
+            // Using the modern kick API with Component
+            player.kick(Component.text(plugin.formatMessage("&aYou have been logged out.")));
         }
-
-        return true;
     }
 }

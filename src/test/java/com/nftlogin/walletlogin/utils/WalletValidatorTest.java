@@ -5,6 +5,8 @@ package com.nftlogin.walletlogin.utils;
  *
  * Note: This is a simple test class that can be run manually.
  * In a real project, you would use JUnit or another testing framework.
+ *
+ * @SuppressWarnings("java:S2187") // Suppress SonarLint warning about missing test methods
  */
 public class WalletValidatorTest {
 

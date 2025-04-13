@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Flow - SolanaLogin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background-color: #512da8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .log {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+    }
+    .qr-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .qr-container img {
+      max-width: 300px;
+      border: 1px solid #ddd;
+    }
+    .step {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .step h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Complete Flow</h1>
+  <p>This page tests the complete flow for Solana wallet connection.</p>
+
+  <div class="step">
+    <h2>Step 1: Create Session</h2>
+    <p>Create a test session for wallet connection.</p>
+    <button id="create-session">Create Session</button>
+  </div>
+
+  <div class="step">
+    <h2>Step 2: Connect Wallet</h2>
+    <p>Connect to Phantom wallet using the session.</p>
+    <button id="connect-wallet">Connect Wallet</button>
+  </div>
+
+  <div class="step">
+    <h2>Step 3: Verify Connection</h2>
+    <p>Check if the wallet is connected.</p>
+    <button id="verify-connection">Verify Connection</button>
+  </div>
+
+  <div class="qr-container" id="qr-container"></div>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    // Elements
+    const logEl = document.getElementById('log');
+    const qrContainerEl = document.getElementById('qr-container');
+    const createSessionBtn = document.getElementById('create-session');
+    const connectWalletBtn = document.getElementById('connect-wallet');
+    const verifyConnectionBtn = document.getElementById('verify-connection');
+
+    // Session data
+    let sessionData = {
+      sessionId: null,
+      nonce: null,
+      player: 'TestPlayer'
+    };
+
+    // Log function
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${type}] ${message}`);
+    }
+
+    // Create Session
+    createSessionBtn.addEventListener('click', async () => {
+      try {
+        // Generate random session and nonce
+        sessionData.sessionId = 'test-' + Date.now();
+        sessionData.nonce = 'nonce-' + Date.now();
+
+        log(`Created test session: ${sessionData.sessionId}`);
+        log(`Nonce: ${sessionData.nonce}`);
+
+        // Store session on server
+        const response = await fetch(`/login?session=${sessionData.sessionId}&nonce=${sessionData.nonce}&player=${sessionData.player}`);
+
+        if (response.redirected) {
+          log(`Server redirected to: ${response.url}`, 'success');
+          // Extract session from redirect URL if needed
+          const url = new URL(response.url);
+          const params = new URLSearchParams(url.search);
+          if (params.has('session')) {
+            sessionData.sessionId = params.get('session');
+            log(`Updated session ID: ${sessionData.sessionId}`, 'success');
+          }
+          if (params.has('nonce')) {
+            sessionData.nonce = params.get('nonce');
+            log(`Updated nonce: ${sessionData.nonce}`, 'success');
+          }
+        } else if (response.ok) {
+          log('Session created successfully!', 'success');
+        } else {
+          throw new Error(`Failed to create session: ${response.status} ${response.statusText}`);
+        }
+
+        // Generate QR code for mobile
+        const qrResponse = await fetch(`/api/qr?session=${sessionData.sessionId}&nonce=${sessionData.nonce}&player=${sessionData.player}`);
+        if (qrResponse.ok) {
+          const qrData = await qrResponse.json();
+
+          // Display QR code
+          qrContainerEl.innerHTML = '';
+          const qrImg = document.createElement('img');
+          qrImg.src = qrData.qrCode;
+          qrImg.alt = 'QR Code';
+          qrContainerEl.appendChild(qrImg);
+
+          // Display deep link
+          const deepLinkP = document.createElement('p');
+          deepLinkP.innerHTML = `<a href="${qrData.deepLink}" target="_blank">Open Deep Link</a>`;
+          qrContainerEl.appendChild(deepLinkP);
+
+          log('QR code generated. Scan with Phantom mobile app or click the deep link.', 'success');
+        } else {
+          log(`Failed to generate QR code: ${qrResponse.status} ${qrResponse.statusText}`, 'error');
+        }
+      } catch (error) {
+        log(`Error creating session: ${error.message}`, 'error');
+      }
+    });
+
+    // Connect Wallet
+    connectWalletBtn.addEventListener('click', async () => {
+      try {
+        if (!sessionData.sessionId || !sessionData.nonce) {
+          log('No active session. Create a session first.', 'error');
+          return;
+        }
+
+        if (!window.phantom) {
+          log('Phantom extension not detected. Please install it first.', 'error');
+          return;
+        }
+
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          log('Phantom Solana provider not found.', 'error');
+          return;
+        }
+
+        log(`Connecting to Phantom with session: ${sessionData.sessionId}...`);
+
+        // Connect to wallet
+        let publicKey;
+        try {
+          // Try to get the current connection first
+          const resp = await provider.request({ method: 'connect' });
+          publicKey = resp.publicKey.toString();
+          log(`Already connected to wallet: ${publicKey}`, 'success');
+        } catch (e) {
+          // If not connected, connect to wallet
+          log('Not connected yet, requesting connection...');
+          const connection = await provider.connect();
+          publicKey = connection.publicKey.toString();
+          log(`Connected to wallet: ${publicKey}`, 'success');
+        }
+
+        // Sign message
+        const message = `Verify wallet ownership for Minecraft login. Session: ${sessionData.sessionId}. Nonce: ${sessionData.nonce}`;
+        log(`Signing message: "${message}"`);
+
+        const encodedMessage = new TextEncoder().encode(message);
+        let signature = ''; // Declare outside try block so it's available later
+
+        try {
+          // Get signature from Phantom
+          log('Requesting signature from Phantom...');
+          const signResult = await provider.signMessage(encodedMessage, 'utf8');
+          log('Received signature response from Phantom');
+
+          // Inspect what we got back
+          log(`Signature result type: ${typeof signResult}`);
+          if (typeof signResult === 'object') {
+            log(`Signature result keys: ${Object.keys(signResult).join(', ')}`);
+          }
+
+          // Different ways to handle the signature based on what Phantom returns
+          let signatureBytes;
+
+          if (signResult instanceof Uint8Array) {
+            // Case 1: Phantom returned a Uint8Array directly
+            signatureBytes = signResult;
+            log(`Got Uint8Array signature of length ${signatureBytes.length}`);
+          } else if (typeof signResult === 'object' && signResult.signature) {
+            // Case 2: Phantom returned an object with a signature property
+            signatureBytes = signResult.signature;
+            log(`Got signature from result.signature property`);
+          } else if (typeof signResult === 'string') {
+            // Case 3: Phantom returned a string
+            signature = signResult;
+            log(`Got string signature of length ${signature.length}`);
+          } else {
+            // Case 4: Unknown format, try to stringify it
+            log(`Unknown signature format: ${JSON.stringify(signResult)}`);
+            signature = JSON.stringify(signResult);
+          }
+
+          // If we have signature bytes, convert them to a string
+          if (signatureBytes && !signature) {
+            try {
+              // Try to convert to base64
+              signature = btoa(Array.from(signatureBytes).map(b => String.fromCharCode(b)).join(''));
+              log(`Converted bytes to base64 signature (${signature.length} chars)`, 'success');
+            } catch (e) {
+              log(`Error converting to base64: ${e.message}`, 'error');
+              // Fallback to hex
+              signature = Array.from(signatureBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+              log(`Converted bytes to hex signature (${signature.length} chars)`, 'success');
+            }
+          }
+
+          // Ensure we have a signature
+          if (!signature) {
+            throw new Error('Failed to get a valid signature from Phantom');
+          }
+
+          log(`Final signature (${signature.length} chars): ${signature.substring(0, 20)}...`, 'success');
+          log(`Message signed successfully!`, 'success');
+        } catch (error) {
+          log(`Error signing message: ${error.message}`, 'error');
+          throw error; // Re-throw to be caught by the outer try/catch
+        }
+
+        log(`Signature: ${signature.substring(0, 20)}...`);
+
+        // Verify on server
+        const verifyResponse = await fetch('/api/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session: sessionData.sessionId,
+            publicKey,
+            signature,
+            message
+          })
+        });
+
+        if (verifyResponse.ok) {
+          const result = await verifyResponse.json();
+          if (result.success) {
+            log('Signature verified successfully!', 'success');
+          } else {
+            log(`Verification failed: ${result.error || 'Unknown error'}`, 'error');
+          }
+        } else {
+          log(`Server error: ${verifyResponse.status} ${verifyResponse.statusText}`, 'error');
+
+          // Try to get error details
+          try {
+            const errorData = await verifyResponse.json();
+            log(`Error details: ${JSON.stringify(errorData)}`, 'error');
+          } catch (e) {
+            // Ignore
+          }
+        }
+      } catch (error) {
+        log(`Error connecting to Phantom: ${error.message}`, 'error');
+      }
+    });
+
+    // Verify Connection
+    verifyConnectionBtn.addEventListener('click', async () => {
+      try {
+        if (!sessionData.sessionId) {
+          log('No active session. Create a session first.', 'error');
+          return;
+        }
+
+        log(`Checking status for session: ${sessionData.sessionId}`);
+
+        const response = await fetch(`/status?session=${sessionData.sessionId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to check status: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        log(`Status: ${JSON.stringify(data)}`);
+
+        if (data.connected) {
+          log(`Connected to wallet: ${data.walletAddress}`, 'success');
+        } else {
+          log('Not connected yet. Try connecting the wallet again.');
+        }
+      } catch (error) {
+        log(`Error checking status: ${error.message}`, 'error');
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Page loaded. Start with "Create Session".');
+    });
+  </script>
+</body>
+</html>

@@ -2,6 +2,61 @@
 
 A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentication with Minecraft login, supporting both premium and cracked Minecraft accounts.
 
+## Changelog
+
+### Version 1.2
+
+- **Removed manual wallet connection method** for improved security and user experience
+- **Removed verification code functionality** as it's no longer needed
+- **Simplified wallet connection process** to focus on QR code and browser extension methods
+- Added comprehensive documentation including visual guides and development resources
+- Updated all commands and help messages to reflect the new connection methods
+- Improved error handling and user feedback
+- Added detailed roadmap for future development
+- Created guides for adding new wallet integrations and enhancing the web interface
+
+### Version 1.1
+
+- Added QR code and browser extension wallet connection support
+- Added web server component for Solana wallet authentication
+- Added proper API version in plugin.yml
+- Fixed code structure in command classes by extracting methods
+- Improved logging with level checks for better performance
+- Added proper null checks and error handling
+- Fixed potential memory leaks in database connections
+- Improved wallet validation for Phantom wallets
+- Enhanced code documentation and comments
+
+### Version 1.0
+
+- Initial release
+- Basic authentication system
+- Solana wallet integration
+- MySQL database support
+- Session management
+
+## Documentation
+
+This project includes comprehensive documentation split across multiple files:
+
+### Core Documentation
+
+- [README.md](README.md) - Main project overview and documentation (this file)
+- [INSTALL.md](INSTALL.md) - Detailed installation instructions
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Guide for developers contributing to the project
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Solutions for common issues
+
+### User Guides
+
+- [VISUAL_GUIDE.md](docs/VISUAL_GUIDE.md) - Visual walkthrough of the wallet connection process
+- [WEB_INTERFACE.md](docs/WEB_INTERFACE.md) - Guide for the web interface and its features
+
+### Advanced Documentation
+
+- [DEMO_SERVER.md](docs/DEMO_SERVER.md) - Guide for setting up a demo server
+- [ROADMAP.md](docs/ROADMAP.md) - Project roadmap and future features
+- [WALLET_INTEGRATION.md](docs/WALLET_INTEGRATION.md) - Guide for adding new wallet providers
+
 ## Table of Contents
 
 1. [Development Setup](#development-setup)
@@ -149,9 +204,17 @@ auth:
 
 # Solana Settings
 solana:
-  network: "mainnet"       # mainnet, testnet, or devnet
-  rpc-url: "https://api.mainnet-beta.solana.com"  # RPC URL for Solana network
+  network: "devnet"        # mainnet, testnet, or devnet
+  rpc-url: "https://api.devnet.solana.com"  # RPC URL for Solana network
   verification-message: "I confirm that I own this wallet and authorize its use on the Minecraft server."  # Message to sign for verification
+
+# Web Server Settings
+web-server:
+  enabled: true            # Whether to enable the web server for QR code login
+  url: "http://localhost:3000"  # URL of the web server
+  port: 3000               # Port of the web server
+  qr-code-timeout: 300     # Time in seconds for QR code to expire (5 minutes)
+  check-interval: 5        # Time in seconds to check for wallet connection status
 ```
 
 ### Commands and Permissions
@@ -176,14 +239,14 @@ solana:
 
 #### Wallet Commands
 
-- `/connectwallet <wallet_address>` - Connect your Solana wallet to your Minecraft account
+- `/connectwallet` - Open wallet connection interface via QR code or browser extension
+  - Permission: `solanalogin.wallet.connect` (default: true)
+- `/connectwallet qr` - Show QR code for wallet connection
   - Permission: `solanalogin.wallet.connect` (default: true)
 - `/disconnectwallet` - Disconnect your Solana wallet from your Minecraft account
   - Permission: `solanalogin.wallet.disconnect` (default: true)
 - `/walletinfo` - View your Solana wallet information
   - Permission: `solanalogin.wallet.info` (default: true)
-- `/verifycode <code>` - Verify your wallet with a verification code
-  - Permission: `solanalogin.wallet.verify` (default: true)
 
 ### Troubleshooting
 
@@ -227,18 +290,26 @@ solana:
 
 ### Wallet Integration
 
-1. **Connecting your Solana wallet**
-   - Get your Solana wallet address (from Phantom or another wallet)
-   - Use `/connectwallet <wallet_address>` to connect your wallet
-   - You'll receive a verification code
+> For a detailed visual walkthrough of the wallet connection process, see our [Visual Guide](docs/VISUAL_GUIDE.md).
 
-2. **Verifying your wallet**
-   - Use `/verifycode <code>` to verify your wallet ownership
-   - This proves you own the wallet you're connecting
+1. **Connecting your Solana wallet via Browser Extension**
+   - Use `/connectwallet` to get connection options
+   - Click on the link to open the web interface
+   - Connect your Phantom wallet through the browser extension
+   - Approve the connection request in your wallet
+   - Your wallet will be automatically verified
+
+2. **Connecting your Solana wallet via QR Code**
+   - Use `/connectwallet qr` to get a QR code
+   - Scan the QR code with your mobile wallet
+   - Approve the connection request in your wallet
+   - Your wallet will be automatically verified
 
 3. **Managing your wallet**
    - Use `/walletinfo` to view your connected wallet information
    - Use `/disconnectwallet` to disconnect your wallet if needed
+
+> For more information about the web interface, see our [Web Interface Guide](docs/WEB_INTERFACE.md).
 
 ### Account Management
 
@@ -261,9 +332,9 @@ solana:
 5. Player uses `/login password`
 6. Player is authenticated and can now play
 7. Player decides to connect their Solana wallet
-8. Player uses `/connectwallet <wallet_address>`
-9. Server generates a verification code
-10. Player uses `/verifycode <code>` to verify wallet ownership
+8. Player uses `/connectwallet` or `/connectwallet qr`
+9. Player clicks the link or scans the QR code
+10. Player approves the connection in their wallet
 11. Player's wallet is now connected and verified
 
 ### Returning Player Login
@@ -282,9 +353,11 @@ solana:
 3. Server checks if player has a connected wallet
 4. If not, server prompts player to connect a wallet
 5. Player has a limited time to connect a wallet before being kicked
-6. Player connects wallet with `/connectwallet <wallet_address>`
-7. Player verifies wallet with `/verifycode <code>`
-8. Player can now play on the server
+6. Player connects wallet using `/connectwallet` or `/connectwallet qr`
+7. Player scans QR code with mobile wallet or clicks link to connect via browser extension
+8. Player approves the connection in their wallet
+9. Wallet is automatically verified through blockchain signature verification
+10. Player can now play on the server
 
 ## Technical Architecture
 
@@ -297,7 +370,8 @@ solana:
 
 2. **Wallet Integration**
    - Wallet address validation
-   - Wallet connection and verification
+   - QR code and browser extension wallet connection
+   - Blockchain signature verification
    - Wallet type detection (Phantom, Solana)
 
 3. **Database Management**
@@ -347,11 +421,13 @@ The plugin uses three main tables:
    - Automatic logout on server restart
 
 3. **Wallet Verification**
-   - Verification code generation
+   - Blockchain signature verification
    - Wallet address validation
-   - Ownership verification
+   - Ownership verification through cryptographic proof
 
 ## Next Steps and Enhancements
+
+For a detailed roadmap of future features and improvements, see our [Project Roadmap](docs/ROADMAP.md).
 
 ### Immediate Improvements
 
@@ -359,50 +435,18 @@ The plugin uses three main tables:
    - Create a web portal for account management
    - Allow wallet connection and verification through the website
    - Provide account recovery options
+   - See our [Web Interface Enhancement Guide](docs/WEB_INTERFACE.md) for details
 
 2. **Enhanced Wallet Integration**
    - Implement wallet signature verification
    - Add support for wallet transactions
    - Integrate with Solana Pay
+   - See our [Wallet Integration Guide](docs/WALLET_INTEGRATION.md) for details
 
 3. **NFT Integration**
    - Add NFT ownership verification
    - Implement NFT-based permissions and features
    - Create in-game representation of NFTs
-
-### Medium-term Roadmap
-
-1. **Multi-wallet Support**
-   - Add support for multiple wallets per player
-   - Allow different wallet types (Ethereum, Bitcoin, etc.)
-   - Implement cross-chain verification
-
-2. **Token Economy**
-   - Integrate with server economy
-   - Allow token-based transactions
-   - Implement token rewards for in-game activities
-
-3. **Enhanced Security**
-   - Add two-factor authentication
-   - Implement IP-based security measures
-   - Add anti-bot protection
-
-### Long-term Vision
-
-1. **Blockchain Game Integration**
-   - Create a full blockchain-based game economy
-   - Implement on-chain assets and inventory
-   - Allow trading of in-game items as NFTs
-
-2. **Decentralized Identity**
-   - Implement decentralized identity verification
-   - Allow cross-server authentication
-   - Create a reputation system
-
-3. **Developer API**
-   - Create a public API for other plugins to integrate with
-   - Allow third-party wallet integrations
-   - Support custom blockchain implementations
 
 ### Implementation Plan
 
@@ -432,4 +476,17 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-If you have any questions or need help, please feel free to open an issue or contact us at [NFTLogin](https://nftlogin.com).
+If you have any questions or need help, please:
+
+1. Check our documentation:
+   - [README.md](README.md) - Main project overview
+   - [INSTALL.md](INSTALL.md) - Installation instructions
+   - [DEVELOPMENT.md](DEVELOPMENT.md) - Development guide
+   - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
+   - [VISUAL_GUIDE.md](docs/VISUAL_GUIDE.md) - Visual walkthrough of wallet connection
+   - [DEMO_SERVER.md](docs/DEMO_SERVER.md) - Setting up a demo server
+   - [ROADMAP.md](docs/ROADMAP.md) - Project roadmap and future features
+   - [WALLET_INTEGRATION.md](docs/WALLET_INTEGRATION.md) - Adding new wallet providers
+   - [WEB_INTERFACE.md](docs/WEB_INTERFACE.md) - Enhancing the web interface
+2. Open an issue on the GitHub repository
+3. Contact us at [NFTLogin](https://nftlogin.com)

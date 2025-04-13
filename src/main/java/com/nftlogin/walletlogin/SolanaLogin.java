@@ -37,7 +37,6 @@ public final class SolanaLogin extends JavaPlugin {
         getCommand("connectwallet").setExecutor(new ConnectWalletCommand(this));
         getCommand("disconnectwallet").setExecutor(new DisconnectWalletCommand(this));
         getCommand("walletinfo").setExecutor(new WalletInfoCommand(this));
-        getCommand("verifycode").setExecutor(new VerifyCodeCommand(this));
         getCommand("solanalogin").setExecutor(new AdminCommand(this));
 
         getLogger().info("SolanaLogin plugin has been enabled!");
@@ -87,5 +86,14 @@ public final class SolanaLogin extends JavaPlugin {
     public String formatMessage(String message) {
         String prefix = getConfig().getString("messages.prefix", "&8[&6SolanaLogin&8] &r");
         return ChatColor.translateAlternateColorCodes('&', prefix + message);
+    }
+
+    /**
+     * Get the web server URL from the config.
+     *
+     * @return The web server URL
+     */
+    public String getWebServerUrl() {
+        return getConfig().getString("web-server.url", "http://localhost:3000");
     }
 }

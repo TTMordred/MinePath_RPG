@@ -27,7 +27,7 @@ commands:
   # Wallet commands
   connectwallet:
     description: Connect your Solana wallet to your Minecraft account
-    usage: /connectwallet <wallet_address>
+    usage: /connectwallet or /connectwallet qr
     permission: solanalogin.wallet.connect
   disconnectwallet:
     description: Disconnect your Solana wallet from your Minecraft account
@@ -37,10 +37,6 @@ commands:
     description: View your Solana wallet information
     usage: /walletinfo
     permission: solanalogin.wallet.info
-  verifycode:
-    description: Verify your wallet with a verification code
-    usage: /verifycode <code>
-    permission: solanalogin.wallet.verify
 
   # Admin commands
   solanalogin:

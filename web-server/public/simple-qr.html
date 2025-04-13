@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple QR Test - SolanaLogin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background-color: #512da8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .log {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+    }
+    .qr-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .qr-container img {
+      max-width: 300px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple QR Code Test</h1>
+  <p>This page tests QR code generation for Phantom wallet connection.</p>
+  
+  <div>
+    <button id="generate-qr">Generate QR Code</button>
+    <button id="check-status">Check Status</button>
+    <button id="clear-log">Clear Log</button>
+  </div>
+  
+  <div class="qr-container" id="qr-container"></div>
+  
+  <div class="log" id="log"></div>
+  
+  <script>
+    // Elements
+    const logEl = document.getElementById('log');
+    const qrContainerEl = document.getElementById('qr-container');
+    const generateQrBtn = document.getElementById('generate-qr');
+    const checkStatusBtn = document.getElementById('check-status');
+    const clearLogBtn = document.getElementById('clear-log');
+    
+    // Session data
+    let currentSession = null;
+    
+    // Log function
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${type}] ${message}`);
+    }
+    
+    // Generate QR Code
+    generateQrBtn.addEventListener('click', async () => {
+      try {
+        // Clear previous QR code
+        qrContainerEl.innerHTML = '';
+        
+        // Create demo session
+        const demoSession = 'demo-' + Date.now();
+        const demoNonce = 'nonce-' + Date.now();
+        const demoPlayer = 'TestPlayer';
+        
+        log(`Creating demo session: ${demoSession}`);
+        
+        // Generate QR code
+        const response = await fetch(`/api/qr?session=${demoSession}&nonce=${demoNonce}&player=${demoPlayer}`);
+        if (!response.ok) {
+          throw new Error(`Failed to generate QR code: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        log('QR code generated successfully!', 'success');
+        
+        // Display QR code
+        const qrImg = document.createElement('img');
+        qrImg.src = data.qrCode;
+        qrImg.alt = 'QR Code';
+        qrContainerEl.appendChild(qrImg);
+        
+        // Display deep link
+        const deepLinkP = document.createElement('p');
+        deepLinkP.innerHTML = `<a href="${data.deepLink}" target="_blank">Open Deep Link</a>`;
+        qrContainerEl.appendChild(deepLinkP);
+        
+        // Store session
+        currentSession = demoSession;
+        log(`Scan this QR code with Phantom mobile app or click the deep link.`);
+        log(`Session ID: ${currentSession}`);
+      } catch (error) {
+        log(`Error generating QR code: ${error.message}`, 'error');
+      }
+    });
+    
+    // Check Status
+    checkStatusBtn.addEventListener('click', async () => {
+      try {
+        if (!currentSession) {
+          log('No active session. Generate a QR code first.', 'error');
+          return;
+        }
+        
+        log(`Checking status for session: ${currentSession}`);
+        
+        const response = await fetch(`/status?session=${currentSession}`);
+        if (!response.ok) {
+          throw new Error(`Failed to check status: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        log(`Status: ${JSON.stringify(data)}`);
+        
+        if (data.connected) {
+          log(`Connected to wallet: ${data.walletAddress}`, 'success');
+        } else {
+          log('Not connected yet. Try scanning the QR code again.');
+        }
+      } catch (error) {
+        log(`Error checking status: ${error.message}`, 'error');
+      }
+    });
+    
+    // Clear log
+    clearLogBtn.addEventListener('click', () => {
+      logEl.innerHTML = '';
+      log('Log cleared.');
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Page loaded. Click "Generate QR Code" to start.');
+    });
+  </script>
+</body>
+</html>
