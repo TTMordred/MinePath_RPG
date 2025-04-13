@@ -30,8 +30,8 @@ auth:
 
 # Solana Settings
 solana:
-  network: "mainnet"  # mainnet, testnet, or devnet
-  rpc-url: "https://api.mainnet-beta.solana.com"  # RPC URL for Solana network
+  network: "devnet"  # mainnet, testnet, or devnet
+  rpc-url: "https://api.devnet.solana.com"  # RPC URL for Solana network
   verification-message: "I confirm that I own this wallet and authorize its use on the Minecraft server."  # Message to sign for verification
 
 # Web Server Settings

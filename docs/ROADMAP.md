@@ -13,7 +13,7 @@ This document outlines the planned features and improvements for the SolanaLogin
 
 ## Current Status
 
-**Version 1.3 (Current Release)**
+**Version 1.2 (Current Release)**
 
 - Solana wallet authentication via QR code and browser extension
 - Integration with Solana devnet
