@@ -1,77 +1,118 @@
 # SolanaLogin Web Server
 
-Đây là thành phần máy chủ web của dự án SolanaLogin, xử lý xác thực ví Solana cho plugin Minecraft.
+This is the web server component of the SolanaLogin project, handling Solana wallet authentication for the Minecraft plugin.
 
-## Tính năng
+## Features
 
-- Xác thực ví Solana thông qua chữ ký blockchain
-- Hỗ trợ kết nối qua Phantom browser extension
-- Tạo và xử lý mã QR cho ứng dụng Phantom mobile
-- Tích hợp với mạng Solana devnet
-- API RESTful để tương tác với plugin Minecraft
+- Solana wallet authentication through blockchain signatures
+- Support for Phantom browser extension connections
+- QR code generation and handling for Phantom mobile app
+- Integration with Solana devnet network
+- RESTful API for interaction with the Minecraft plugin
 
-## Cài đặt
+## Installation
 
-1. Cài đặt Node.js (phiên bản 14 hoặc cao hơn)
-2. Cài đặt các phụ thuộc:
+1. Install Node.js (version 14 or higher)
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Khởi động máy chủ:
+3. Start the server:
    ```bash
    npm start
    ```
 
-Máy chủ sẽ chạy trên cổng 3000 theo mặc định. Bạn có thể thay đổi bằng cách đặt biến môi trường `PORT`.
+The server will run on port 3000 by default. You can change this by setting the `PORT` environment variable.
 
 ## API Endpoints
 
-- `GET /login` - Trang đăng nhập
-- `GET /api/qr` - Tạo mã QR cho kết nối mobile
-- `POST /api/verify` - Xác minh chữ ký ví
-- `GET /status` - Kiểm tra trạng thái kết nối
-- `GET /phantom-redirect` - Xử lý redirect từ Phantom
+- `GET /login` - Login page
+- `GET /api/qr` - Generate QR code for mobile connection
+- `POST /api/verify` - Verify wallet signature
+- `GET /status` - Check connection status
+- `GET /phantom-redirect` - Handle redirect from Phantom
 
-## Trang kiểm tra và debug
+## Testing and Debug Pages
 
-Máy chủ web bao gồm một số trang kiểm tra để giúp debug các vấn đề kết nối ví:
+The web server includes several test pages to help debug wallet connection issues:
 
 1. **Test Flow**: `/test-flow.html`
-   Truy cập http://localhost:3000/test-flow.html
-   - Kiểm tra toàn bộ quy trình kết nối ví
-   - Tạo session, kết nối ví và xác minh kết nối
+   Access http://localhost:3000/test-flow.html
+   - Test the complete wallet connection flow
+   - Create session, connect wallet, and verify connection
 
 2. **Simple Connect**: `/simple-connect.html`
-   - Kiểm tra kết nối cơ bản với Phantom extension
-   - Kiểm tra ký tin nhắn
+   - Test basic connection with Phantom extension
+   - Test message signing
 
 3. **Simple QR**: `/simple-qr.html`
-   - Kiểm tra tạo và quét mã QR
-   - Kiểm tra deep link cho Phantom mobile
+   - Test QR code generation and scanning
+   - Test deep linking for Phantom mobile
 
 4. **Simple Redirect**: `/simple-redirect.html`
-   - Kiểm tra xử lý redirect từ Phantom
-   - Kiểm tra các tham số URL
+   - Test Phantom redirect handling
+   - Test URL parameters
 
-## Cấu hình
+## Configuration
 
-Đảm bảo URL trong tệp `config.yml` của plugin Minecraft khớp với URL nơi máy chủ web này đang chạy:
+Make sure the URL in the Minecraft plugin's `config.yml` file matches the URL where this web server is running:
 
 ```yaml
 web-server:
   enabled: true
-  url: "http://localhost:3000"  # Thay đổi thành URL của máy chủ của bạn
+  url: "http://localhost:3000"  # Change to your server's URL
   port: 3000
   qr-code-timeout: 300
   check-interval: 5
 ```
 
-## Cập nhật mới nhất (Version 1.2)
+## Development Mode
 
-- Chuyển sang sử dụng mạng Solana devnet
-- Cải thiện xử lý kết nối ví Phantom
-- Sửa lỗi "Missing required parameters" khi xác minh chữ ký
-- Đơn giản hóa định dạng deep link cho Phantom wallet
-- Thêm chế độ phát triển (development mode) để dễ dàng debug
-- Cải thiện xử lý lỗi và logging
-- Thêm các trang kiểm tra đơn giản để debug kết nối ví
+The server includes a development mode that makes debugging easier:
+
+```javascript
+// Set development mode for testing
+process.env.NODE_ENV = 'development';
+```
+
+In development mode:
+- Missing parameters will be auto-filled with test values
+- Signature verification is more lenient
+- More detailed logging is enabled
+
+To run in production mode, set `NODE_ENV=production` in your environment variables.
+
+## Latest Updates (Version 1.3)
+
+- Optimized code structure with utility functions
+- Improved signature handling from Phantom wallet
+- Fixed "Empty signature" error when connecting from Minecraft
+- Added multiple fallback methods for signature handling
+- Improved UI and user experience
+- Added more detailed logging for easier debugging
+
+## Previous Updates (Version 1.2)
+
+- Switched to Solana devnet network
+- Improved Phantom wallet connection handling
+- Fixed "Missing required parameters" error during signature verification
+- Simplified deep link format for Phantom wallet
+- Added development mode for easier debugging
+- Improved error handling and logging
+- Added simple test pages for wallet connection debugging
+
+## Troubleshooting
+
+### Common Issues
+
+- **"Missing required parameters" error**: Ensure the login URL contains all required parameters: session, nonce, and player.
+- **Cannot connect to Phantom**: Check that the Phantom extension is installed and logged in.
+- **QR code not working**: Make sure the Phantom app is updated to the latest version.
+- **Signature verification fails**: Try using the Simple Connect test page to verify that signature generation works correctly.
+
+### Debugging Tips
+
+1. Check the console logs for detailed error messages
+2. Use the test pages to isolate specific components of the authentication flow
+3. Ensure your Phantom wallet is connected to the correct Solana network (devnet)
+4. Verify that CORS is properly configured if accessing from a different domain

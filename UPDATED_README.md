@@ -1,245 +1,245 @@
 # SolanaLogin - Minecraft Solana Wallet Authentication
 
-SolanaLogin là một plugin Minecraft cho phép người chơi đăng nhập bằng ví Solana, tích hợp blockchain vào trải nghiệm chơi game. Dự án này bao gồm một plugin Spigot và một máy chủ web để xử lý xác thực ví.
+SolanaLogin is a Minecraft plugin that allows players to authenticate using Solana wallets, integrating blockchain into the gaming experience. This project includes a Spigot plugin and a web server component for wallet authentication.
 
-## Tính năng
+## Features
 
-- Đăng nhập Minecraft bằng ví Solana (Phantom)
-- Hỗ trợ hai phương thức xác thực:
-  - Kết nối trực tiếp qua Phantom browser extension
-  - Quét mã QR bằng ứng dụng Phantom trên điện thoại
-- Xác thực an toàn thông qua chữ ký blockchain
-- Tích hợp với mạng Solana devnet
-- Hỗ trợ phiên bản Minecraft "cracked"
+- Minecraft login with Solana wallet (Phantom)
+- Support for two authentication methods:
+  - Direct connection via Phantom browser extension
+  - QR code scanning with Phantom mobile app
+- Secure authentication through blockchain signatures
+- Integration with Solana devnet
+- Support for "cracked" Minecraft versions
 
-## Cấu trúc dự án
+## Project Structure
 
-Dự án được chia thành hai phần chính:
+The project is divided into two main components:
 
-1. **Plugin Minecraft (thư mục `src/`)**: Plugin Spigot xử lý các lệnh trong game và tương tác với máy chủ web.
-2. **Máy chủ web (thư mục `web-server/`)**: Máy chủ Express.js xử lý xác thực ví Solana và tạo mã QR.
+1. **Minecraft Plugin (`src/` directory)**: Spigot plugin that handles in-game commands and interacts with the web server.
+2. **Web Server (`web-server/` directory)**: Express.js server that handles Solana wallet authentication and QR code generation.
 
-## Yêu cầu
+## Requirements
 
-- Java 8 hoặc cao hơn
-- Máy chủ Minecraft Spigot/Paper
-- Node.js 14 hoặc cao hơn
-- Ví Phantom (extension hoặc ứng dụng di động)
+- Java 8 or higher
+- Minecraft Spigot/Paper server
+- Node.js 14 or higher
+- Phantom wallet (browser extension or mobile app)
 
-## Cài đặt
+## Installation
 
-### Plugin Minecraft
+### Minecraft Plugin
 
-1. Biên dịch plugin hoặc tải tệp JAR từ phần Releases
-2. Đặt tệp JAR vào thư mục `plugins` của máy chủ Minecraft
-3. Khởi động lại máy chủ
-4. Cấu hình plugin trong tệp `plugins/SolanaLogin/config.yml`
+1. Compile the plugin or download the JAR file from the Releases section
+2. Place the JAR file in the `plugins` directory of your Minecraft server
+3. Restart the server
+4. Configure the plugin in the `plugins/SolanaLogin/config.yml` file
 
-### Máy chủ web
+### Web Server
 
-1. Di chuyển đến thư mục `web-server`
-2. Cài đặt các phụ thuộc:
+1. Navigate to the `web-server` directory
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Khởi động máy chủ:
+3. Start the server:
    ```bash
    npm start
    ```
 
-## Cấu hình
+## Configuration
 
-### Plugin Minecraft (config.yml)
+### Minecraft Plugin (config.yml)
 
 ```yaml
-# Cài đặt máy chủ web
+# Web Server Settings
 web-server:
-  enabled: true  # Bật/tắt máy chủ web cho đăng nhập QR code
-  url: "http://localhost:3000"  # URL của máy chủ web
-  port: 3000  # Cổng của máy chủ web
-  qr-code-timeout: 300  # Thời gian hết hạn của mã QR (giây)
-  check-interval: 5  # Thời gian kiểm tra trạng thái kết nối (giây)
+  enabled: true  # Enable/disable web server for QR code login
+  url: "http://localhost:3000"  # Web server URL
+  port: 3000  # Web server port
+  qr-code-timeout: 300  # QR code expiration time (seconds)
+  check-interval: 5  # Connection status check interval (seconds)
 
-# Cài đặt Solana
+# Solana Settings
 solana:
-  network: "devnet"  # Mạng Solana (devnet, testnet, mainnet-beta)
-  rpc-url: "https://api.devnet.solana.com"  # URL RPC của Solana
+  network: "devnet"  # Solana network (devnet, testnet, mainnet-beta)
+  rpc-url: "https://api.devnet.solana.com"  # Solana RPC URL
 
-# Cài đặt bảo mật
+# Security Settings
 security:
-  max-login-attempts: 5  # Số lần đăng nhập tối đa trước khi tạm khóa
-  login-timeout: 300  # Thời gian tạm khóa sau khi đăng nhập thất bại (giây)
-  session-timeout: 3600  # Thời gian hết hạn phiên đăng nhập (giây)
+  max-login-attempts: 5  # Maximum login attempts before lockout
+  login-timeout: 300  # Lockout time after failed login attempts (seconds)
+  session-timeout: 3600  # Session expiration time (seconds)
 
-# Cài đặt cơ sở dữ liệu
+# Database Settings
 database:
-  type: "sqlite"  # Loại cơ sở dữ liệu (sqlite, mysql)
-  file: "database.db"  # Tên tệp SQLite
+  type: "sqlite"  # Database type (sqlite, mysql)
+  file: "database.db"  # SQLite file name
 ```
 
-### Máy chủ web (.env hoặc biến môi trường)
+### Web Server (.env or environment variables)
 
 ```
-PORT=3000  # Cổng máy chủ web
-NODE_ENV=development  # Môi trường (development, production)
+PORT=3000  # Web server port
+NODE_ENV=development  # Environment (development, production)
 ```
 
-## Sử dụng
+## Usage
 
-### Lệnh trong game
+### In-game Commands
 
-- `/connectwallet` - Mở giao diện kết nối ví
-- `/login` - Đăng nhập bằng ví đã kết nối
-- `/logout` - Đăng xuất khỏi phiên hiện tại
-- `/walletinfo` - Hiển thị thông tin ví đã kết nối
+- `/connectwallet` - Open wallet connection interface
+- `/login` - Login with connected wallet
+- `/logout` - Logout from current session
+- `/walletinfo` - Display connected wallet information
 
-### Quy trình đăng nhập
+### Login Process
 
-#### Phương thức 1: Kết nối qua Phantom Extension
+#### Method 1: Connect via Phantom Extension
 
-1. Sử dụng lệnh `/connectwallet` trong Minecraft
-2. Nhấp vào liên kết được hiển thị trong trò chơi
-3. Trên trang web, nhấp vào "Connect with Phantom"
-4. Xác nhận kết nối trong extension Phantom
-5. Ký tin nhắn xác thực
-6. Quay lại Minecraft và sử dụng lệnh `/login`
+1. Use the `/connectwallet` command in Minecraft
+2. Click on the link displayed in the game
+3. On the web page, click "Connect with Phantom"
+4. Confirm the connection in the Phantom extension
+5. Sign the verification message
+6. Return to Minecraft and use the `/login` command
 
-#### Phương thức 2: Quét mã QR bằng Phantom Mobile
+#### Method 2: Scan QR Code with Phantom Mobile
 
-1. Sử dụng lệnh `/connectwallet qr` trong Minecraft
-2. Nhấp vào liên kết được hiển thị trong trò chơi
-3. Quét mã QR bằng ứng dụng Phantom trên điện thoại
-4. Xác nhận kết nối và ký tin nhắn trong ứng dụng Phantom
-5. Quay lại Minecraft và sử dụng lệnh `/login`
+1. Use the `/connectwallet qr` command in Minecraft
+2. Click on the link displayed in the game
+3. Scan the QR code with the Phantom app on your phone
+4. Confirm the connection and sign the message in the Phantom app
+5. Return to Minecraft and use the `/login` command
 
-## Xử lý sự cố
+## Troubleshooting
 
-### Vấn đề kết nối ví
+### Wallet Connection Issues
 
-- **Lỗi "Missing required parameters"**: Đảm bảo URL đăng nhập chứa đầy đủ các tham số session, nonce và player.
-- **Không thể kết nối với Phantom**: Kiểm tra xem Phantom extension đã được cài đặt và đăng nhập.
-- **Mã QR không hoạt động**: Đảm bảo ứng dụng Phantom đã được cập nhật lên phiên bản mới nhất.
+- **"Missing required parameters" error**: Ensure the login URL contains all required parameters: session, nonce, and player.
+- **Cannot connect to Phantom**: Check that the Phantom extension is installed and logged in.
+- **QR code not working**: Make sure the Phantom app is updated to the latest version.
 
-### Vấn đề máy chủ web
+### Web Server Issues
 
-- **Máy chủ web không khởi động**: Kiểm tra xem Node.js đã được cài đặt và các phụ thuộc đã được cài đặt đúng cách.
-- **Lỗi CORS**: Đảm bảo URL trong config.yml khớp với URL thực tế của máy chủ web.
+- **Web server won't start**: Check that Node.js is installed and dependencies are correctly installed.
+- **CORS errors**: Ensure the URL in config.yml matches the actual URL of the web server.
 
-### Vấn đề plugin
+### Plugin Issues
 
-- **Plugin không tải**: Kiểm tra phiên bản Java và Spigot/Paper.
-- **Lệnh không hoạt động**: Kiểm tra quyền của người chơi và cấu hình plugin.
+- **Plugin won't load**: Check Java and Spigot/Paper versions.
+- **Commands not working**: Check player permissions and plugin configuration.
 
-## Trang kiểm tra và debug
+## Testing and Debug Pages
 
-Máy chủ web bao gồm một số trang kiểm tra để giúp debug các vấn đề kết nối ví:
+The web server includes several test pages to help debug wallet connection issues:
 
 1. **Test Flow**: `http://localhost:3000/test-flow.html`
-   - Kiểm tra toàn bộ quy trình kết nối ví
-   - Tạo session, kết nối ví và xác minh kết nối
+   - Test the complete wallet connection flow
+   - Create session, connect wallet, and verify connection
 
 2. **Simple Connect**: `http://localhost:3000/simple-connect.html`
-   - Kiểm tra kết nối cơ bản với Phantom extension
-   - Kiểm tra ký tin nhắn
+   - Test basic connection with Phantom extension
+   - Test message signing
 
 3. **Simple QR**: `http://localhost:3000/simple-qr.html`
-   - Kiểm tra tạo và quét mã QR
-   - Kiểm tra deep link cho Phantom mobile
+   - Test QR code generation and scanning
+   - Test deep linking for Phantom mobile
 
 4. **Simple Redirect**: `http://localhost:3000/simple-redirect.html`
-   - Kiểm tra xử lý redirect từ Phantom
-   - Kiểm tra các tham số URL
+   - Test Phantom redirect handling
+   - Test URL parameters
 
 ## Changelog
 
-### Version 1.3 (Cập nhật mới nhất)
+### Version 1.3 (Latest Update)
 
-- Tối ưu hóa cấu trúc code với các utility functions
-- Cải thiện xử lý chữ ký từ Phantom wallet
-- Sửa lỗi "Empty signature" khi kết nối từ Minecraft
-- Thêm nhiều phương thức dự phòng để xử lý chữ ký
-- Cải thiện UI và trải nghiệm người dùng
-- Thêm logging chi tiết hơn để dễ dàng debug
+- Optimized code structure with utility functions
+- Improved signature handling from Phantom wallet
+- Fixed "Empty signature" error when connecting from Minecraft
+- Added multiple fallback methods for signature handling
+- Improved UI and user experience
+- Added more detailed logging for easier debugging
 
 ### Version 1.2
 
-- Chuyển sang sử dụng mạng Solana devnet
-- Cải thiện xử lý kết nối ví Phantom
-- Sửa lỗi "Missing required parameters" khi xác minh chữ ký
-- Đơn giản hóa định dạng deep link cho Phantom wallet
-- Thêm chế độ phát triển (development mode) để dễ dàng debug
-- Cải thiện xử lý lỗi và logging
-- Thêm các trang kiểm tra đơn giản để debug kết nối ví
+- Switched to Solana devnet network
+- Improved Phantom wallet connection handling
+- Fixed "Missing required parameters" error during signature verification
+- Simplified deep link format for Phantom wallet
+- Added development mode for easier debugging
+- Improved error handling and logging
+- Added simple test pages for wallet connection debugging
 
 ### Version 1.1
 
-- Thêm hỗ trợ kết nối ví qua mã QR và browser extension
-- Thêm thành phần máy chủ web cho xác thực ví Solana
-- Cải thiện cấu trúc mã trong các lớp lệnh
-- Cải thiện logging với kiểm tra cấp độ để tăng hiệu suất
-- Thêm kiểm tra null và xử lý lỗi phù hợp
-- Sửa rò rỉ bộ nhớ tiềm ẩn trong kết nối cơ sở dữ liệu
-- Cải thiện xác thực ví cho ví Phantom
+- Added QR code and browser extension wallet connection support
+- Added web server component for Solana wallet authentication
+- Improved code structure in command classes
+- Improved logging with level checks for better performance
+- Added proper null checks and error handling
+- Fixed potential memory leaks in database connections
+- Improved wallet validation for Phantom wallets
 
 ### Version 1.0
 
-- Phát hành ban đầu
-- Chức năng kết nối ví cơ bản
-- Tích hợp cơ sở dữ liệu SQLite
-- Lệnh đăng nhập và đăng ký
-- Tính năng bảo mật cơ bản
+- Initial release
+- Basic wallet connection functionality
+- SQLite database integration
+- Login and registration commands
+- Basic security features
 
-## Phát triển
+## Development
 
-### Yêu cầu phát triển
+### Development Requirements
 
-- JDK 8 hoặc cao hơn
+- JDK 8 or higher
 - Maven
-- Node.js và npm
-- IDE Java (IntelliJ IDEA, Eclipse)
+- Node.js and npm
+- Java IDE (IntelliJ IDEA, Eclipse)
 
-### Biên dịch plugin
+### Compiling the Plugin
 
 ```bash
 mvn clean package
 ```
 
-### Chạy máy chủ web trong chế độ phát triển
+### Running the Web Server in Development Mode
 
 ```bash
 cd web-server
 npm run dev
 ```
 
-### Cấu trúc mã nguồn
+### Source Code Structure
 
-- `src/main/java/com/nftlogin/walletlogin/` - Mã nguồn Java cho plugin
-  - `commands/` - Các lệnh trong game
-  - `database/` - Xử lý cơ sở dữ liệu
-  - `session/` - Quản lý phiên đăng nhập
-  - `utils/` - Tiện ích
-- `web-server/` - Mã nguồn máy chủ web
-  - `public/` - Tệp tĩnh (HTML, CSS, JS)
-  - `server.js` - Mã nguồn máy chủ Express
+- `src/main/java/com/nftlogin/walletlogin/` - Java source code for the plugin
+  - `commands/` - In-game commands
+  - `database/` - Database handling
+  - `session/` - Session management
+  - `utils/` - Utilities
+- `web-server/` - Web server source code
+  - `public/` - Static files (HTML, CSS, JS)
+  - `server.js` - Express server source code
 
-## Đóng góp
+## Contributing
 
-Đóng góp luôn được chào đón! Vui lòng làm theo các bước sau:
+Contributions are always welcome! Please follow these steps:
 
-1. Fork dự án
-2. Tạo nhánh tính năng (`git checkout -b feature/amazing-feature`)
-3. Commit thay đổi (`git commit -m 'Add some amazing feature'`)
-4. Push lên nhánh (`git push origin feature/amazing-feature`)
-5. Mở Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Giấy phép
+## License
 
-Dự án này được cấp phép theo giấy phép MIT - xem tệp [LICENSE](LICENSE) để biết chi tiết.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Liên hệ
+## Contact
 
-Nếu bạn có bất kỳ câu hỏi hoặc đề xuất nào, vui lòng mở một issue trên GitHub.
+If you have any questions or suggestions, please open an issue on GitHub.
 
 ---
 
-Dự án được phát triển cho Solana Hackathon 2025.
+Developed for the Solana Hackathon 2025.

@@ -25,6 +25,15 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 - MySQL database support
 - Session management
 
+## Documentation
+
+This project includes comprehensive documentation split across multiple files:
+
+- [README.md](README.md) - Main project overview and documentation (this file)
+- [INSTALL.md](INSTALL.md) - Detailed installation instructions
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Guide for developers contributing to the project
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Solutions for common issues
+
 ## Table of Contents
 
 1. [Development Setup](#development-setup)
@@ -472,4 +481,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-If you have any questions or need help, please feel free to open an issue or contact us at [NFTLogin](https://nftlogin.com).
+If you have any questions or need help, please:
+
+1. Check our documentation:
+   - [README.md](README.md) - Main project overview
+   - [INSTALL.md](INSTALL.md) - Installation instructions
+   - [DEVELOPMENT.md](DEVELOPMENT.md) - Development guide
+   - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
+2. Open an issue on the GitHub repository
+3. Contact us at [NFTLogin](https://nftlogin.com)
