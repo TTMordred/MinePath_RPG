@@ -4,7 +4,7 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 ## Changelog
 
-### Version 1.2
+### Version 1.2 
 
 - **Removed manual wallet connection method** for improved security and user experience
 - **Removed verification code functionality** as it's no longer needed
