@@ -4,6 +4,17 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 ## Changelog
 
+### Version 1.2
+
+- **Removed manual wallet connection method** for improved security and user experience
+- **Removed verification code functionality** as it's no longer needed
+- **Simplified wallet connection process** to focus on QR code and browser extension methods
+- Added comprehensive documentation including visual guides and development resources
+- Updated all commands and help messages to reflect the new connection methods
+- Improved error handling and user feedback
+- Added detailed roadmap for future development
+- Created guides for adding new wallet integrations and enhancing the web interface
+
 ### Version 1.1
 
 - Added QR code and browser extension wallet connection support
@@ -15,7 +26,6 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 - Fixed potential memory leaks in database connections
 - Improved wallet validation for Phantom wallets
 - Enhanced code documentation and comments
-- Updated comprehensive documentation
 
 ### Version 1.0
 
@@ -343,12 +353,11 @@ web-server:
 3. Server checks if player has a connected wallet
 4. If not, server prompts player to connect a wallet
 5. Player has a limited time to connect a wallet before being kicked
-6. Player connects wallet using one of two methods:
-   - **Method 1:** Player uses `/connectwallet <wallet_address>` and then verifies with `/verifycode <code>`
-   - **Method 2:** Player uses `/connectwallet` or `/connectwallet qr` to get QR code/link options
+6. Player connects wallet using `/connectwallet` or `/connectwallet qr`
 7. Player scans QR code with mobile wallet or clicks link to connect via browser extension
-8. Wallet is automatically verified through direct signature verification
-9. Player can now play on the server
+8. Player approves the connection in their wallet
+9. Wallet is automatically verified through blockchain signature verification
+10. Player can now play on the server
 
 ## Technical Architecture
 
@@ -361,7 +370,8 @@ web-server:
 
 2. **Wallet Integration**
    - Wallet address validation
-   - Wallet connection and verification
+   - QR code and browser extension wallet connection
+   - Blockchain signature verification
    - Wallet type detection (Phantom, Solana)
 
 3. **Database Management**
@@ -438,39 +448,7 @@ For a detailed roadmap of future features and improvements, see our [Project Roa
    - Implement NFT-based permissions and features
    - Create in-game representation of NFTs
 
-### Medium-term Roadmap
 
-1. **Multi-wallet Support**
-   - Add support for multiple wallets per player
-   - Allow different wallet types (Ethereum, Bitcoin, etc.)
-   - Implement cross-chain verification
-
-2. **Token Economy**
-   - Integrate with server economy
-   - Allow token-based transactions
-   - Implement token rewards for in-game activities
-
-3. **Enhanced Security**
-   - Add two-factor authentication
-   - Implement IP-based security measures
-   - Add anti-bot protection
-
-### Long-term Vision
-
-1. **Blockchain Game Integration**
-   - Create a full blockchain-based game economy
-   - Implement on-chain assets and inventory
-   - Allow trading of in-game items as NFTs
-
-2. **Decentralized Identity**
-   - Implement decentralized identity verification
-   - Allow cross-server authentication
-   - Create a reputation system
-
-3. **Developer API**
-   - Create a public API for other plugins to integrate with
-   - Allow third-party wallet integrations
-   - Support custom blockchain implementations
 
 ### Implementation Plan
 

@@ -1,7 +1,6 @@
 package com.nftlogin.walletlogin.session;
 
 import com.nftlogin.walletlogin.SolanaLogin;
-import com.nftlogin.walletlogin.utils.PasswordUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -164,9 +163,14 @@ public class SessionManager {
     /**
      * Stores a verification code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      * @param code The verification code
      */
+    @Deprecated
     public void storeVerificationCode(UUID uuid, String code) {
         verificationCodes.put(uuid, code);
     }
@@ -174,10 +178,15 @@ public class SessionManager {
     /**
      * Verifies a code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      * @param code The code to verify
      * @return true if the code is valid, false otherwise
      */
+    @Deprecated
     public boolean verifyCode(UUID uuid, String code) {
         String storedCode = verificationCodes.get(uuid);
         if (storedCode != null && storedCode.equals(code)) {
@@ -190,8 +199,13 @@ public class SessionManager {
     /**
      * Removes a verification code for a player.
      *
+     * @deprecated This method is used for the manual wallet connection method which is being phased out.
+     *             It is kept for backward compatibility but will be removed in a future version.
+     *             Use the QR code or browser extension connection methods instead.
+     *
      * @param uuid The player's UUID
      */
+    @Deprecated
     public void removeVerificationCode(UUID uuid) {
         verificationCodes.remove(uuid);
     }
@@ -203,9 +217,17 @@ public class SessionManager {
      * @return The generated nonce
      */
     public String generateAuthNonce(UUID uuid) {
-        String nonce = PasswordUtils.generateVerificationCode(12);
-        authNonces.put(uuid, nonce);
-        return nonce;
+        // Generate a random nonce (12 characters)
+        StringBuilder nonce = new StringBuilder();
+        String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        for (int i = 0; i < 12; i++) {
+            nonce.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        String nonceStr = nonce.toString();
+        authNonces.put(uuid, nonceStr);
+        return nonceStr;
     }
 
     /**

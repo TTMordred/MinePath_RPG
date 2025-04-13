@@ -37,7 +37,6 @@ public final class SolanaLogin extends JavaPlugin {
         getCommand("connectwallet").setExecutor(new ConnectWalletCommand(this));
         getCommand("disconnectwallet").setExecutor(new DisconnectWalletCommand(this));
         getCommand("walletinfo").setExecutor(new WalletInfoCommand(this));
-        getCommand("verifycode").setExecutor(new VerifyCodeCommand(this));
         getCommand("solanalogin").setExecutor(new AdminCommand(this));
 
         getLogger().info("SolanaLogin plugin has been enabled!");

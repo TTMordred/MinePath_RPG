@@ -1,7 +1,6 @@
 package com.nftlogin.walletlogin.commands;
 
 import com.nftlogin.walletlogin.SolanaLogin;
-import com.nftlogin.walletlogin.utils.PasswordUtils;
 import com.nftlogin.walletlogin.utils.WalletValidator;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -42,102 +41,26 @@ public class ConnectWalletCommand implements CommandExecutor {
         // Check if web server is enabled
         boolean webServerEnabled = plugin.getConfig().getBoolean("web-server.enabled", false);
 
-        // If no arguments, show QR code login option if web server is enabled
-        if (args.length == 0) {
-            if (webServerEnabled) {
-                return showQRCodeLogin(player);
-            } else {
-                player.sendMessage(plugin.formatMessage("&cUsage: /connectwallet <wallet_address>"));
-                return false;
-            }
+        if (!webServerEnabled) {
+            player.sendMessage(plugin.formatMessage("&cWallet connection is not enabled on this server."));
+            return true;
         }
 
         // If argument is "qr", show QR code login option
         if (args.length == 1 && args[0].equalsIgnoreCase("qr")) {
-            if (webServerEnabled) {
-                return showQRCodeLogin(player);
-            } else {
-                player.sendMessage(plugin.formatMessage("&cQR code login is not enabled on this server."));
-                return true;
-            }
+            return showQRCodeLogin(player);
         }
 
-        // Otherwise, treat as wallet address
-        if (args.length == 1) {
-            String walletAddress = args[0];
-            return connectWallet(player, walletAddress);
+        // Default to showing QR code login option
+        if (args.length == 0) {
+            return showQRCodeLogin(player);
         } else {
-            player.sendMessage(plugin.formatMessage("&cUsage: /connectwallet <wallet_address> or /connectwallet qr"));
+            player.sendMessage(plugin.formatMessage("&cUsage: /connectwallet or /connectwallet qr"));
             return false;
         }
     }
 
-    /**
-     * Connect a wallet to a player's account.
-     *
-     * @param player The player
-     * @param walletAddress The wallet address to connect
-     * @return true if the wallet was connected successfully, false otherwise
-     */
-    private boolean connectWallet(Player player, String walletAddress) {
-        UUID playerUuid = player.getUniqueId();
 
-        // Check if player is logged in
-        if (!plugin.getSessionManager().hasSession(playerUuid) ||
-                !plugin.getSessionManager().getSession(playerUuid).isAuthenticated()) {
-            String message = plugin.getConfig().getString("messages.not-logged-in",
-                    "You must be logged in to use this command!");
-            player.sendMessage(plugin.formatMessage(message));
-            return false;
-        }
-
-        // Check if player already has a wallet connected
-        Optional<String> existingWallet = plugin.getDatabaseManager().getWalletAddress(playerUuid);
-        if (existingWallet.isPresent()) {
-            String message = plugin.getConfig().getString("messages.already-connected",
-                    "You already have a wallet connected. Use /disconnectwallet first.");
-            player.sendMessage(plugin.formatMessage(message));
-            return false;
-        }
-
-        // Validate wallet address if validation is enabled
-        if (plugin.getConfig().getBoolean("settings.wallet-validation", true) &&
-                !WalletValidator.isValidWalletAddress(walletAddress)) {
-            String message = plugin.getConfig().getString("messages.invalid-wallet",
-                    "The wallet address you provided is not a valid Solana address.");
-            player.sendMessage(plugin.formatMessage(message));
-            return false;
-        }
-
-        // Get wallet type
-        String walletType = WalletValidator.getWalletType(walletAddress);
-
-        // Connect the wallet
-        boolean success = plugin.getDatabaseManager().connectWallet(playerUuid, walletAddress, walletType);
-        if (success) {
-            // Generate verification code
-            String verificationCode = PasswordUtils.generateVerificationCode(6);
-            plugin.getSessionManager().storeVerificationCode(playerUuid, verificationCode);
-
-            String message = plugin.getConfig().getString("messages.wallet-connected",
-                    "Your Solana wallet has been successfully connected!");
-            player.sendMessage(plugin.formatMessage(message));
-
-            // Send verification instructions
-            player.sendMessage(plugin.formatMessage("&eTo verify your wallet ownership, use the code: &6" + verificationCode));
-            player.sendMessage(plugin.formatMessage("&eYou can verify through the website or use /verifycode <code>"));
-
-            // Log the wallet connection
-            if (plugin.getLogger().isLoggable(Level.INFO)) {
-                plugin.getLogger().info(String.format("Player %s connected a %s wallet: %s",
-                        player.getName(), walletType, walletAddress));
-            }
-            return true;
-        } else {
-            player.sendMessage(plugin.formatMessage("&cFailed to connect your wallet. Please try again later."));
-            return false;
-        }
-    }
 
     /**
      * Show QR code login option to a player.

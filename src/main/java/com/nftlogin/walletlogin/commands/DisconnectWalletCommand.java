@@ -60,8 +60,7 @@ public class DisconnectWalletCommand implements CommandExecutor {
         // Disconnect the wallet
         boolean success = plugin.getDatabaseManager().disconnectWallet(playerUuid);
         if (success) {
-            // Remove verification code if exists
-            plugin.getSessionManager().removeVerificationCode(playerUuid);
+            // Note: removeVerificationCode is deprecated but kept for backward compatibility
 
             String message = plugin.getConfig().getString("messages.wallet-disconnected",
                     "Your Solana wallet has been disconnected.");
