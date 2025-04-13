@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/dist/index.min.js"></script>
+  <script src="https://unpkg.com/bs58@5.0.0/dist/index.js"></script>
 </head>
 <body>
   <div class="container">
@@ -57,9 +58,12 @@
   <script>
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session');
-    const nonce = urlParams.get('nonce');
+    let sessionId = urlParams.get('session');
+    let nonce = urlParams.get('nonce');
     const playerId = urlParams.get('player');
+
+    // Debug info
+    console.log('URL parameters:', { sessionId, nonce, playerId });
 
     // Elements
     const loadingEl = document.getElementById('loading');
@@ -75,9 +79,12 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
+      // Log parameters for debugging
+      console.log('DOMContentLoaded with parameters:', { sessionId, nonce, playerId });
+
       if (!sessionId || !nonce || !playerId) {
-        showError('Missing required parameters');
-        return;
+        console.warn('Missing parameters, will try to continue anyway');
+        // We'll try to continue and let the server handle it
       }
 
       playerIdEl.textContent = playerId;
@@ -113,15 +120,63 @@
           return;
         }
 
+        // Show loading state
+        contentEl.style.display = 'none';
+        loadingEl.style.display = 'block';
+
+        // Double check session parameters
+        if (!sessionId || !nonce) {
+          // Try to get session data from server
+          try {
+            const response = await fetch(`/api/session/${sessionId}`);
+            if (!response.ok) {
+              throw new Error('Session not found or expired');
+            }
+            // If we get here, session exists but might be missing nonce
+            if (!nonce) {
+              const nonceResponse = await fetch(`/api/nonce/${sessionId}`);
+              if (!nonceResponse.ok) {
+                throw new Error('Failed to get nonce');
+              }
+              const nonceData = await nonceResponse.json();
+              nonce = nonceData.nonce;
+            }
+          } catch (error) {
+            showError('Session error: ' + error.message);
+            return;
+          }
+        }
+
         // Connect to wallet
-        await provider.connect();
-        const publicKey = provider.publicKey.toString();
+        let publicKey;
+        try {
+          // Try to get the current connection first
+          const resp = await provider.request({ method: 'connect' });
+          publicKey = resp.publicKey.toString();
+          console.log('Already connected to Phantom:', publicKey);
+        } catch (e) {
+          // If not connected, connect to wallet
+          console.log('Connecting to Phantom...');
+          const connection = await provider.connect();
+          publicKey = connection.publicKey.toString();
+        }
 
         // Sign message
         const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
+        console.log('Signing message:', message);
         const encodedMessage = new TextEncoder().encode(message);
         const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
-        const signature = bs58.encode(signatureBytes);
+        console.log('Signature received from wallet');
+
+        // Use a fallback method if bs58 is not available
+        let signature;
+        if (typeof bs58 !== 'undefined' && bs58.encode) {
+          signature = bs58.encode(signatureBytes);
+        } else {
+          // Fallback to base64 encoding
+          signature = btoa(String.fromCharCode.apply(null, signatureBytes));
+          console.log('Using base64 fallback for signature');
+        }
 
         // Verify signature on server
         const response = await fetch('/api/verify', {

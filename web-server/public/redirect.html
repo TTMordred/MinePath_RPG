@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/dist/index.min.js"></script>
+  <script src="https://unpkg.com/bs58@5.0.0/dist/index.js"></script>
 </head>
 <body>
   <div class="container">
@@ -42,6 +43,13 @@
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session');
+    const errorCode = urlParams.get('errorCode');
+    const errorMessage = urlParams.get('errorMessage');
+
+    // Check for error parameters from Phantom
+    if (errorCode || errorMessage) {
+      console.error('Phantom error:', errorCode, errorMessage);
+    }
 
     // Elements
     const loadingEl = document.getElementById('loading');
@@ -53,8 +61,18 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
+      console.log('Redirect page loaded with parameters:', { sessionId, errorCode, errorMessage });
+
       if (!sessionId) {
-        showError('Missing session parameter');
+        console.error('Missing session parameter');
+        showError('Missing session parameter. Please try again.');
+        return;
+      }
+
+      // If there's an error from Phantom, show it
+      if (errorCode || errorMessage) {
+        console.error('Phantom error:', { errorCode, errorMessage });
+        showError(`Phantom error: ${errorMessage || 'Unknown error'} (${errorCode || 'No code'})`);
         return;
       }
 
@@ -88,9 +106,19 @@
           return;
         }
 
-        // Connect to wallet
-        const connection = await provider.connect();
-        const publicKey = connection.publicKey.toString();
+        // Check if we already have a connection from Phantom
+        let publicKey;
+        try {
+          // Try to get the current connection first
+          const resp = await provider.request({ method: 'connect' });
+          publicKey = resp.publicKey.toString();
+          console.log('Already connected to Phantom:', publicKey);
+        } catch (e) {
+          // If not connected, connect to wallet
+          console.log('Connecting to Phantom...');
+          const connection = await provider.connect();
+          publicKey = connection.publicKey.toString();
+        }
 
         // Get nonce from server
         const nonceResponse = await fetch(`/api/nonce/${sessionId}`);
@@ -103,8 +131,18 @@
         // Sign message
         const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
         const encodedMessage = new TextEncoder().encode(message);
+        console.log('Requesting signature for message:', message);
         const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
-        const signature = bs58.encode(signatureBytes);
+
+        // Use a fallback method if bs58 is not available
+        let signature;
+        if (typeof bs58 !== 'undefined' && bs58.encode) {
+          signature = bs58.encode(signatureBytes);
+        } else {
+          // Fallback to base64 encoding
+          signature = btoa(String.fromCharCode.apply(null, signatureBytes));
+          console.log('Using base64 fallback for signature');
+        }
 
         // Verify signature on server
         const verifyResponse = await fetch('/api/verify', {

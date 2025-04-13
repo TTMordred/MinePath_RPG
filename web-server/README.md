@@ -1,37 +1,77 @@
 # SolanaLogin Web Server
 
-This is the web server component for the SolanaLogin Minecraft plugin. It handles wallet authentication via QR code and browser extension.
+Đây là thành phần máy chủ web của dự án SolanaLogin, xử lý xác thực ví Solana cho plugin Minecraft.
 
-## Setup
+## Tính năng
 
-1. Install dependencies:
+- Xác thực ví Solana thông qua chữ ký blockchain
+- Hỗ trợ kết nối qua Phantom browser extension
+- Tạo và xử lý mã QR cho ứng dụng Phantom mobile
+- Tích hợp với mạng Solana devnet
+- API RESTful để tương tác với plugin Minecraft
+
+## Cài đặt
+
+1. Cài đặt Node.js (phiên bản 14 hoặc cao hơn)
+2. Cài đặt các phụ thuộc:
    ```bash
    npm install
    ```
-
-2. Start the server:
+3. Khởi động máy chủ:
    ```bash
    npm start
    ```
 
-The server will run on port 3000 by default. You can change this by setting the `PORT` environment variable.
+Máy chủ sẽ chạy trên cổng 3000 theo mặc định. Bạn có thể thay đổi bằng cách đặt biến môi trường `PORT`.
 
 ## API Endpoints
 
-- `GET /login` - Login page
-- `GET /api/qr` - Generate QR code for mobile wallet
-- `POST /api/verify` - Verify wallet signature
-- `GET /status` - Check connection status
+- `GET /login` - Trang đăng nhập
+- `GET /api/qr` - Tạo mã QR cho kết nối mobile
+- `POST /api/verify` - Xác minh chữ ký ví
+- `GET /status` - Kiểm tra trạng thái kết nối
+- `GET /phantom-redirect` - Xử lý redirect từ Phantom
 
-## Configuration
+## Trang kiểm tra và debug
 
-Make sure the URL in the Minecraft plugin's `config.yml` matches the URL where this web server is running:
+Máy chủ web bao gồm một số trang kiểm tra để giúp debug các vấn đề kết nối ví:
+
+1. **Test Flow**: `/test-flow.html`
+   Truy cập http://localhost:3000/test-flow.html
+   - Kiểm tra toàn bộ quy trình kết nối ví
+   - Tạo session, kết nối ví và xác minh kết nối
+
+2. **Simple Connect**: `/simple-connect.html`
+   - Kiểm tra kết nối cơ bản với Phantom extension
+   - Kiểm tra ký tin nhắn
+
+3. **Simple QR**: `/simple-qr.html`
+   - Kiểm tra tạo và quét mã QR
+   - Kiểm tra deep link cho Phantom mobile
+
+4. **Simple Redirect**: `/simple-redirect.html`
+   - Kiểm tra xử lý redirect từ Phantom
+   - Kiểm tra các tham số URL
+
+## Cấu hình
+
+Đảm bảo URL trong tệp `config.yml` của plugin Minecraft khớp với URL nơi máy chủ web này đang chạy:
 
 ```yaml
 web-server:
   enabled: true
-  url: "http://localhost:3000"  # Change this to your server's URL
+  url: "http://localhost:3000"  # Thay đổi thành URL của máy chủ của bạn
   port: 3000
   qr-code-timeout: 300
   check-interval: 5
 ```
+
+## Cập nhật mới nhất (Version 1.2)
+
+- Chuyển sang sử dụng mạng Solana devnet
+- Cải thiện xử lý kết nối ví Phantom
+- Sửa lỗi "Missing required parameters" khi xác minh chữ ký
+- Đơn giản hóa định dạng deep link cho Phantom wallet
+- Thêm chế độ phát triển (development mode) để dễ dàng debug
+- Cải thiện xử lý lỗi và logging
+- Thêm các trang kiểm tra đơn giản để debug kết nối ví

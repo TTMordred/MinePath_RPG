@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Phantom Connect - SolanaLogin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background-color: #512da8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .log {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Phantom Connect Test</h1>
+  <p>This page tests basic Phantom wallet connection functionality.</p>
+  
+  <div>
+    <button id="check-phantom">Check Phantom</button>
+    <button id="connect-phantom">Connect Phantom</button>
+    <button id="sign-message">Sign Message</button>
+    <button id="clear-log">Clear Log</button>
+  </div>
+  
+  <div class="log" id="log"></div>
+  
+  <script>
+    // Elements
+    const logEl = document.getElementById('log');
+    const checkPhantomBtn = document.getElementById('check-phantom');
+    const connectPhantomBtn = document.getElementById('connect-phantom');
+    const signMessageBtn = document.getElementById('sign-message');
+    const clearLogBtn = document.getElementById('clear-log');
+    
+    // Log function
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = type;
+      entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(`[${type}] ${message}`);
+    }
+    
+    // Check Phantom
+    checkPhantomBtn.addEventListener('click', () => {
+      try {
+        if (!window.phantom) {
+          log('Phantom extension not detected. Please install it first.', 'error');
+          return;
+        }
+        
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          log('Phantom Solana provider not found.', 'error');
+          return;
+        }
+        
+        log('Phantom extension detected! ✓', 'success');
+        log(`isPhantom: ${provider.isPhantom}`);
+        log(`Connected: ${provider.isConnected}`);
+      } catch (error) {
+        log(`Error checking Phantom: ${error.message}`, 'error');
+      }
+    });
+    
+    // Connect to Phantom
+    connectPhantomBtn.addEventListener('click', async () => {
+      try {
+        if (!window.phantom) {
+          log('Phantom extension not detected. Please install it first.', 'error');
+          return;
+        }
+        
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          log('Phantom Solana provider not found.', 'error');
+          return;
+        }
+        
+        log('Connecting to Phantom...');
+        
+        try {
+          // Try to get the current connection first
+          const resp = await provider.request({ method: 'connect' });
+          const publicKey = resp.publicKey.toString();
+          log(`Already connected to wallet: ${publicKey}`, 'success');
+        } catch (e) {
+          // If not connected, connect to wallet
+          log('Not connected yet, requesting connection...');
+          const connection = await provider.connect();
+          const publicKey = connection.publicKey.toString();
+          log(`Connected to wallet: ${publicKey}`, 'success');
+        }
+      } catch (error) {
+        log(`Error connecting to Phantom: ${error.message}`, 'error');
+      }
+    });
+    
+    // Sign message
+    signMessageBtn.addEventListener('click', async () => {
+      try {
+        if (!window.phantom) {
+          log('Phantom extension not detected. Please install it first.', 'error');
+          return;
+        }
+        
+        const provider = window.phantom?.solana;
+        if (!provider) {
+          log('Phantom Solana provider not found.', 'error');
+          return;
+        }
+        
+        // Check if connected
+        if (!provider.isConnected) {
+          log('Please connect to Phantom first.', 'error');
+          return;
+        }
+        
+        // Create a test message
+        const message = `Test message from SolanaLogin: ${Date.now()}`;
+        log(`Signing message: "${message}"`);
+        
+        // Encode message
+        const encodedMessage = new TextEncoder().encode(message);
+        
+        // Sign message
+        const signatureBytes = await provider.signMessage(encodedMessage, 'utf8');
+        
+        // Convert signature to base64 for display
+        const signature = btoa(String.fromCharCode.apply(null, signatureBytes));
+        log(`Message signed successfully!`, 'success');
+        log(`Signature (base64): ${signature.substring(0, 20)}...`);
+        
+        // Verify on client side (just for testing)
+        log('Verification would normally happen on the server.');
+      } catch (error) {
+        log(`Error signing message: ${error.message}`, 'error');
+      }
+    });
+    
+    // Clear log
+    clearLogBtn.addEventListener('click', () => {
+      logEl.innerHTML = '';
+      log('Log cleared.');
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Page loaded. Click "Check Phantom" to start.');
+    });
+  </script>
+</body>
+</html>
