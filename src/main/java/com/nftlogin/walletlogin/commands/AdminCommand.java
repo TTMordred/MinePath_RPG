@@ -18,22 +18,28 @@ public class AdminCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Check if sender has permission
-        if (!sender.hasPermission("solanalogin.admin")) {
-            sender.sendMessage(plugin.formatMessage("&cYou don't have permission to use this command."));
-            return true;
+        try {
+            // Check if sender has permission
+            if (!sender.hasPermission("solanalogin.admin")) {
+                sender.sendMessage(plugin.formatMessage("&cYou don't have permission to use this command."));
+                return true;
+            }
+
+            // Check if the command has arguments
+            if (args.length == 0) {
+                showHelp(sender);
+                return true;
+            }
+
+            String subCommand = args[0].toLowerCase();
+
+            // Process the subcommand
+            return processSubCommand(sender, subCommand);
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error executing admin command: " + e.getMessage());
+            sender.sendMessage(plugin.formatMessage("&cAn error occurred while executing the command."));
+            return false;
         }
-
-        // Check if the command has arguments
-        if (args.length == 0) {
-            showHelp(sender);
-            return true;
-        }
-
-        String subCommand = args[0].toLowerCase();
-
-        // Process the subcommand
-        return processSubCommand(sender, subCommand);
     }
 
     /**
@@ -41,25 +47,29 @@ public class AdminCommand implements CommandExecutor {
      *
      * @param sender The command sender
      * @param subCommand The subcommand to process
-     * @return true if the command was processed successfully
+     * @return true if the command was processed successfully, false otherwise
      */
     private boolean processSubCommand(CommandSender sender, String subCommand) {
-        switch (subCommand) {
-            case "reload":
-                plugin.reloadConfig();
-                sender.sendMessage(plugin.formatMessage("&aConfiguration reloaded!"));
-                break;
+        try {
+            switch (subCommand) {
+                case "reload":
+                    plugin.reloadConfig();
+                    sender.sendMessage(plugin.formatMessage("&aConfiguration reloaded!"));
+                    return true;
 
-            case "info":
-                showPluginInfo(sender);
-                break;
+                case "info":
+                    showPluginInfo(sender);
+                    return true;
 
-            default:
-                showHelp(sender);
-                break;
+                default:
+                    showHelp(sender);
+                    return true;
+            }
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error processing admin command: " + e.getMessage());
+            sender.sendMessage(plugin.formatMessage("&cAn error occurred while processing the command."));
+            return false;
         }
-
-        return true;
     }
 
     private void showHelp(CommandSender sender) {
