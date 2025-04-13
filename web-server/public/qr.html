@@ -61,6 +61,7 @@
     </div>
   </div>
 
+  <script src="/js/utils.js"></script>
   <script>
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -108,8 +109,7 @@
         qrcodeEl.innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
 
         // Show content
-        loadingEl.style.display = 'none';
-        contentEl.style.display = 'block';
+        showContent();
 
         // Start polling for connection status
         startPolling();
@@ -177,24 +177,24 @@
       setTimeout(poll, pollInterval);
     }
 
-    // Show success
+    // UI utility functions
     function showSuccess(walletAddress) {
-      loadingEl.style.display = 'none';
-      contentEl.style.display = 'none';
-      errorEl.style.display = 'none';
-      successEl.style.display = 'block';
-
-      walletAddressEl.textContent = walletAddress;
+      UIUtils.showSuccess(walletAddress, successEl, walletAddressEl, loadingEl, contentEl, errorEl);
     }
 
-    // Show error
     function showError(message) {
-      loadingEl.style.display = 'none';
-      contentEl.style.display = 'none';
-      successEl.style.display = 'none';
-      errorEl.style.display = 'block';
+      UIUtils.showError(message, errorEl, errorMessageEl, loadingEl, contentEl, successEl);
+    }
 
-      errorMessageEl.textContent = message;
+    function showLoading() {
+      UIUtils.showLoading(loadingEl, contentEl, errorEl, successEl);
+    }
+
+    function showContent() {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+      contentEl.style.display = 'block';
     }
   </script>
 </body>

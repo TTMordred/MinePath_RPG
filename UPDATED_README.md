@@ -152,7 +152,16 @@ Máy chủ web bao gồm một số trang kiểm tra để giúp debug các vấ
 
 ## Changelog
 
-### Version 1.2 (Cập nhật mới nhất)
+### Version 1.3 (Cập nhật mới nhất)
+
+- Tối ưu hóa cấu trúc code với các utility functions
+- Cải thiện xử lý chữ ký từ Phantom wallet
+- Sửa lỗi "Empty signature" khi kết nối từ Minecraft
+- Thêm nhiều phương thức dự phòng để xử lý chữ ký
+- Cải thiện UI và trải nghiệm người dùng
+- Thêm logging chi tiết hơn để dễ dàng debug
+
+### Version 1.2
 
 - Chuyển sang sử dụng mạng Solana devnet
 - Cải thiện xử lý kết nối ví Phantom
