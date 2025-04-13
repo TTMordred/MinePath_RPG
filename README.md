@@ -29,10 +29,23 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 This project includes comprehensive documentation split across multiple files:
 
+### Core Documentation
+
 - [README.md](README.md) - Main project overview and documentation (this file)
 - [INSTALL.md](INSTALL.md) - Detailed installation instructions
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Guide for developers contributing to the project
 - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Solutions for common issues
+
+### User Guides
+
+- [VISUAL_GUIDE.md](docs/VISUAL_GUIDE.md) - Visual walkthrough of the wallet connection process
+- [WEB_INTERFACE.md](docs/WEB_INTERFACE.md) - Guide for the web interface and its features
+
+### Advanced Documentation
+
+- [DEMO_SERVER.md](docs/DEMO_SERVER.md) - Guide for setting up a demo server
+- [ROADMAP.md](docs/ROADMAP.md) - Project roadmap and future features
+- [WALLET_INTEGRATION.md](docs/WALLET_INTEGRATION.md) - Guide for adding new wallet providers
 
 ## Table of Contents
 
@@ -216,14 +229,14 @@ web-server:
 
 #### Wallet Commands
 
-- `/connectwallet <wallet_address>` - Connect your Solana wallet to your Minecraft account
+- `/connectwallet` - Open wallet connection interface via QR code or browser extension
+  - Permission: `solanalogin.wallet.connect` (default: true)
+- `/connectwallet qr` - Show QR code for wallet connection
   - Permission: `solanalogin.wallet.connect` (default: true)
 - `/disconnectwallet` - Disconnect your Solana wallet from your Minecraft account
   - Permission: `solanalogin.wallet.disconnect` (default: true)
 - `/walletinfo` - View your Solana wallet information
   - Permission: `solanalogin.wallet.info` (default: true)
-- `/verifycode <code>` - Verify your wallet with a verification code
-  - Permission: `solanalogin.wallet.verify` (default: true)
 
 ### Troubleshooting
 
@@ -267,24 +280,26 @@ web-server:
 
 ### Wallet Integration
 
-1. **Connecting your Solana wallet (Manual Method)**
-   - Get your Solana wallet address (from Phantom or another wallet)
-   - Use `/connectwallet <wallet_address>` to connect your wallet
-   - You'll receive a verification code
+> For a detailed visual walkthrough of the wallet connection process, see our [Visual Guide](docs/VISUAL_GUIDE.md).
 
-2. **Connecting your Solana wallet (QR Code/Link Method)**
-   - Use `/connectwallet` or `/connectwallet qr` to get connection options
-   - Click on the link to open the web interface or scan the QR code with your mobile wallet
+1. **Connecting your Solana wallet via Browser Extension**
+   - Use `/connectwallet` to get connection options
+   - Click on the link to open the web interface
+   - Connect your Phantom wallet through the browser extension
    - Approve the connection request in your wallet
    - Your wallet will be automatically verified
 
-3. **Verifying your wallet (Manual Method Only)**
-   - Use `/verifycode <code>` to verify your wallet ownership
-   - This proves you own the wallet you're connecting
+2. **Connecting your Solana wallet via QR Code**
+   - Use `/connectwallet qr` to get a QR code
+   - Scan the QR code with your mobile wallet
+   - Approve the connection request in your wallet
+   - Your wallet will be automatically verified
 
-4. **Managing your wallet**
+3. **Managing your wallet**
    - Use `/walletinfo` to view your connected wallet information
    - Use `/disconnectwallet` to disconnect your wallet if needed
+
+> For more information about the web interface, see our [Web Interface Guide](docs/WEB_INTERFACE.md).
 
 ### Account Management
 
@@ -307,10 +322,10 @@ web-server:
 5. Player uses `/login password`
 6. Player is authenticated and can now play
 7. Player decides to connect their Solana wallet
-8. Player can choose one of two methods:
-   - **Method 1 (Manual):** Player uses `/connectwallet <wallet_address>`, receives a verification code, and uses `/verifycode <code>` to verify
-   - **Method 2 (QR/Link):** Player uses `/connectwallet`, clicks a link or scans QR code, and approves the connection in their wallet
-9. Player's wallet is now connected and verified
+8. Player uses `/connectwallet` or `/connectwallet qr`
+9. Player clicks the link or scans the QR code
+10. Player approves the connection in their wallet
+11. Player's wallet is now connected and verified
 
 ### Returning Player Login
 
@@ -396,11 +411,13 @@ The plugin uses three main tables:
    - Automatic logout on server restart
 
 3. **Wallet Verification**
-   - Verification code generation
+   - Blockchain signature verification
    - Wallet address validation
-   - Ownership verification
+   - Ownership verification through cryptographic proof
 
 ## Next Steps and Enhancements
+
+For a detailed roadmap of future features and improvements, see our [Project Roadmap](docs/ROADMAP.md).
 
 ### Immediate Improvements
 
@@ -408,11 +425,13 @@ The plugin uses three main tables:
    - Create a web portal for account management
    - Allow wallet connection and verification through the website
    - Provide account recovery options
+   - See our [Web Interface Enhancement Guide](docs/WEB_INTERFACE.md) for details
 
 2. **Enhanced Wallet Integration**
    - Implement wallet signature verification
    - Add support for wallet transactions
    - Integrate with Solana Pay
+   - See our [Wallet Integration Guide](docs/WALLET_INTEGRATION.md) for details
 
 3. **NFT Integration**
    - Add NFT ownership verification
@@ -488,5 +507,10 @@ If you have any questions or need help, please:
    - [INSTALL.md](INSTALL.md) - Installation instructions
    - [DEVELOPMENT.md](DEVELOPMENT.md) - Development guide
    - [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
+   - [VISUAL_GUIDE.md](docs/VISUAL_GUIDE.md) - Visual walkthrough of wallet connection
+   - [DEMO_SERVER.md](docs/DEMO_SERVER.md) - Setting up a demo server
+   - [ROADMAP.md](docs/ROADMAP.md) - Project roadmap and future features
+   - [WALLET_INTEGRATION.md](docs/WALLET_INTEGRATION.md) - Adding new wallet providers
+   - [WEB_INTERFACE.md](docs/WEB_INTERFACE.md) - Enhancing the web interface
 2. Open an issue on the GitHub repository
 3. Contact us at [NFTLogin](https://nftlogin.com)

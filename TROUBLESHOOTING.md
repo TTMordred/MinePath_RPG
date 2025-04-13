@@ -178,8 +178,8 @@ mysql -u username -p
 - Cannot play despite successful login
 
 **Solutions:**
-1. Connect your wallet using `/connectwallet`
-2. Complete the verification process
+1. Connect your wallet using `/connectwallet` or `/connectwallet qr`
+2. Follow the on-screen instructions to complete the connection
 3. Check if the server requires wallet connection (`require-wallet-login: true`)
 4. Verify your wallet is connected to the correct Solana network
 

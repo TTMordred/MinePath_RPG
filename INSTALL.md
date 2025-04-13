@@ -178,7 +178,8 @@ web-server:
 3. Join the server and try the plugin commands:
    - `/register <password> <confirmPassword>` - Register an account
    - `/login <password>` - Login to your account
-   - `/connectwallet` - Connect your Solana wallet
+   - `/connectwallet` - Open wallet connection interface via QR code or browser extension
+   - `/connectwallet qr` - Show QR code for wallet connection
    - `/walletinfo` - View your wallet information
 
 ## Troubleshooting
