@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Code - SolanaLogin</title>
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="container">
@@ -16,46 +18,52 @@
       <div class="card-body">
         <div id="loading">
           <div class="spinner"></div>
-          <p>Generating QR code...</p>
+          <p>Generating secure QR code...</p>
         </div>
 
         <div id="content" style="display: none;">
           <div class="wallet-info">
-            <p>Player: <span id="player-id">Loading...</span></p>
+            <p><i class="fas fa-user" style="color: var(--accent-color); margin-right: 8px;"></i> <strong>Player:</strong> <span id="player-id">Loading...</span></p>
           </div>
 
           <div class="qr-container">
             <div id="qrcode"></div>
-            <p>Scan this QR code with your Phantom mobile app</p>
+            <p><i class="fas fa-info-circle" style="margin-right: 8px;"></i> Scan with your Phantom mobile app</p>
           </div>
 
           <div class="instructions">
-            <p>1. Open Phantom app on your mobile device</p>
-            <p>2. Scan this QR code</p>
-            <p>3. Approve the connection request</p>
+            <p><i class="fas fa-mobile-alt" style="color: var(--secondary-color); margin-right: 8px;"></i> Open Phantom app on your mobile device</p>
+            <p><i class="fas fa-qrcode" style="color: var(--secondary-color); margin-right: 8px;"></i> Tap the scan button and point at this QR code</p>
+            <p><i class="fas fa-check-circle" style="color: var(--secondary-color); margin-right: 8px;"></i> Approve the connection request</p>
           </div>
 
           <div class="status">
-            <p id="status-message">Waiting for wallet connection...</p>
+            <p id="status-message"><i class="fas fa-sync fa-spin" style="margin-right: 10px;"></i> Waiting for wallet connection...</p>
           </div>
 
           <div class="actions">
-            <a href="#" id="back-button" class="btn btn-secondary">Back to Login Options</a>
+            <a href="#" id="back-button" class="btn btn-secondary">
+              <i class="fas fa-arrow-left" style="margin-right: 10px;"></i> Back to Login Options
+            </a>
           </div>
         </div>
 
         <div id="success" style="display: none;">
-          <div class="success-icon">✓</div>
+          <div class="success-icon"><i class="fas fa-check-circle"></i></div>
           <h2>Wallet Connected!</h2>
           <p>You can now return to Minecraft.</p>
           <div class="wallet-address" id="wallet-address"></div>
         </div>
 
         <div id="error" style="display: none;">
-          <div class="error-icon">✗</div>
+          <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
           <h2>Connection Failed</h2>
           <p id="error-message">Something went wrong. Please try again.</p>
-          <button id="retry-button" class="btn btn-primary">Try Again</button>
+          <div class="actions">
+            <button id="retry-button" class="btn btn-primary">
+              <i class="fas fa-redo" style="margin-right: 10px;"></i> Try Again
+            </button>
+          </div>
         </div>
       </div>
     </div>

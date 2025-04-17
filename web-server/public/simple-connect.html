@@ -4,59 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple Phantom Connect - SolanaLogin</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    button {
-      background-color: #512da8;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 10px 0;
-    }
-    pre {
-      background-color: #f5f5f5;
-      padding: 10px;
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-    .success {
-      color: green;
-      font-weight: bold;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-    .log {
-      margin-top: 20px;
-      border: 1px solid #ddd;
-      padding: 10px;
-      height: 300px;
-      overflow-y: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <h1>Simple Phantom Connect Test</h1>
-  <p>This page tests basic Phantom wallet connection functionality.</p>
-  
-  <div>
-    <button id="check-phantom">Check Phantom</button>
-    <button id="connect-phantom">Connect Phantom</button>
-    <button id="sign-message">Sign Message</button>
-    <button id="clear-log">Clear Log</button>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>Phantom Connect Test</h1>
+        <p>Basic Phantom wallet connection functionality</p>
+      </div>
+      <div class="card-body">
+        <div class="button-group">
+          <button id="check-phantom" class="btn btn-secondary">
+            <i class="fas fa-search" style="margin-right: 10px;"></i> Check Phantom
+          </button>
+          <button id="connect-phantom" class="btn btn-primary">
+            <i class="fas fa-wallet" style="margin-right: 10px;"></i> Connect Phantom
+          </button>
+          <button id="sign-message" class="btn btn-secondary">
+            <i class="fas fa-signature" style="margin-right: 10px;"></i> Sign Message
+          </button>
+          <button id="clear-log" class="btn btn-secondary">
+            <i class="fas fa-broom" style="margin-right: 10px;"></i> Clear Log
+          </button>
+        </div>
+        
+        <div class="log" id="log"></div>
+      </div>
+    </div>
   </div>
-  
-  <div class="log" id="log"></div>
-  
+
   <script>
     // Elements
     const logEl = document.getElementById('log');

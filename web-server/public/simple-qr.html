@@ -4,67 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple QR Test - SolanaLogin</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    button {
-      background-color: #512da8;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 10px 0;
-    }
-    pre {
-      background-color: #f5f5f5;
-      padding: 10px;
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-    .success {
-      color: green;
-      font-weight: bold;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-    .log {
-      margin-top: 20px;
-      border: 1px solid #ddd;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-    }
-    .qr-container {
-      margin: 20px 0;
-      text-align: center;
-    }
-    .qr-container img {
-      max-width: 300px;
-      border: 1px solid #ddd;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <h1>Simple QR Code Test</h1>
-  <p>This page tests QR code generation for Phantom wallet connection.</p>
-  
-  <div>
-    <button id="generate-qr">Generate QR Code</button>
-    <button id="check-status">Check Status</button>
-    <button id="clear-log">Clear Log</button>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>QR Code Test</h1>
+        <p>Testing QR generation for Phantom mobile</p>
+      </div>
+      <div class="card-body">
+        <div class="button-group">
+          <button id="generate-qr" class="btn btn-primary">
+            <i class="fas fa-qrcode" style="margin-right: 10px;"></i> Generate QR Code
+          </button>
+          <button id="check-status" class="btn btn-secondary">
+            <i class="fas fa-sync" style="margin-right: 10px;"></i> Check Status
+          </button>
+          <button id="clear-log" class="btn btn-secondary">
+            <i class="fas fa-broom" style="margin-right: 10px;"></i> Clear Log
+          </button>
+        </div>
+        
+        <div class="qr-container" id="qr-container"></div>
+        
+        <div class="log" id="log"></div>
+      </div>
+    </div>
   </div>
-  
-  <div class="qr-container" id="qr-container"></div>
-  
-  <div class="log" id="log"></div>
   
   <script>
     // Elements

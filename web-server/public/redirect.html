@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redirecting - SolanaLogin</title>
   <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/dist/index.min.js"></script>
   <script src="https://unpkg.com/bs58@5.0.0/dist/index.js"></script>
@@ -14,26 +16,30 @@
     <div class="card">
       <div class="card-header">
         <h1>Connecting Wallet</h1>
-        <p>Please wait while we connect your wallet</p>
+        <p>Securing your Minecraft connection</p>
       </div>
       <div class="card-body">
         <div id="loading">
           <div class="spinner"></div>
-          <p>Connecting to Phantom...</p>
+          <p>Securely connecting to Phantom...</p>
         </div>
 
         <div id="success" style="display: none;">
-          <div class="success-icon">✓</div>
+          <div class="success-icon"><i class="fas fa-check-circle"></i></div>
           <h2>Wallet Connected!</h2>
           <p>You can now return to Minecraft.</p>
           <div class="wallet-address" id="wallet-address"></div>
         </div>
 
         <div id="error" style="display: none;">
-          <div class="error-icon">✗</div>
+          <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
           <h2>Connection Failed</h2>
           <p id="error-message">Something went wrong. Please try again.</p>
-          <button id="retry-button" class="btn btn-primary">Try Again</button>
+          <div class="actions">
+            <button id="retry-button" class="btn btn-primary">
+              <i class="fas fa-redo" style="margin-right: 10px;"></i> Try Again
+            </button>
+          </div>
         </div>
       </div>
     </div>
