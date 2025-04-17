@@ -1,21 +1,29 @@
 :root {
-  --primary-color: #9945FF;
-  --primary-hover: #8134eb;
+  /* Primary: Grass Block Green */
+  --primary-color: #5E8C31;
+  --primary-hover: #4C7124;
   --secondary-color: #14F195;
-  --accent-color: #00C2FF;
-  --background-color: #0F1624;
-  --card-background: #1A2036;
-  --card-highlight: #252B42;
-  --text-color: #ffffff;
-  --text-secondary: #94A3B8;
+
+  /* Accent: Diamond Blue */
+  --accent-color: #3FA9F5;
+/* Deep Cave Background */
+--background-color: #0B0F05;
+--card-background: #1A1D13;
+--card-highlight: #2E2C20;
+--text-color: #EDEDED;
+--text-secondary: #94A3B8;
   --border-color: #2D3748;
-  --success-color: #14F195;
-  --error-color: #FF5E5B;
+  --success-color: #50C878; /* Emerald Green */
+  --error-color: #C02E2E;   /* Nether Wart Red */
   --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 12px 20px rgba(0, 0, 0, 0.3);
-  --gradient-primary: linear-gradient(135deg, #9945FF 0%, #00C2FF 100%);
-  --gradient-card: linear-gradient(160deg, rgba(26, 32, 54, 0.98) 0%, rgba(21, 25, 40, 0.98) 100%);
-  --font-main: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  --gradient-primary: linear-gradient(135deg, #9945FF 0%, #3f82f5 100%);
+  --gradient-card: linear-gradient(
+    160deg,
+    rgba(26, 29, 19, 0.98) 0%,
+    rgba(18, 21, 14, 0.98) 100%
+  );
+    --font-main: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Roboto Mono', monospace;
 }
 
