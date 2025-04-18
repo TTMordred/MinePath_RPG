@@ -1,0 +1,66 @@
+{
+  "name": "Great Light",
+  "symbol": "GRTL",
+  "description": "A mystical wand containing the power of the great light",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "external_url": "https://minecraft-server.example.com",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Magic Wand"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Light"
+    },
+    {
+      "trait_type": "Power",
+      "value": "100"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "YOUR_CREATOR_ADDRESS",
+        "share": 100
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "BLAZE_ROD",
+    "target_name": "Great Light",
+    "duration": 0,
+    "description": "Hold a blaze rod named 'Great Light'",
+    "reward": {
+      "item": "BLAZE_ROD",
+      "name": "§e§lGreat Light",
+      "lore": [
+        "§7A mystical wand containing the power of the great light",
+        "§7Earned by finding the 'Great Light'",
+        "§7Contains powerful light magic",
+        "§7Right-click to reveal its power",
+        "§7\"Let there be light\"",
+        "§dPower Level: §6Legendary"
+      ],
+      "enchantments": [
+        "FIRE_ASPECT:3",
+        "DURABILITY:10"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7002
+    }
+  }
+}

@@ -1,0 +1,200 @@
+### Java & Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+hs_err_pid*
+replay_pid*
+
+### Exceptions ###
+!NFTPlugin.jar
+!libs/*.jar
+
+### IDEs and Editors ###
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+.metadata/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+### Node.js & Web ###
+# Dependencies
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+logs
+*.log
+
+# Local env files
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Next.js ###
+.next/
+out/
+build/
+dist/
+.vercel
+
+### TypeScript ###
+*.tsbuildinfo
+next-env.d.ts
+
+### Testing ###
+/coverage
+.nyc_output
+junit.xml
+
+### Production ###
+/build
+/dist
+
+### Solana Specific ###
+.anchor
+test-ledger
+**/*.rs.bk
+.crates.toml
+.crates2.json
+
+### Minecraft Server ###
+test-server/
+server/
+plugins/
+worlds/
+crash-reports/
+logs/
+*.yml
+!src/**/resources/*.yml
+
+### Database ###
+*.sqlite
+*.db
+*.sql
+*.mdb
+
+### OS Specific ###
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+### Temporary Files ###
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.orig
+
+### Compiled Sources ###
+*.com
+*.dll
+*.exe
+*.o
+*.so
+
+### Packages ###
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+
+### Logs and Databases ###
+*.log.*
+*.sqlite3
+
+### Cache Files ###
+.sass-cache/
+.eslintcache
+.stylelintcache
+.cache/
+
+### Security ###
+*.pem
+*.key
+*.cert
+*.crt
+
+### Project Specific ###
+# Add any project-specific files or directories here
+
