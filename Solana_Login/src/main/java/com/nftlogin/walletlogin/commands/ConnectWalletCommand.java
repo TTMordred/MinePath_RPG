@@ -309,7 +309,15 @@ public class ConnectWalletCommand implements CommandExecutor {
                         player.getName(), walletType, walletAddress));
             }
         } else {
-            player.sendMessage(plugin.formatMessage("&cFailed to connect your wallet. Please try again later."));
+            // Check if the wallet is already in use by another player
+            Optional<UUID> existingPlayer = plugin.getDatabaseManager().getPlayerByWalletAddress(walletAddress);
+            if (existingPlayer.isPresent()) {
+                String message = plugin.getConfig().getString("messages.wallet-already-in-use",
+                        "&cThis wallet address is already connected to another player. Each wallet can only be connected to one account.");
+                player.sendMessage(plugin.formatMessage(message));
+            } else {
+                player.sendMessage(plugin.formatMessage("&cFailed to connect your wallet. Please try again later."));
+            }
         }
 
         // Clean up

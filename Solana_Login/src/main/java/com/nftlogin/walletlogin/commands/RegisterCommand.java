@@ -111,6 +111,13 @@ public class RegisterCommand implements CommandExecutor {
             if (plugin.getLogger().isLoggable(Level.INFO)) {
                 plugin.getLogger().info(String.format("Player %s registered from IP: %s", player.getName(), ip));
             }
+
+            // Send server-wide welcome message
+            String welcomeMessage = plugin.getConfig().getString("messages.welcome-new-player",
+                    "&a&lWelcome &e%player% &a&lto the server! They just registered for the first time!");
+            welcomeMessage = welcomeMessage.replace("%player%", player.getName());
+            plugin.getServer().broadcast(net.kyori.adventure.text.Component.text(
+                    plugin.formatMessage(welcomeMessage)));
         } else {
             String message = plugin.getConfig().getString("messages.register-fail",
                     "Registration failed. Please try again.");

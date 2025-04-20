@@ -6,14 +6,23 @@ A comprehensive Minecraft Spigot plugin that integrates Solana wallet authentica
 
 ### Version 1.3
 
-- **Removed manual wallet connection method** for improved security and user experience
-- **Removed verification code functionality** as it's no longer needed
-- **Simplified wallet connection process** to focus on QR code and browser extension methods
-- Added comprehensive documentation including visual guides and development resources
-- Updated all commands and help messages to reflect the new connection methods
-- Improved error handling and user feedback
-- Added detailed roadmap for future development
-- Created guides for adding new wallet integrations and enhancing the web interface
+- **Mandatory wallet connection at server entry** - Players must connect a Solana wallet to play
+- **Prevented wallet disconnection during gameplay** - Only admins can disconnect wallets
+- **Blocked all actions until login and wallet connection are complete** - Enhanced security
+- **Prevented multiple Minecraft accounts from using the same wallet** - One wallet per player
+- **Increased wallet connection timeout from 1 minute to 5 minutes** - Better user experience
+- **Added proper session management** - Sessions expire when players leave the server
+- **Added server-wide notifications for new player registrations** - Community engagement
+- **Enhanced admin commands** - Added comprehensive admin tools for server management:
+  - `/solanalogin help` - Show all available admin commands
+  - `/solanalogin stats` - Show plugin statistics
+  - `/solanalogin list [filter]` - List players with various filters
+  - `/solanalogin forcelogin <player>` - Force a player to be logged in
+  - `/solanalogin forcelogout <player>` - Force a player to be logged out
+  - `/solanalogin resetpassword <player> <newpassword>` - Reset a player's password
+  - `/solanalogin forcewallet <player> <address>` - Force connect a wallet to a player
+  - `/solanalogin disconnectwallet <player>` - Force disconnect a player's wallet
+  - `/solanalogin purge <days>` - Purge inactive accounts
 
 ### Version 1.1
 
@@ -184,8 +193,8 @@ database:
 # Plugin Settings
 settings:
   require-login: true      # If true, players must login to play
-  require-wallet-login: false  # If true, players must connect a wallet to play
-  login-timeout: 60        # Time in seconds for players to login after joining
+  require-wallet-login: true   # If true, players must connect a wallet to play
+  login-timeout: 300       # Time in seconds for players to login after joining (5 minutes)
   session-timeout: 1440    # Time in minutes for session to expire (24 hours)
   max-login-attempts: 5    # Maximum number of login attempts before timeout
   login-attempt-timeout: 10  # Time in minutes for login attempt timeout
@@ -211,7 +220,7 @@ solana:
 # Web Server Settings
 web-server:
   enabled: true            # Whether to enable the web server for QR code login
-  url: "http://localhost:3000"  # URL of the web server
+  url: "https://minepath-api.vercel.app"  # URL of the web server
   port: 3000               # Port of the web server
   qr-code-timeout: 300     # Time in seconds for QR code to expire (5 minutes)
   check-interval: 5        # Time in seconds to check for wallet connection status
@@ -221,9 +230,27 @@ web-server:
 
 #### Admin Commands
 
+- `/solanalogin help` - Show all available admin commands
+  - Permission: `solanalogin.admin`
 - `/solanalogin reload` - Reload the plugin configuration
   - Permission: `solanalogin.admin`
 - `/solanalogin info` - View plugin information
+  - Permission: `solanalogin.admin`
+- `/solanalogin stats` - Show plugin statistics
+  - Permission: `solanalogin.admin`
+- `/solanalogin list [filter]` - List players with various filters (all, online, registered, unregistered, wallet, nowallet)
+  - Permission: `solanalogin.admin`
+- `/solanalogin forcelogin <player>` - Force a player to be logged in
+  - Permission: `solanalogin.admin`
+- `/solanalogin forcelogout <player>` - Force a player to be logged out
+  - Permission: `solanalogin.admin`
+- `/solanalogin resetpassword <player> <newpassword>` - Reset a player's password
+  - Permission: `solanalogin.admin`
+- `/solanalogin forcewallet <player> <address>` - Force connect a wallet to a player
+  - Permission: `solanalogin.admin`
+- `/solanalogin disconnectwallet <player>` - Force disconnect a player's wallet
+  - Permission: `solanalogin.admin`
+- `/solanalogin purge <days> [confirm]` - Purge inactive accounts older than specified days
   - Permission: `solanalogin.admin`
 
 #### Authentication Commands
@@ -244,7 +271,8 @@ web-server:
 - `/connectwallet qr` - Show QR code for wallet connection
   - Permission: `solanalogin.wallet.connect` (default: true)
 - `/disconnectwallet` - Disconnect your Solana wallet from your Minecraft account
-  - Permission: `solanalogin.wallet.disconnect` (default: true)
+  - Permission: `solanalogin.wallet.disconnect` (default: op)
+  - Note: Only admins can disconnect wallets when wallet connection is required
 - `/walletinfo` - View your Solana wallet information
   - Permission: `solanalogin.wallet.info` (default: true)
 

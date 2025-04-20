@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class PlayerLoginListener implements Listener {
 
@@ -47,9 +48,9 @@ public class PlayerLoginListener implements Listener {
             handleAuthentication(player, playerUuid, isRegistered);
         }
 
-        // Handle wallet connection if required
-        if (isPlayerAuthenticated(playerUuid) &&
-                plugin.getConfig().getBoolean("settings.require-wallet-login", false)) {
+        // Always handle wallet connection if player is authenticated
+        // This ensures wallet connection is enforced from the beginning
+        if (isPlayerAuthenticated(playerUuid)) {
             handleWalletConnection(player, playerUuid);
         }
     }
@@ -92,8 +93,10 @@ public class PlayerLoginListener implements Listener {
                 "Please register with /register <password> <confirmPassword>");
         player.sendMessage(plugin.formatMessage(message));
 
-        // Set a timer to kick the player if they don't register
+        // Get timeout in minutes and notify player
         int timeout = plugin.getConfig().getInt(LOGIN_TIMEOUT_CONFIG, DEFAULT_LOGIN_TIMEOUT);
+        int minutes = timeout / 60;
+        player.sendMessage(plugin.formatMessage(String.format("&cYou have %d minutes to register or you will be kicked.", minutes)));
 
         new BukkitRunnable() {
             @Override
@@ -119,8 +122,10 @@ public class PlayerLoginListener implements Listener {
                 "Please login with /login <password>");
         player.sendMessage(plugin.formatMessage(message));
 
-        // Set a timer to kick the player if they don't login
+        // Get timeout in minutes and notify player
         int timeout = plugin.getConfig().getInt(LOGIN_TIMEOUT_CONFIG, DEFAULT_LOGIN_TIMEOUT);
+        int minutes = timeout / 60;
+        player.sendMessage(plugin.formatMessage(String.format("&cYou have %d minutes to login or you will be kicked.", minutes)));
 
         new BukkitRunnable() {
             @Override
@@ -143,13 +148,18 @@ public class PlayerLoginListener implements Listener {
      * @param playerUuid The player's UUID
      */
     private void handleWalletConnection(Player player, UUID playerUuid) {
-        if (!plugin.getDatabaseManager().hasWalletConnected(playerUuid)) {
-            promptWalletConnection(player, playerUuid);
-        } else if (!plugin.getDatabaseManager().isWalletVerified(playerUuid)) {
-            // Notify player they need to verify their wallet
-            String message = plugin.getConfig().getString("messages.wallet-verification-pending",
-                    "Your wallet verification is pending. Please complete the verification process.");
-            player.sendMessage(plugin.formatMessage(message));
+        // Only proceed if wallet login is required or player already has a wallet connected
+        if (plugin.getConfig().getBoolean("settings.require-wallet-login", true) ||
+                plugin.getDatabaseManager().hasWalletConnected(playerUuid)) {
+
+            if (!plugin.getDatabaseManager().hasWalletConnected(playerUuid)) {
+                promptWalletConnection(player, playerUuid);
+            } else if (!plugin.getDatabaseManager().isWalletVerified(playerUuid)) {
+                // Notify player they need to verify their wallet
+                String message = plugin.getConfig().getString("messages.wallet-verification-pending",
+                        "Your wallet verification is pending. Please complete the verification process.");
+                player.sendMessage(plugin.formatMessage(message));
+            }
         }
     }
 
@@ -162,11 +172,15 @@ public class PlayerLoginListener implements Listener {
     private void promptWalletConnection(Player player, UUID playerUuid) {
         // Notify player they need to connect a wallet
         String message = plugin.getConfig().getString("messages.wallet-required",
-                "You need to connect a Solana wallet to play on this server. Use /connectwallet <address>");
+                "You need to connect a Solana wallet to play on this server. Use /connectwallet");
         player.sendMessage(plugin.formatMessage(message));
 
-        // Set a timer to kick the player if they don't connect a wallet
+        // Get timeout in minutes and notify player
         int timeout = plugin.getConfig().getInt(LOGIN_TIMEOUT_CONFIG, DEFAULT_LOGIN_TIMEOUT);
+        int minutes = timeout / 60;
+        player.sendMessage(plugin.formatMessage(String.format("&cYou have %d minutes to connect a wallet or you will be kicked.", minutes)));
+
+        // Set a timer to kick the player if they don't connect a wallet
 
         new BukkitRunnable() {
             @Override
@@ -185,10 +199,15 @@ public class PlayerLoginListener implements Listener {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
 
-        // If player has a session but is not authenticated, remove the session
-        if (plugin.getSessionManager().hasSession(playerUuid) &&
-                !plugin.getSessionManager().getSession(playerUuid).isAuthenticated()) {
+        // Always remove the session when player quits to ensure they need to login again
+        if (plugin.getSessionManager().hasSession(playerUuid)) {
             plugin.getSessionManager().removeSession(playerUuid);
+            plugin.getDatabaseManager().removeSession(playerUuid);
+
+            // Log the session removal
+            if (plugin.getLogger().isLoggable(Level.FINE)) {
+                plugin.getLogger().fine(String.format("Session removed for player %s on quit", player.getName()));
+            }
         }
     }
 }
