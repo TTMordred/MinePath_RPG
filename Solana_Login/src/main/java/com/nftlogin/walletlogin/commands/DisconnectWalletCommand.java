@@ -27,6 +27,15 @@ public class DisconnectWalletCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+
+        // Check if player has admin permission
+        if (!player.isOp() && !player.hasPermission("solanalogin.admin")) {
+            String message = plugin.getConfig().getString("messages.no-permission",
+                    "&cYou don't have permission to use this command. Only admins can disconnect wallets.");
+            player.sendMessage(plugin.formatMessage(message));
+            return true;
+        }
+
         disconnectWallet(player);
         return true;
     }
@@ -53,6 +62,15 @@ public class DisconnectWalletCommand implements CommandExecutor {
         if (!existingWallet.isPresent()) {
             String message = plugin.getConfig().getString("messages.not-connected",
                     "You don't have a wallet connected.");
+            player.sendMessage(plugin.formatMessage(message));
+            return;
+        }
+
+        // Check if wallet login is required (skip this check for admins)
+        if (plugin.getConfig().getBoolean("settings.require-wallet-login", true) &&
+                !player.isOp() && !player.hasPermission("solanalogin.admin")) {
+            String message = plugin.getConfig().getString("messages.wallet-disconnect-not-allowed",
+                    "&cYou cannot disconnect your wallet as it is required to play on this server.");
             player.sendMessage(plugin.formatMessage(message));
             return;
         }
@@ -85,14 +103,15 @@ public class DisconnectWalletCommand implements CommandExecutor {
      * @param playerUuid The player's UUID
      */
     private void handleRequiredWalletLogin(Player player, UUID playerUuid) {
-        if (plugin.getConfig().getBoolean("settings.require-wallet-login", false)) {
+        if (plugin.getConfig().getBoolean("settings.require-wallet-login", true)) {
             String requiredMessage = plugin.getConfig().getString("messages.wallet-required",
-                    "You need to connect a Solana wallet to play on this server. Use /connectwallet <address>");
+                    "You need to connect a Solana wallet to play on this server. Use /connectwallet");
             player.sendMessage(plugin.formatMessage(requiredMessage));
 
             // Set a timer to kick the player if they don't reconnect
             int timeout = plugin.getConfig().getInt("settings.login-timeout", 60);
-            player.sendMessage(plugin.formatMessage(String.format("&cYou have %d seconds to connect a wallet or you will be kicked.", timeout)));
+            int minutes = timeout / 60;
+            player.sendMessage(plugin.formatMessage(String.format("&cYou have %d minutes to connect a wallet or you will be kicked.", minutes)));
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 // Check if the player is still online and hasn't connected a wallet

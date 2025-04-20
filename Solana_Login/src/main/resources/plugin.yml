@@ -12,8 +12,8 @@ commands:
     usage: /register <password> <confirmPassword>
     permission: solanalogin.register
   login:
-    description: Login to your account
-    usage: /login <password>
+    description: Login to your account or show help menu
+    usage: /login <password> or /login help
     permission: solanalogin.login
   changepassword:
     description: Change your password
@@ -30,9 +30,9 @@ commands:
     usage: /connectwallet or /connectwallet qr
     permission: solanalogin.wallet.connect
   disconnectwallet:
-    description: Disconnect your Solana wallet from your Minecraft account
+    description: Disconnect your Solana wallet from your Minecraft account (admin only)
     usage: /disconnectwallet
-    permission: solanalogin.wallet.disconnect
+    permission: solanalogin.admin
   walletinfo:
     description: View your Solana wallet information
     usage: /walletinfo
@@ -41,7 +41,7 @@ commands:
   # Admin commands
   solanalogin:
     description: Admin commands for SolanaLogin
-    usage: /solanalogin <reload|info>
+    usage: /solanalogin <help|reload|info|stats|list|forcelogin|forcelogout|resetpassword|forcewallet|disconnectwallet|purge>
     permission: solanalogin.admin
 
 permissions:
@@ -64,8 +64,8 @@ permissions:
     description: Allows players to connect their Solana wallet
     default: true
   solanalogin.wallet.disconnect:
-    description: Allows players to disconnect their Solana wallet
-    default: true
+    description: Allows players to disconnect their Solana wallet (deprecated, use solanalogin.admin)
+    default: op
   solanalogin.wallet.info:
     description: Allows players to view their Solana wallet information
     default: true

@@ -63,8 +63,11 @@ public class SessionManager {
         }
 
         // Check if the session has expired
-        long sessionTimeout = plugin.getConfig().getLong("settings.session-timeout", 1440) * 60 * 1000; // Convert minutes to milliseconds
-        if (System.currentTimeMillis() - session.getCreationTime() > sessionTimeout) {
+        long sessionTimeout = plugin.getConfig().getLong("settings.session-timeout", 0);
+
+        // If session-timeout is 0, sessions are only valid during the current server connection
+        // Otherwise, check if the session has expired based on the timeout
+        if (sessionTimeout == 0 || System.currentTimeMillis() - session.getCreationTime() > sessionTimeout * 60 * 1000) {
             sessions.remove(uuid);
             return false;
         }

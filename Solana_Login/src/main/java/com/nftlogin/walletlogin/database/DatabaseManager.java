@@ -6,6 +6,8 @@ import com.nftlogin.walletlogin.utils.PasswordUtils;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -259,6 +261,62 @@ public class DatabaseManager {
     }
 
     /**
+     * Checks if a wallet address is already in use by another player.
+     *
+     * @param walletAddress The wallet address to check
+     * @param excludeUuid UUID to exclude from the check (can be null)
+     * @return true if the wallet address is already in use, false otherwise
+     */
+    public boolean isWalletAddressInUse(String walletAddress, UUID excludeUuid) {
+        String sql = SELECT + "uuid FROM " + tablePrefix + "wallets WHERE wallet_address = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, walletAddress);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String uuidStr = resultSet.getString("uuid");
+                // If we're excluding a UUID and this is it, continue checking
+                if (excludeUuid != null && uuidStr.equals(excludeUuid.toString())) {
+                    continue;
+                }
+                // If we found any other UUID using this wallet, return true
+                return true;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error checking if wallet address is in use", e);
+            return false;
+        }
+    }
+
+    /**
+     * Gets the player UUID associated with a wallet address.
+     *
+     * @param walletAddress The wallet address
+     * @return The player UUID, or empty if no player has this wallet address
+     */
+    public Optional<UUID> getPlayerByWalletAddress(String walletAddress) {
+        String sql = SELECT + "uuid FROM " + tablePrefix + "wallets WHERE wallet_address = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, walletAddress);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String uuidStr = resultSet.getString("uuid");
+                return Optional.of(UUID.fromString(uuidStr));
+            }
+
+            return Optional.empty();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting player by wallet address", e);
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Connects a wallet to a player's account.
      *
      * @param uuid The player's UUID
@@ -267,6 +325,12 @@ public class DatabaseManager {
      * @return true if the connection was successful, false otherwise
      */
     public boolean connectWallet(UUID uuid, String walletAddress, String walletType) {
+        // First check if this wallet is already in use by another player
+        if (isWalletAddressInUse(walletAddress, uuid)) {
+            plugin.getLogger().info("Wallet address " + walletAddress + " is already in use by another player");
+            return false;
+        }
+
         String sql = INSERT_INTO + tablePrefix + "wallets (uuid, wallet_address, wallet_type) VALUES (?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE wallet_address = ?, wallet_type = ?, connected_at = CURRENT_TIMESTAMP";
 
@@ -408,6 +472,211 @@ public class DatabaseManager {
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Error checking wallet verification", e);
             return false;
+        }
+    }
+
+    /**
+     * Gets the total number of players in the database.
+     *
+     * @return The total number of players
+     */
+    public int getTotalPlayers() {
+        String sql = "SELECT COUNT(*) FROM " + tablePrefix + "players";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting total players", e);
+            return 0;
+        }
+    }
+
+    /**
+     * Gets the number of registered players (with passwords).
+     *
+     * @return The number of registered players
+     */
+    public int getRegisteredPlayers() {
+        String sql = "SELECT COUNT(*) FROM " + tablePrefix + "players WHERE password IS NOT NULL";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting registered players", e);
+            return 0;
+        }
+    }
+
+    /**
+     * Gets the number of wallet connections.
+     *
+     * @return The number of wallet connections
+     */
+    public int getWalletConnections() {
+        String sql = "SELECT COUNT(*) FROM " + tablePrefix + "wallets";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting wallet connections", e);
+            return 0;
+        }
+    }
+
+    /**
+     * Gets a list of all player names in the database.
+     *
+     * @return A list of all player names
+     */
+    public List<String> getAllPlayers() {
+        String sql = "SELECT username FROM " + tablePrefix + "players ORDER BY username";
+        List<String> players = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                players.add(resultSet.getString("username"));
+            }
+            return players;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting all players", e);
+            return players;
+        }
+    }
+
+    /**
+     * Gets a list of registered player names.
+     *
+     * @return A list of registered player names
+     */
+    public List<String> getRegisteredPlayerNames() {
+        String sql = "SELECT username FROM " + tablePrefix + "players WHERE password IS NOT NULL ORDER BY username";
+        List<String> players = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                players.add(resultSet.getString("username"));
+            }
+            return players;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting registered players", e);
+            return players;
+        }
+    }
+
+    /**
+     * Gets a list of unregistered player names.
+     *
+     * @return A list of unregistered player names
+     */
+    public List<String> getUnregisteredPlayerNames() {
+        String sql = "SELECT username FROM " + tablePrefix + "players WHERE password IS NULL ORDER BY username";
+        List<String> players = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                players.add(resultSet.getString("username"));
+            }
+            return players;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting unregistered players", e);
+            return players;
+        }
+    }
+
+    /**
+     * Gets a list of player names with connected wallets.
+     *
+     * @return A list of player names with connected wallets
+     */
+    public List<String> getPlayersWithWallet() {
+        String sql = "SELECT p.username FROM " + tablePrefix + "players p JOIN " + tablePrefix + "wallets w ON p.uuid = w.uuid ORDER BY p.username";
+        List<String> players = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                players.add(resultSet.getString("username"));
+            }
+            return players;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting players with wallet", e);
+            return players;
+        }
+    }
+
+    /**
+     * Gets a list of player names without connected wallets.
+     *
+     * @return A list of player names without connected wallets
+     */
+    public List<String> getPlayersWithoutWallet() {
+        String sql = "SELECT p.username FROM " + tablePrefix + "players p LEFT JOIN " + tablePrefix + "wallets w ON p.uuid = w.uuid WHERE w.uuid IS NULL ORDER BY p.username";
+        List<String> players = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                players.add(resultSet.getString("username"));
+            }
+            return players;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting players without wallet", e);
+            return players;
+        }
+    }
+
+    /**
+     * Gets a player's UUID by their username.
+     *
+     * @param username The player's username
+     * @return The player's UUID, or null if not found
+     */
+    public UUID getPlayerUUID(String username) {
+        String sql = "SELECT uuid FROM " + tablePrefix + "players WHERE username = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return UUID.fromString(resultSet.getString("uuid"));
+            }
+            return null;
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting player UUID", e);
+            return null;
+        }
+    }
+
+    /**
+     * Purges inactive accounts older than the specified number of days.
+     *
+     * @param days The number of days
+     * @return The number of purged accounts, or -1 if an error occurred
+     */
+    public int purgeInactiveAccounts(int days) {
+        String sql = DELETE_FROM + tablePrefix + "players WHERE last_login < DATE_SUB(NOW(), INTERVAL ? DAY)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, days);
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Error purging inactive accounts", e);
+            return -1;
         }
     }
 

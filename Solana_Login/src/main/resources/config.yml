@@ -10,8 +10,8 @@ database:
 # Plugin Settings
 settings:
   require-login: true  # If true, players must login to play
-  require-wallet-login: false  # If true, players must connect a wallet to play
-  login-timeout: 60  # Time in seconds for players to login after joining
+  require-wallet-login: true  # If true, players must connect a wallet to play
+  login-timeout: 300  # Time in seconds for players to login after joining (5 minutes)
   session-timeout: 1440  # Time in minutes for session to expire (24 hours)
   max-login-attempts: 5  # Maximum number of login attempts before timeout
   login-attempt-timeout: 10  # Time in minutes for login attempt timeout
@@ -37,7 +37,7 @@ solana:
 # Web Server Settings
 web-server:
   enabled: true  # Whether to enable the web server for QR code login
-  url: "http://localhost:3000"  # URL of the web server
+  url: "https://minepath-api.vercel.app"  # URL of the web server
   port: 3000  # Port of the web server
   qr-code-timeout: 300  # Time in seconds for QR code to expire (5 minutes)
   check-interval: 5  # Time in seconds to check for wallet connection status
@@ -61,11 +61,12 @@ messages:
   already-logged-in: "&cYou are already logged in!"
   already-registered: "&cYou are already registered!"
   not-logged-in: "&cYou must be logged in to use this command!"
+  no-permission: "&cYou don't have permission to use this command."
 
   # Wallet Messages
   wallet-connected: "&aYour Solana wallet has been successfully connected!"
   wallet-disconnected: "&cYour Solana wallet has been disconnected."
-  wallet-required: "&cYou need to connect a Solana wallet to play on this server. Use /connectwallet <address>"
+  wallet-required: "&cYou need to connect a Solana wallet to play on this server. Use /connectwallet"
   invalid-wallet: "&cThe wallet address you provided is not a valid Solana address."
   already-connected: "&cYou already have a wallet connected. Use /disconnectwallet first."
   not-connected: "&cYou don't have a wallet connected."
@@ -74,3 +75,8 @@ messages:
   wallet-verification-success: "&aYour wallet has been successfully verified!"
   wallet-verification-fail: "&cWallet verification failed. Please try again."
   wallet-verification-pending: "&eYour wallet verification is pending. Please complete the verification process."
+  wallet-disconnect-not-allowed: "&cYou cannot disconnect your wallet as it is required to play on this server."
+  wallet-already-in-use: "&cThis wallet address is already connected to another player. Each wallet can only be connected to one account."
+
+  # Server Messages
+  welcome-new-player: "&a&lWelcome &e%player% &a&lto the server! They just registered for the first time!"

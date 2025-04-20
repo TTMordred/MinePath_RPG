@@ -3,6 +3,7 @@ package com.nftlogin.walletlogin;
 import com.nftlogin.walletlogin.commands.*;
 import com.nftlogin.walletlogin.database.DatabaseManager;
 import com.nftlogin.walletlogin.listeners.PlayerLoginListener;
+import com.nftlogin.walletlogin.listeners.PlayerRestrictionListener;
 import com.nftlogin.walletlogin.session.SessionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,6 +29,7 @@ public final class SolanaLogin extends JavaPlugin {
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerLoginListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerRestrictionListener(this), this);
 
         // Register commands
         getCommand("register").setExecutor(new RegisterCommand(this));
@@ -37,7 +39,9 @@ public final class SolanaLogin extends JavaPlugin {
         getCommand("connectwallet").setExecutor(new ConnectWalletCommand(this));
         getCommand("disconnectwallet").setExecutor(new DisconnectWalletCommand(this));
         getCommand("walletinfo").setExecutor(new WalletInfoCommand(this));
-        getCommand("solanalogin").setExecutor(new AdminCommand(this));
+        AdminCommand adminCommand = new AdminCommand(this);
+        getCommand("solanalogin").setExecutor(adminCommand);
+        getCommand("solanalogin").setTabCompleter(adminCommand);
 
         getLogger().info("SolanaLogin plugin has been enabled!");
     }
