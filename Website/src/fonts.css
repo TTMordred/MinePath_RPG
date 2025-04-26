@@ -1,0 +1,128 @@
+/* Import the Minecraft font stylesheet */
+@import url('../public/fonts/stylesheet.css');
+
+/* Import Minecraft font variants */
+@font-face {
+  font-family: 'minecraftregular';
+  src: url('/public/fonts/minecraftregular-bmg3-webfont.woff2') format('woff2'),
+       url('/public/fonts/minecraftregular-bmg3-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'minecraftbold';
+  src: url('/public/fonts/minecraftbold-nmk1-webfont.woff2') format('woff2'),
+       url('/public/fonts/minecraftbold-nmk1-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'minecraftitalic';
+  src: url('/public/fonts/minecraftitalic-r8mo-webfont.woff2') format('woff2'),
+       url('/public/fonts/minecraftitalic-r8mo-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'minecraftbold_italic';
+  src: url('/public/fonts/minecraftbolditalic-1y1e-webfont.woff2') format('woff2'),
+       url('/public/fonts/minecraftbolditalic-1y1e-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Default font for the entire site */
+body, html {
+  font-family: 'minecraftregular', monospace !important;
+}
+
+/* Apply Minecraft fonts globally */
+body {
+  font-family: 'minecraftregular', Arial, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'minecraftbold', Arial, sans-serif;
+}
+
+/* Font utility classes */
+.minecraft-regular {
+  font-family: 'minecraftregular', Arial, sans-serif;
+}
+
+.minecraft-bold {
+  font-family: 'minecraftbold', Arial, sans-serif;
+}
+
+.minecraft-italic {
+  font-family: 'minecraftitalic', Arial, sans-serif;
+}
+
+.minecraft-bold-italic {
+  font-family: 'minecraftbold_italic', Arial, sans-serif;
+}
+
+/* Font utility classes */
+.minecraft-font {
+  font-family: 'minecraftregular', monospace !important;
+}
+
+.minecraft-font-bold {
+  font-family: 'minecraftbold', monospace !important;
+}
+
+.minecraft-font-italic {
+  font-family: 'minecraftitalic', monospace !important;
+}
+
+.minecraft-font-bold-italic {
+  font-family: 'minecraftbold_italic', monospace !important;
+}
+
+/* Override for existing font-minecraft class to ensure it uses the proper font */
+.font-minecraft {
+  font-family: 'minecraftregular', monospace !important;
+}
+
+/* Ensure all headings use Minecraft font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'minecraftbold', monospace !important;
+}
+
+/* Ensure buttons and interactive elements use Minecraft font */
+button, 
+a, 
+input, 
+textarea, 
+select, 
+.minecraft-btn, 
+.minecraft-btn-green, 
+.minecraft-btn-blue, 
+.minecraft-btn-purple, 
+.minecraft-3d-btn, 
+.minecraft-diamond-btn {
+  font-family: 'minecraftregular', monospace !important;
+}
+
+/* Override for UI components */
+.dialog-content, 
+.popover-content, 
+.tooltip-content, 
+.sheet-content,
+.drawer-content,
+.dropdown-menu,
+.navigation-menu {
+  font-family: 'minecraftregular', monospace !important;
+}
+
+/* Ensure text in paragraphs uses Minecraft font */
+p, span, div {
+  font-family: 'minecraftregular', monospace !important;
+}
