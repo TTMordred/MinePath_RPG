@@ -1,0 +1,58 @@
+{
+  "name": "Explosion Pickaxe V",
+  "symbol": "EXPICK5",
+  "description": "A magical pickaxe with explosion enchantment level V",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Mythic"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Legendary Explosion Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "NETHERITE_PICKAXE",
+    "target_name": "Explosion Pickaxe V",
+    "duration": 0,
+    "description": "Hold a netherite pickaxe named 'Explosion Pickaxe V'",
+    "reward": {
+      "item": "NETHERITE_PICKAXE",
+      "name": "§d§lExplosion Pickaxe V",
+      "lore": [
+        "§7A magical pickaxe with ultimate explosion enchantment",
+        "§7Earned by completing legendary mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Explosion V: §7Break blocks in a 7x7 area (vertical plane when mining horizontally, horizontal plane when mining vertically)",
+        "§7\"The earth trembles before this pickaxe\"",
+        "§dMining Level: §dMythic"
+      ],
+      "enchantments": [
+        "EFFICIENCY:5",
+        "FORTUNE:3",
+        "DURABILITY:3",
+        "MENDING:1",
+        "SILK_TOUCH:1",
+        "EXPLOSION:5"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7405
+    }
+  }
+}

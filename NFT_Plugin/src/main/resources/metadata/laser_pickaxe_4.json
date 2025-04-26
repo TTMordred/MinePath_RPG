@@ -1,0 +1,57 @@
+{
+  "name": "Laser Pickaxe IV",
+  "symbol": "LASPICK4",
+  "description": "A magical pickaxe with laser enchantment level IV",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Master Laser Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "NETHERITE_PICKAXE",
+    "target_name": "Laser Pickaxe IV",
+    "duration": 0,
+    "description": "Hold a netherite pickaxe named 'Laser Pickaxe IV'",
+    "reward": {
+      "item": "NETHERITE_PICKAXE",
+      "name": "§6§lLaser Pickaxe IV",
+      "lore": [
+        "§7A magical pickaxe with laser enchantment",
+        "§7Earned by completing master mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Laser IV: §7Break blocks up to 5 blocks deep",
+        "§7\"Your laser beam can pierce through mountains\"",
+        "§dMining Level: §6Legendary"
+      ],
+      "enchantments": [
+        "EFFICIENCY:5",
+        "FORTUNE:3",
+        "DURABILITY:3",
+        "MENDING:1",
+        "LASER:4"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7504
+    }
+  }
+}

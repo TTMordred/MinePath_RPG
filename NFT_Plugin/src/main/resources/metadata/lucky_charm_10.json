@@ -1,0 +1,57 @@
+{
+  "name": "Lucky Charm X",
+  "symbol": "LUCK10",
+  "description": "A magical charm that brings a substantial amount of luck",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charm"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Buff",
+      "value": "Luck +10%"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "EMERALD",
+    "target_name": "Lucky Charm X",
+    "duration": 0,
+    "description": "Hold an emerald named 'Lucky Charm X'",
+    "reward": {
+      "item": "EMERALD",
+      "name": "§5§lLucky Charm X",
+      "lore": [
+        "§7A magical charm that brings a substantial amount of luck",
+        "§7Earned through extraordinary fortune",
+        "§d§lBuff Effects:",
+        "§b- Luck: §7+10% chance of better drops",
+        "§7\"Luck flows through your veins\"",
+        "§dRarity: §5Epic"
+      ],
+      "enchantments": [
+        "LUCK:3"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 8010
+    },
+    "buff": {
+      "type": "LUCK",
+      "value": 10
+    }
+  }
+}

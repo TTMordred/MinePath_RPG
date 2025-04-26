@@ -1,0 +1,56 @@
+{
+  "name": "Laser Pickaxe I",
+  "symbol": "LASPICK1",
+  "description": "A magical pickaxe with laser enchantment level I",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Novice Laser Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "IRON_PICKAXE",
+    "target_name": "Laser Pickaxe I",
+    "duration": 0,
+    "description": "Hold an iron pickaxe named 'Laser Pickaxe I'",
+    "reward": {
+      "item": "IRON_PICKAXE",
+      "name": "§a§lLaser Pickaxe I",
+      "lore": [
+        "§7A magical pickaxe with laser enchantment",
+        "§7Earned by completing novice mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Laser I: §7Break blocks up to 2 blocks deep",
+        "§7\"Your pickaxe emits a faint beam\"",
+        "§dMining Level: §aUncommon"
+      ],
+      "enchantments": [
+        "EFFICIENCY:3",
+        "FORTUNE:1",
+        "DURABILITY:2",
+        "LASER:1"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7501
+    }
+  }
+}

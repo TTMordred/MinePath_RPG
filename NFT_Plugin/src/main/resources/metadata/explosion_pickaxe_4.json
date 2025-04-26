@@ -1,0 +1,57 @@
+{
+  "name": "Explosion Pickaxe IV",
+  "symbol": "EXPICK4",
+  "description": "A magical pickaxe with explosion enchantment level IV",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Master Explosion Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "NETHERITE_PICKAXE",
+    "target_name": "Explosion Pickaxe IV",
+    "duration": 0,
+    "description": "Hold a netherite pickaxe named 'Explosion Pickaxe IV'",
+    "reward": {
+      "item": "NETHERITE_PICKAXE",
+      "name": "§6§lExplosion Pickaxe IV",
+      "lore": [
+        "§7A magical pickaxe with explosion enchantment",
+        "§7Earned by completing master mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Explosion IV: §7Break blocks in a 6x6 area (vertical plane when mining horizontally, horizontal plane when mining vertically)",
+        "§7\"Your mining power rivals TNT\"",
+        "§dMining Level: §6Legendary"
+      ],
+      "enchantments": [
+        "EFFICIENCY:5",
+        "FORTUNE:3",
+        "DURABILITY:3",
+        "MENDING:1",
+        "EXPLOSION:4"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7404
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Ancient Scroll",
+  "symbol": "ASCR",
+  "description": "A mysterious scroll containing ancient knowledge",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Artifact"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Scroll Finder"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "PAPER",
+    "target_name": "Ancient Scroll",
+    "duration": 0,
+    "description": "Hold a paper item named 'Ancient Scroll'",
+    "reward": {
+      "item": "PAPER",
+      "name": "§e§lAncient Scroll",
+      "lore": [
+        "§7A mysterious scroll containing ancient knowledge",
+        "§7Earned by finding the 'Ancient Scroll'",
+        "§7Contains powerful enchantments and spells",
+        "§7Right-click to reveal its secrets",
+        "§7\"Knowledge is power\"",
+        "§dPrison Level: §6Legendary"
+      ],
+      "enchantments": [
+        "LUCK:3",
+        "DURABILITY:10"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7001
+    }
+  }
+}

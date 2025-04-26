@@ -1,0 +1,57 @@
+{
+  "name": "Lucky Charm II",
+  "symbol": "LUCK2",
+  "description": "A magical charm that brings a moderate amount of luck",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charm"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Buff",
+      "value": "Luck +2%"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "EMERALD",
+    "target_name": "Lucky Charm II",
+    "duration": 0,
+    "description": "Hold an emerald named 'Lucky Charm II'",
+    "reward": {
+      "item": "EMERALD",
+      "name": "§a§lLucky Charm II",
+      "lore": [
+        "§7A magical charm that brings a moderate amount of luck",
+        "§7Earned through good fortune",
+        "§d§lBuff Effects:",
+        "§b- Luck: §7+2% chance of better drops",
+        "§7\"Fortune smiles upon you\"",
+        "§dRarity: §aUncommon"
+      ],
+      "enchantments": [
+        "LUCK:2"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 8002
+    },
+    "buff": {
+      "type": "LUCK",
+      "value": 2
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Lucky Charm V",
+  "symbol": "LUCK5",
+  "description": "A magical charm that brings a significant amount of luck",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charm"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Buff",
+      "value": "Luck +5%"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "EMERALD",
+    "target_name": "Lucky Charm V",
+    "duration": 0,
+    "description": "Hold an emerald named 'Lucky Charm V'",
+    "reward": {
+      "item": "EMERALD",
+      "name": "§9§lLucky Charm V",
+      "lore": [
+        "§7A magical charm that brings a significant amount of luck",
+        "§7Earned through exceptional fortune",
+        "§d§lBuff Effects:",
+        "§b- Luck: §7+5% chance of better drops",
+        "§7\"Lady Luck is on your side\"",
+        "§dRarity: §9Rare"
+      ],
+      "enchantments": [
+        "LUCK:3"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 8005
+    },
+    "buff": {
+      "type": "LUCK",
+      "value": 5
+    }
+  }
+}

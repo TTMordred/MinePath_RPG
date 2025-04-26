@@ -1,0 +1,56 @@
+{
+  "name": "Explosion Pickaxe II",
+  "symbol": "EXPICK2",
+  "description": "A magical pickaxe with explosion enchantment level II",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Skilled Explosion Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "DIAMOND_PICKAXE",
+    "target_name": "Explosion Pickaxe II",
+    "duration": 0,
+    "description": "Hold a diamond pickaxe named 'Explosion Pickaxe II'",
+    "reward": {
+      "item": "DIAMOND_PICKAXE",
+      "name": "§9§lExplosion Pickaxe II",
+      "lore": [
+        "§7A magical pickaxe with explosion enchantment",
+        "§7Earned by completing skilled mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Explosion II: §7Break blocks in a 4x4 area (vertical plane when mining horizontally, horizontal plane when mining vertically)",
+        "§7\"The earth shakes beneath your feet\"",
+        "§dMining Level: §9Rare"
+      ],
+      "enchantments": [
+        "EFFICIENCY:4",
+        "FORTUNE:2",
+        "DURABILITY:3",
+        "EXPLOSION:2"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7402
+    }
+  }
+}

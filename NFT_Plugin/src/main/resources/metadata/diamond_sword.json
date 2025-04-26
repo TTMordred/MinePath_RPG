@@ -1,0 +1,67 @@
+{
+  "name": "Diamond Sword of Power",
+  "symbol": "DSWD",
+  "description": "A powerful diamond sword infused with ancient magic",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "external_url": "https://minecraft-server.example.com",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Weapon"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Magic"
+    },
+    {
+      "trait_type": "Power",
+      "value": "85"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "YOUR_CREATOR_ADDRESS",
+        "share": 100
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "DIAMOND_SWORD",
+    "target_name": "Sword of Power",
+    "duration": 0,
+    "description": "Hold a diamond sword named 'Sword of Power'",
+    "reward": {
+      "item": "DIAMOND_SWORD",
+      "name": "§b§lDiamond Sword of Power",
+      "lore": [
+        "§7A powerful diamond sword infused with ancient magic",
+        "§7Earned by finding the 'Sword of Power'",
+        "§7Strikes with the force of lightning",
+        "§7Right-click to unleash its power",
+        "§7\"Power comes with responsibility\"",
+        "§dPower Level: §bEpic"
+      ],
+      "enchantments": [
+        "DAMAGE_ALL:5",
+        "DURABILITY:10",
+        "KNOCKBACK:2"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7003
+    }
+  }
+}

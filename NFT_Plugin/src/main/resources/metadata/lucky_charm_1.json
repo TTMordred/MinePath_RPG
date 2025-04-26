@@ -1,0 +1,57 @@
+{
+  "name": "Lucky Charm I",
+  "symbol": "LUCK1",
+  "description": "A magical charm that brings a small amount of luck",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charm"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Buff",
+      "value": "Luck +1%"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "EMERALD",
+    "target_name": "Lucky Charm I",
+    "duration": 0,
+    "description": "Hold an emerald named 'Lucky Charm I'",
+    "reward": {
+      "item": "EMERALD",
+      "name": "§a§lLucky Charm I",
+      "lore": [
+        "§7A magical charm that brings a small amount of luck",
+        "§7Earned through good fortune",
+        "§d§lBuff Effects:",
+        "§b- Luck: §7+1% chance of better drops",
+        "§7\"Fortune favors the bold\"",
+        "§dRarity: §aCommon"
+      ],
+      "enchantments": [
+        "LUCK:1"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 8001
+    },
+    "buff": {
+      "type": "LUCK",
+      "value": 1
+    }
+  }
+}

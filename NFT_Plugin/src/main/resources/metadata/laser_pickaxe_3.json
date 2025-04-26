@@ -1,0 +1,56 @@
+{
+  "name": "Laser Pickaxe III",
+  "symbol": "LASPICK3",
+  "description": "A magical pickaxe with laser enchantment level III",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Expert Laser Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4",
+        "type": "image/png"
+      }
+    ]
+  },
+  "quest": {
+    "type": "HOLD_NAMED_ITEM_INSTANT",
+    "target": "DIAMOND_PICKAXE",
+    "target_name": "Laser Pickaxe III",
+    "duration": 0,
+    "description": "Hold a diamond pickaxe named 'Laser Pickaxe III'",
+    "reward": {
+      "item": "DIAMOND_PICKAXE",
+      "name": "§5§lLaser Pickaxe III",
+      "lore": [
+        "§7A magical pickaxe with laser enchantment",
+        "§7Earned by completing expert mining tasks",
+        "§d§lSpecial Enchantments:",
+        "§b- Laser III: §7Break blocks up to 4 blocks deep",
+        "§7\"Your laser beam penetrates deep into the earth\"",
+        "§dMining Level: §5Epic"
+      ],
+      "enchantments": [
+        "EFFICIENCY:4",
+        "FORTUNE:3",
+        "DURABILITY:3",
+        "LASER:3"
+      ],
+      "unbreakable": true,
+      "glowing": true,
+      "custom_model_data": 7503
+    }
+  }
+}
