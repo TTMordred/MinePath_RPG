@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.87.6",
-    "express": "^4.18.2",
+    "bs58": "^5.0.0",
     "cors": "^2.8.5",
+    "express": "^4.21.2",
     "qrcode": "^1.5.3",
-    "tweetnacl": "^1.0.3",
-    "bs58": "^5.0.0"
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
