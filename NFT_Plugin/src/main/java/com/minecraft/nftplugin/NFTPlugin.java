@@ -19,6 +19,7 @@ import com.minecraft.nftplugin.listeners.CustomEnchantListener;
 import com.minecraft.nftplugin.listeners.InventoryListener;
 import com.minecraft.nftplugin.listeners.PlayerListener;
 import com.minecraft.nftplugin.metadata.MetadataManager;
+import com.minecraft.nftplugin.service.MintNFTService;
 import com.minecraft.nftplugin.solana.SolanaService;
 // import com.minecraft.nftplugin.storage.NFTInventoryStorage;
 import com.minecraft.nftplugin.storage.SimpleNFTInventory;
@@ -43,7 +44,7 @@ public class NFTPlugin extends JavaPlugin {
     private CustomEnchantManager customEnchantManager;
     private BuffManager buffManager;
     private SimpleNFTInventory simpleNFTInventory;
-
+    private MintNFTService mintNFTService;
 
     @Override
     public void onEnable() {
@@ -73,7 +74,8 @@ public class NFTPlugin extends JavaPlugin {
 
         // Initialize Solana service
         solanaService = new SolanaService(this);
-
+        // Initialize mint NFT service
+        mintNFTService = new MintNFTService(this);
         // Initialize item manager
         itemManager = new ItemManager(this);
 
@@ -235,6 +237,13 @@ public class NFTPlugin extends JavaPlugin {
         return simpleNFTInventory;
     }
 
+    /**
+     * Get the mint NFT service
+     * @return The mint NFT service
+     */
+    public MintNFTService getMintNFTService() {
+        return mintNFTService;
+    }
 
     /**
      * Log a message with the specified level
