@@ -1,6 +1,7 @@
 package com.minecraft.nftplugin.metadata;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.minecraft.nftplugin.NFTPlugin;
@@ -136,6 +137,38 @@ public class MetadataManager {
     }
 
     /**
+     * Get the NFT symbol from metadata
+     * @param achievementKey The achievement key
+     * @return The NFT symbol, or an empty string if not found
+     */
+    public String getNftSymbol(String achievementKey) {
+        JsonObject metadata = getMetadata(achievementKey);
+        if (metadata != null && metadata.has("symbol")) {
+            return metadata.get("symbol").getAsString();
+        }
+        // Generate a default symbol from the achievement key
+        // Convert to uppercase and limit to 10 characters
+        String defaultSymbol = achievementKey.toUpperCase().replaceAll("[^A-Z0-9]", "");
+        if (defaultSymbol.length() > 10) {
+            defaultSymbol = defaultSymbol.substring(0, 10);
+        }
+        return defaultSymbol;
+    }
+
+    /**
+     * Get the NFT attributes from metadata
+     * @param achievementKey The achievement key
+     * @return The NFT attributes as a JsonArray, or null if not found
+     */
+    public JsonArray getNftAttributes(String achievementKey) {
+        JsonObject metadata = getMetadata(achievementKey);
+        if (metadata != null && metadata.has("attributes")) {
+            return metadata.getAsJsonArray("attributes");
+        }
+        return null;
+    }
+
+    /**
      * Get the NFT description from metadata
      * @param achievementKey The achievement key
      * @return The NFT description, or a default description if not found
@@ -155,10 +188,45 @@ public class MetadataManager {
      */
     public String getNftImageUrl(String achievementKey) {
         JsonObject metadata = getMetadata(achievementKey);
-        if (metadata != null && metadata.has("image")) {
-            return metadata.get("image").getAsString();
+        if (metadata != null) {
+            // First try to get the image directly from the metadata
+            if (metadata.has("image")) {
+                String imageUrl = metadata.get("image").getAsString();
+                plugin.getLogger().info("Found image URL in metadata: " + imageUrl);
+                return imageUrl;
+            }
+
+            // If not found, try to get it from properties.files
+            if (metadata.has("properties") &&
+                metadata.getAsJsonObject("properties").has("files") &&
+                metadata.getAsJsonObject("properties").getAsJsonArray("files").size() > 0) {
+
+                JsonObject firstFile = metadata.getAsJsonObject("properties")
+                    .getAsJsonArray("files").get(0).getAsJsonObject();
+
+                if (firstFile.has("uri")) {
+                    String imageUrl = firstFile.get("uri").getAsString();
+                    plugin.getLogger().info("Found image URL in properties.files: " + imageUrl);
+                    return imageUrl;
+                }
+            }
+
+            // If still not found, try to get it from the reward section
+            if (metadata.has("quest") &&
+                metadata.getAsJsonObject("quest").has("reward") &&
+                metadata.getAsJsonObject("quest").getAsJsonObject("reward").has("image")) {
+
+                String imageUrl = metadata.getAsJsonObject("quest")
+                    .getAsJsonObject("reward").get("image").getAsString();
+                plugin.getLogger().info("Found image URL in quest.reward: " + imageUrl);
+                return imageUrl;
+            }
         }
-        return "https://example.com/default.png";
+
+        // Default URL if not found
+        String defaultUrl = "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4";
+        plugin.getLogger().warning("No image URL found in metadata for " + achievementKey + ", using default: " + defaultUrl);
+        return defaultUrl;
     }
 
     /**

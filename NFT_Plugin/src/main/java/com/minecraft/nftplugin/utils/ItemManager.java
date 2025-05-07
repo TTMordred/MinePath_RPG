@@ -175,7 +175,21 @@ public class ItemManager {
             meta.setLore(lore);
 
             // Set custom model data
-            meta.setCustomModelData(customModelData);
+            // Check if we have a specific custom model data for this achievement
+            int specificCustomModelData = plugin.getConfigManager().getNftItemCustomModelData(achievementType);
+            if (specificCustomModelData != -1) {
+                meta.setCustomModelData(specificCustomModelData);
+                plugin.getLogger().info("Applied custom model data " + specificCustomModelData + " to NFT " + achievementType + " from config");
+            } else {
+                meta.setCustomModelData(customModelData);
+                plugin.getLogger().info("Applied default custom model data " + customModelData + " to NFT " + achievementType);
+            }
+
+            // Special case for explosion_pickaxe_5
+            if (achievementType.equals("explosion_pickaxe_5")) {
+                meta.setCustomModelData(7405);
+                plugin.getLogger().info("Forced custom model data 7405 for explosion_pickaxe_5");
+            }
 
             // Add item flags
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);

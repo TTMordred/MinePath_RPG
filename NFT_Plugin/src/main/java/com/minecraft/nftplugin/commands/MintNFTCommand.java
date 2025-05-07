@@ -109,6 +109,14 @@ public class MintNFTCommand implements CommandExecutor {
         player.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW +
                 "Minting NFT for " + targetPlayer.getName() + " using metadata: " + metadataKey + "...");
 
+        // Check if we have a metadata URI for this NFT (only log to console, not to player)
+        String metadataUri = plugin.getConfigManager().getNftMetadataUri(metadataKey);
+        if (metadataUri != null && !metadataUri.isEmpty()) {
+            plugin.getLogger().info("Using metadata URI for " + metadataKey + ": " + metadataUri);
+        } else {
+            plugin.getLogger().info("No metadata URI found for " + metadataKey + ", using local metadata file");
+        }
+
         // Verify NFT metadata exists (but don't store the values to avoid unnecessary operations)
         plugin.getConfigManager().getNftName(metadataKey);
         plugin.getConfigManager().getNftDescription(metadataKey);
@@ -358,6 +366,36 @@ public class MintNFTCommand implements CommandExecutor {
                 // Add item flags
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
+                // Set custom model data if present in the reward or config
+                if (reward.has("custom_model_data")) {
+                    try {
+                        int customModelData = reward.get("custom_model_data").getAsInt();
+                        meta.setCustomModelData(customModelData);
+                        plugin.getLogger().info("Applied custom model data " + customModelData + " to NFT " + achievementKey + " from metadata");
+                    } catch (Exception e) {
+                        plugin.getLogger().warning("Failed to apply custom model data from metadata for NFT " + achievementKey + ": " + e.getMessage());
+                        plugin.getLogger().warning("Reward JSON: " + reward.toString());
+                    }
+                } else {
+                    // Try to get custom model data from config
+                    int configCustomModelData = plugin.getConfigManager().getNftItemCustomModelData(achievementKey);
+                    if (configCustomModelData != -1) {
+                        meta.setCustomModelData(configCustomModelData);
+                        plugin.getLogger().info("Applied custom model data " + configCustomModelData + " to NFT " + achievementKey + " from config");
+                    } else {
+                        // Use default custom model data
+                        int defaultCustomModelData = plugin.getConfigManager().getNftItemCustomModelData();
+                        meta.setCustomModelData(defaultCustomModelData);
+                        plugin.getLogger().info("Applied default custom model data " + defaultCustomModelData + " to NFT " + achievementKey);
+                    }
+                }
+
+                // Force custom model data for explosion_pickaxe_5
+                if (achievementKey.equals("explosion_pickaxe_5")) {
+                    meta.setCustomModelData(7405);
+                    plugin.getLogger().info("Forced custom model data 7405 for explosion_pickaxe_5");
+                }
+
                 // Add NFT data
                 PersistentDataContainer container = meta.getPersistentDataContainer();
                 NamespacedKey nftKey = new NamespacedKey(plugin, "nft");
@@ -385,6 +423,18 @@ public class MintNFTCommand implements CommandExecutor {
                 meta.setLore(lore);
                 meta.setUnbreakable(true);
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
+
+                // Set custom model data from config or default
+                int configCustomModelData = plugin.getConfigManager().getNftItemCustomModelData(achievementKey);
+                if (configCustomModelData != -1) {
+                    meta.setCustomModelData(configCustomModelData);
+                    plugin.getLogger().info("Applied custom model data " + configCustomModelData + " to fallback NFT " + achievementKey + " from config");
+                } else {
+                    // Use default custom model data
+                    int defaultCustomModelData = plugin.getConfigManager().getNftItemCustomModelData();
+                    meta.setCustomModelData(defaultCustomModelData);
+                    plugin.getLogger().info("Applied default custom model data " + defaultCustomModelData + " to fallback NFT " + achievementKey);
+                }
 
                 // Add NFT data
                 PersistentDataContainer container = meta.getPersistentDataContainer();

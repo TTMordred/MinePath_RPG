@@ -240,10 +240,79 @@ public class ConfigManager {
      * @return The NFT image URL
      */
     public String getNftImageUrl(String achievementKey) {
-        // Default image URL for all achievements if not specified
-        String defaultImageUrl = "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4";
+        // Check if we should use metadata image URL
+        boolean useMetadataImageUrl = config.getBoolean("solana.use_metadata_image_url", true);
 
-        return config.getString("achievements." + achievementKey + ".nft_image_url", defaultImageUrl);
+        if (useMetadataImageUrl) {
+            // Try to get image URL from metadata
+            String imageUrl = plugin.getMetadataManager().getNftImageUrl(achievementKey);
+            if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.equals("https://example.com/default.png")) {
+                return imageUrl;
+            }
+        }
+
+        // Try to get from config
+        String configImageUrl = config.getString("achievements." + achievementKey + ".nft_image_url", null);
+        if (configImageUrl != null && !configImageUrl.isEmpty()) {
+            return configImageUrl;
+        }
+
+        // Use default from config
+        String defaultImageUrl = config.getString("solana.default_image_url",
+            "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4");
+
+        return defaultImageUrl;
+    }
+
+    /**
+     * Get the complete metadata URI for an achievement
+     * @param achievementKey The achievement key
+     * @return The metadata URI, or null if not configured
+     */
+    public String getNftMetadataUri(String achievementKey) {
+        // Special case for explosion_pickaxe_5
+        if (achievementKey.equals("explosion_pickaxe_5")) {
+            String specialUri = config.getString("achievements.explosion_pickaxe_5.metadata_uri", null);
+            if (specialUri != null && !specialUri.isEmpty()) {
+                plugin.getLogger().info("Using special metadata URI for explosion_pickaxe_5: " + specialUri);
+                return specialUri;
+            }
+        }
+
+        // First check if there's a specific URI for this achievement
+        String metadataUri = config.getString("achievements." + achievementKey + ".metadata_uri", null);
+        if (metadataUri != null && !metadataUri.isEmpty()) {
+            // Log at info level for debugging
+            plugin.getLogger().info("Using specific metadata URI for " + achievementKey + ": " + metadataUri);
+            return metadataUri;
+        }
+
+        // Check if we should use Pinata metadata
+        boolean usePinataMetadata = config.getBoolean("solana.use_pinata_metadata", false);
+        if (!usePinataMetadata) {
+            plugin.getLogger().info("Pinata metadata is disabled in config");
+            return null;
+        }
+
+        // Check if we have a base Pinata metadata URI
+        String pinataBaseUri = config.getString("solana.pinata_base_uri", null);
+        if (pinataBaseUri != null && !pinataBaseUri.isEmpty()) {
+            // Get the CID for this metadata key
+            String metadataCid = config.getString("solana.metadata_cids." + achievementKey, null);
+            if (metadataCid != null && !metadataCid.isEmpty()) {
+                String fullUri = pinataBaseUri + metadataCid;
+                plugin.getLogger().info("Using generated Pinata URI for " + achievementKey + ": " + fullUri);
+                return fullUri;
+            }
+        }
+
+        // No specific metadata URI configured, but we want to use Pinata
+        plugin.getLogger().info("No metadata URI found for " + achievementKey + ", but Pinata metadata is enabled");
+        plugin.getLogger().info("Configure URI in config.yml using achievements." + achievementKey + ".metadata_uri");
+        plugin.getLogger().info("Or using solana.pinata_base_uri and solana.metadata_cids." + achievementKey);
+
+        // No metadata URI configured
+        return null;
     }
 
     /**
@@ -341,6 +410,15 @@ public class ConfigManager {
     }
 
     /**
+     * Get the custom model data for a specific achievement
+     * @param achievementKey The achievement key
+     * @return The custom model data, or -1 if not found
+     */
+    public int getNftItemCustomModelData(String achievementKey) {
+        return config.getInt("achievements." + achievementKey + ".custom_model_data", -1);
+    }
+
+    /**
      * Get the Solana Explorer URL
      * @return The Solana Explorer URL
      */
@@ -354,6 +432,42 @@ public class ConfigManager {
             return "https://explorer.solana.com/?cluster=testnet";
         } else {
             return "https://explorer.solana.com";
+        }
+    }
+
+    /**
+     * Get the Solana Explorer URL for a specific address
+     * @param address The address to view
+     * @return The complete Solana Explorer URL for the address
+     */
+    public String getSolanaExplorerAddressUrl(String address) {
+        String network = getSolanaNetwork();
+        if ("mainnet".equals(network)) {
+            return "https://explorer.solana.com/address/" + address;
+        } else if ("devnet".equals(network)) {
+            return "https://explorer.solana.com/address/" + address + "?cluster=devnet";
+        } else if ("testnet".equals(network)) {
+            return "https://explorer.solana.com/address/" + address + "?cluster=testnet";
+        } else {
+            return "https://explorer.solana.com/address/" + address;
+        }
+    }
+
+    /**
+     * Get the Solana Explorer URL for a specific transaction
+     * @param txId The transaction ID to view
+     * @return The complete Solana Explorer URL for the transaction
+     */
+    public String getSolanaExplorerTransactionUrl(String txId) {
+        String network = getSolanaNetwork();
+        if ("mainnet".equals(network)) {
+            return "https://explorer.solana.com/tx/" + txId;
+        } else if ("devnet".equals(network)) {
+            return "https://explorer.solana.com/tx/" + txId + "?cluster=devnet";
+        } else if ("testnet".equals(network)) {
+            return "https://explorer.solana.com/tx/" + txId + "?cluster=testnet";
+        } else {
+            return "https://explorer.solana.com/tx/" + txId;
         }
     }
 }

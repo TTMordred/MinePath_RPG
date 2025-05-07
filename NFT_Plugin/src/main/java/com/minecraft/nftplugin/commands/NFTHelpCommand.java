@@ -28,19 +28,15 @@ public class NFTHelpCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        // Check if the player is requesting admin help
-        if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
-            // Only show admin commands if the player has admin permission
-            if (player.hasPermission("nftplugin.admin")) {
-                showAdminHelp(player);
-            } else {
-                player.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "You don't have permission to view admin commands.");
-            }
-            return true;
+        // Check if the player has OP permissions
+        if (player.isOp() || player.hasPermission("nftplugin.admin")) {
+            // Show both user and admin commands for OP players
+            showFullHelp(player);
+        } else {
+            // Show only user commands for non-OP players
+            showUserHelp(player);
         }
 
-        // Show regular user commands
-        showUserHelp(player);
         return true;
     }
 
@@ -50,53 +46,39 @@ public class NFTHelpCommand implements CommandExecutor {
      */
     private void showUserHelp(Player player) {
         player.sendMessage("");
-        player.sendMessage(ChatColor.GOLD + "╔══════════ " + ChatColor.YELLOW + "✨ NFT Plugin Help ✨" + ChatColor.GOLD + " ══════════╗");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.YELLOW + "Player Commands:" + ChatColor.GOLD + "                           ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.AQUA + "/nftinfo" + ChatColor.WHITE + " - View NFT item information       " + ChatColor.GOLD + "║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.AQUA + "/nftlist" + ChatColor.WHITE + " - Browse all your NFTs            " + ChatColor.GOLD + "║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.AQUA + "/nftinv [page]" + ChatColor.WHITE + " - Open NFT inventory        " + ChatColor.GOLD + "║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.AQUA + "/nftbuff" + ChatColor.WHITE + " - View your active NFT buffs      " + ChatColor.GOLD + "║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.AQUA + "/nfthelp" + ChatColor.WHITE + " - Show this help message          " + ChatColor.GOLD + "║");
-
-        // If the player has admin permission, show a hint about admin commands
-        if (player.hasPermission("nftplugin.admin")) {
-            player.sendMessage(ChatColor.GOLD + "║                                              ║");
-            player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.YELLOW + "You have admin access!" + ChatColor.GOLD + "                     ║");
-            player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.YELLOW + "Use " + ChatColor.AQUA + "/nfthelp admin" + ChatColor.YELLOW + " for admin commands.    " + ChatColor.GOLD + "║");
-        }
-
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "╚══════════════════════════════════════════════╝");
+        player.sendMessage(ChatColor.YELLOW + "✦ NFT Plugin Help ✦");
         player.sendMessage("");
+        player.sendMessage(ChatColor.YELLOW + "Player Commands:");
+        player.sendMessage(ChatColor.AQUA + "/nftinfo" + ChatColor.WHITE + " - View NFT item information");
+        player.sendMessage(ChatColor.AQUA + "/nftlist" + ChatColor.WHITE + " - Browse all your NFTs");
+        player.sendMessage(ChatColor.AQUA + "/nftinv" + ChatColor.WHITE + " - Open NFT inventory with unlimited pages");
+        player.sendMessage(ChatColor.AQUA + "/nftbuff" + ChatColor.WHITE + " - View your active NFT buffs");
+        player.sendMessage(ChatColor.AQUA + "/nfthelp" + ChatColor.WHITE + " - Show this help message");
     }
 
     /**
-     * Display help information for administrators
+     * Display complete help information for OP/admin players
      * @param player The admin player to show help to
      */
-    private void showAdminHelp(Player player) {
+    private void showFullHelp(Player player) {
         player.sendMessage("");
-        player.sendMessage(ChatColor.GOLD + "╔══════════ " + ChatColor.RED + "⚙ NFT Plugin Admin Help ⚙" + ChatColor.GOLD + " ══════════╗");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.RED + "Admin Commands:" + ChatColor.GOLD + "                           ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.RED + "/resetnft <player> [achievement]" + ChatColor.GOLD + "         ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.WHITE + "  Reset a player's NFT progress" + ChatColor.GOLD + "            ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.RED + "/mintnft <player> <metadata_key>" + ChatColor.GOLD + "         ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.WHITE + "  Mint an NFT for a player" + ChatColor.GOLD + "                 ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.RED + "/nftbuff <player>" + ChatColor.GOLD + "                        ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.WHITE + "  View a player's active NFT buffs" + ChatColor.GOLD + "         ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.RED + "/test" + ChatColor.GOLD + "                                     ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.WHITE + "  Test command for debugging" + ChatColor.GOLD + "               ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "║  " + ChatColor.YELLOW + "Use " + ChatColor.AQUA + "/nfthelp" + ChatColor.YELLOW + " for player commands." + ChatColor.GOLD + "        ║");
-        player.sendMessage(ChatColor.GOLD + "║                                              ║");
-        player.sendMessage(ChatColor.GOLD + "╚══════════════════════════════════════════════╝");
+        player.sendMessage(ChatColor.YELLOW + "✦ NFT Plugin Help ✦");
         player.sendMessage("");
+        player.sendMessage(ChatColor.YELLOW + "Player Commands:");
+        player.sendMessage(ChatColor.AQUA + "/nftinfo" + ChatColor.WHITE + " - View NFT item information");
+        player.sendMessage(ChatColor.AQUA + "/nftlist" + ChatColor.WHITE + " - Browse all your NFTs");
+        player.sendMessage(ChatColor.AQUA + "/nftinv" + ChatColor.WHITE + " - Open NFT inventory with unlimited pages");
+        player.sendMessage(ChatColor.AQUA + "/nftbuff" + ChatColor.WHITE + " - View your active NFT buffs");
+        player.sendMessage(ChatColor.AQUA + "/nfthelp" + ChatColor.WHITE + " - Show this help message");
+        player.sendMessage("");
+        player.sendMessage(ChatColor.RED + "Admin Commands:");
+        player.sendMessage(ChatColor.RED + "/resetnft <player> [achievement]");
+        player.sendMessage(ChatColor.WHITE + "  Reset a player's NFT progress");
+        player.sendMessage(ChatColor.RED + "/mintnft <player> <metadata_key>");
+        player.sendMessage(ChatColor.WHITE + "  Mint an NFT for a player");
+        player.sendMessage(ChatColor.RED + "/nftbuff <player>");
+        player.sendMessage(ChatColor.WHITE + "  View a player's active NFT buffs");
+        player.sendMessage(ChatColor.RED + "/test");
+        player.sendMessage(ChatColor.WHITE + "  Test command for debugging");
     }
 }
