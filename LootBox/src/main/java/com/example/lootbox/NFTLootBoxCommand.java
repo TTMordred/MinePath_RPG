@@ -1,23 +1,28 @@
 package com.example.lootbox;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.units.qual.min;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 
 /**
  * Command to purchase NFT lootboxes
  */
 public class NFTLootBoxCommand implements CommandExecutor {
     private final LootBoxPlugin plugin;
-    private final NFTLootBoxUtil nftLootBoxUtil;
+    private final NFTLootBoxUtil nftLootBoxUtil; // Replace with actual URL
 
     /**
      * Constructor
@@ -73,76 +78,46 @@ public class NFTLootBoxCommand implements CommandExecutor {
 
         double cost = price * amount;
         String uuid = player.getUniqueId().toString();
-        Connection conn = plugin.getConnection();
-        boolean dbBad = false;
-
+        Method burnTokensMethod;
+        Object minePathInstance;
         try {
-            if (conn == null || conn.isClosed()) {
-                dbBad = true;
+            // 1) Grab the already-loaded plugin by name (must match plugin.yml 'name:')
+            Plugin raw = Bukkit.getPluginManager().getPlugin("MinePath");
+            if (raw == null) {
+                player.sendMessage(ChatColor.RED + "Token plugin not found on this server.");
+                return true;
             }
-        } catch (SQLException e) {
-            dbBad = true;
-            plugin.getLogger().severe("DB check failed: " + e.getMessage());
-        }
-
-        if (dbBad) {
-            player.sendMessage(ChatColor.RED + "Database unavailable—try again later.");
+            // 2) Reflect on its actual class
+            Class<?> mpClass = raw.getClass();
+            // 3) Locate the public API method
+            burnTokensMethod = mpClass.getMethod("burnTokens", Player.class, String.class);
+            minePathInstance  = raw;
+        } catch (NoSuchMethodException nsme) {
+            plugin.getLogger().severe("burnTokens(Player,String) not found in MinePathCoinPlugin");
+            player.sendMessage(ChatColor.RED + "Token API has changed—contact an admin.");
+            return true;
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error hooking into token plugin: " + e);
+            player.sendMessage(ChatColor.RED + "Internal error initializing token plugin.");
             return true;
         }
 
+        // 2) Invoke burnTokens to deduct the cost
         try {
-            // Check if the player has enough balance
-            PreparedStatement select = conn.prepareStatement(
-                "SELECT balance FROM balance WHERE uuid = ?"
-            );
-            select.setString(1, uuid);
-            ResultSet rs = select.executeQuery();
-            double balance;
+            // turn cost into a raw-unit string (assuming burnTokens expects human-readable)
+            String costStr = String.valueOf((long)(cost)); 
+            String txid = (String) burnTokensMethod.invoke(minePathInstance, player, costStr);
 
-            if (rs.next()) {
-                balance = rs.getDouble("balance");
-            } else {
-                // No row for this user
-                player.sendMessage(ChatColor.RED + "Account not found.");
-                rs.close();
-                select.close();
-                return true;
-            }
-            rs.close();
-            select.close();
-
-            if (balance < cost) {
-                player.sendMessage(ChatColor.RED +
-                    String.format("You only have %.2f tokens, but need %.2f.", balance, cost)
-                );
-                return true;
-            }
-
-            // Deduct the cost from the player's balance
-            PreparedStatement update = conn.prepareStatement(
-                "UPDATE balance SET balance = balance - ? WHERE uuid = ?"
-            );
-            update.setDouble(1, cost);
-            update.setString(2, uuid);
-            int rows = update.executeUpdate();
-            update.close();
-
-            if (rows == 0) {
-                player.sendMessage(ChatColor.RED + "Failed to deduct tokens. Try again later.");
-                return true;
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("SQL error during purchase: " + e);
-            player.sendMessage(ChatColor.RED + "Database error: see console.");
-            return true;
+            // 3) On success, give the lootbox
+            ItemStack box = nftLootBoxUtil.createNFTLootbox(type, amount);
+            player.getInventory().addItem(box);
+            player.sendMessage(ChatColor.GREEN + "Purchase successful! TXID: " + txid);
+        } catch (Exception e) {
+            // unwrap underlying cause if present
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            player.sendMessage(ChatColor.RED + "Purchase failed: " + cause.getMessage());
+            plugin.getLogger().severe("Error during external burn: " + cause);
         }
-
-        // Create the NFT lootbox item
-        ItemStack box = nftLootBoxUtil.createNFTLootbox(type, amount);
-
-        // Add the lootbox to the player's inventory
-        player.getInventory().addItem(box);
-        player.sendMessage(ChatColor.GREEN + "You bought " + amount + " " + type.replace("_", " ") + " lootbox(es).");
 
         return true;
     }
