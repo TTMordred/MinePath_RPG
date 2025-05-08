@@ -42,22 +42,7 @@ MinePath RPG is a Minecraft server built on [Paper](https://papermc.io/) 1.18.2 
    ```
 4. Start the server once to generate necessary files, then stop it
 
-### Step 2: Database Setup
-
-1. Install MySQL if not already installed
-2. Create a new database for MinePath:
-   ```sql
-   CREATE DATABASE minepath;
-   CREATE USER 'minepath'@'localhost' IDENTIFIED BY 'your_password';
-   GRANT ALL PRIVILEGES ON minepath.* TO 'minepath'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-3. Import the database schema:
-   ```
-   mysql -u minepath -p minepath < plugins/MinePath/balance.sql
-   ```
-
-### Step 3: Plugin Installation
+### Step 2: Plugin Installation
 
 #### NFTPlugin
 
@@ -124,8 +109,21 @@ MinePath RPG is a Minecraft server built on [Paper](https://papermc.io/) 1.18.2 
      user: minepath
      password: your_password
    ```
+#### MinePath
 
-### Step 4: Web Interface Setup (Optional)
+1. Place `MinePath.jar` in the `plugins` folder
+2. Start the server to generate configuration files
+3. Configure in `plugins/MinePath/config.yml` as needed
+4. Download web server to handle transaction at (https://github.com/HungPhan-0612/server_handle_request)
+5. Open root folder of the WebServer
+6. Use 
+      ```bash
+      npm install
+      npm run dev
+      ```
+7. At default the web will run at Port 3000
+
+### Step 3: Web Interface Setup (Optional)
 
 If you want to deploy the web interface for better user experience:
 
@@ -140,7 +138,7 @@ If you want to deploy the web interface for better user experience:
    ```
 4. Deploy the built files to your web server or use a service like Vercel
 
-### Step 5: Final Configuration
+### Step 4: Final Configuration
 
 1. Make sure all plugins are properly configured
 2. Ensure the web server is running and accessible
