@@ -1,6 +1,6 @@
 # MinePath RPG - Minecraft Server with Solana Blockchain Integration
 
-Server Download: [MinePath_RPG.rar](https://www.mediafire.com/file/1mzqvzvhssn0sk0/MinePath_RPG.rar/file)
+Server Download: [MinePath_RPG.rar](https://www.mediafire.com/file/mz12iswxqxaz11g/servertien.zip/file)
 
 ## Overview
 
