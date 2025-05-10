@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
@@ -40,55 +39,18 @@ const STEPS = [
 
 const HowToPlay = () => {
   const isMobile = useIsMobile();
-  
+
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden" style={{ 
-      background: 'linear-gradient(180deg, rgba(21,26,49,1) 0%, rgba(13,14,22,1) 100%)',
-      backgroundSize: 'cover',
-      backgroundAttachment: 'fixed' 
-    }}>
-      {/* Background elements */}
+    <section className="relative py-16 md:py-24 overflow-hidden">
+      {/* Background with overlay - Copied from WhatIs */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('/public/lovable-uploads/571ce867-0253-4784-ba20-b363e73c1463.png')] bg-repeat"></div>
-        <div className="absolute top-0 left-0 w-full h-full" style={{ 
-          background: 'radial-gradient(circle, rgba(10, 21, 77, 0.3) 0%, rgba(13, 14, 22, 0) 70%)'
-        }}></div>
-        
-        {/* Minecraft particles - reduced for mobile */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(isMobile ? 10 : 20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute pixelated w-2 h-2 bg-white opacity-30"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animation: `float ${5 + Math.random() * 5}s ease-in-out infinite ${Math.random() * 5}s`
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Floating blocks - reduced for mobile */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(isMobile ? 4 : 8)].map((_, i) => (
-            <div
-              key={`block-${i}`}
-              className="absolute pixelated w-6 md:w-8 h-6 md:h-8"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                backgroundImage: `url('/images/${['dirt', 'stone', 'diamond', 'gold'][Math.floor(Math.random() * 4)]}_block.png')`,
-                backgroundSize: 'cover',
-                transform: 'rotate(10deg)',
-                imageRendering: 'pixelated',
-                animation: `float ${7 + Math.random() * 7}s ease-in-out infinite ${Math.random() * 7}s, rotate ${15 + Math.random() * 10}s linear infinite ${Math.random() * 10}s`
-              }}
-            />
-          ))}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80"></div>
+        <div className="absolute inset-0 bg-[url('/images/bg-minecraft.png')] bg-no-repeat bg-cover bg-center opacity-4"></div>
+        <div className="absolute left-0 inset-y-0 w-16 opacity-20">
+          <div className="h-full w-full bg-[url('/public/lovable-uploads/571ce867-0253-4784-ba20-b363e73c1463.png')] bg-repeat-y"></div>
         </div>
       </div>
-      
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-16">
           <motion.div

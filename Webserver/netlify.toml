@@ -1,0 +1,79 @@
+# netlify.toml
+
+[build]
+  command   = "npm install"
+  publish   = "public"
+  functions = "functions"
+
+# ─────────────────────────────────────────────────
+# Dynamic routes → Netlify Functions
+# ─────────────────────────────────────────────────
+
+# /login handled by your Express function
+[[redirects]]
+  from   = "/login"
+  to     = "/.netlify/functions/server/login"
+  status = 200
+  force  = true
+
+# /connect handled by your Express function
+[[redirects]]
+  from   = "/connect"
+  to     = "/.netlify/functions/server/connect"
+  status = 200
+  force  = true
+
+# /api/* handled by your Express function
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/server/api/:splat"
+  status = 200
+  force  = true
+
+# /phantom-redirect handled by your Express function
+[[redirects]]
+  from   = "/phantom-redirect"
+  to     = "/.netlify/functions/server/phantom-redirect"
+  status = 200
+  force  = true
+
+# /status handled by your Express function
+[[redirects]]
+  from   = "/status"
+  to     = "/.netlify/functions/server/status"
+  status = 200
+  force  = true
+
+# ─────────────────────────────────────────────────
+# Static HTML routes (served from public/)
+# ─────────────────────────────────────────────────
+
+[[redirects]]
+  from   = "/qr"
+  to     = "/qr.html"
+  status = 200
+
+[[redirects]]
+  from   = "/redirect"
+  to     = "/redirect.html"
+  status = 200
+
+[[redirects]]
+  from   = "/simple-connect"
+  to     = "/simple-connect.html"
+  status = 200
+
+[[redirects]]
+  from   = "/simple-qr"
+  to     = "/simple-qr.html"
+  status = 200
+
+[[redirects]]
+  from   = "/simple-redirect"
+  to     = "/simple-redirect.html"
+  status = 200
+
+[[redirects]]
+  from   = "/test-flow"
+  to     = "/test-flow.html"
+  status = 200

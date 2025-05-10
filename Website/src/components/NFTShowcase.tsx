@@ -4,42 +4,62 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-const FEATURED_NFTS = [
+type FeaturedNFT = {
+  id: string;
+  name: string;
+  image: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+  category: 'weapon' | 'armor' | 'tool' | 'pet' | 'cosmetic' | 'resource';
+  description: string;
+  attributes: {
+    trait: string;
+    value: string;
+  }[];
+};
+
+const FEATURED_NFTS: FeaturedNFT[] = [
   {
-    id: 1,
-    name: "Dragon's Breath",
-    image: "/images/dragons_breath.png",
+    id: 'exp5',
+    name: "Explosion Pickaxe V",
+    image: "/images/explosion-5.png",
+    rarity: "mythic",
+    category: "tool",
+    description: "Ultimate explosion pickaxe for unparalleled mining efficiency.",
+    attributes: [
+      { trait: "Efficiency", value: "V" },
+      { trait: "Fortune", value: "III" },
+      { trait: "Durability", value: "III" },
+      { trait: "Mending", value: "I" },
+      { trait: "Silk Touch", value: "I" },
+      { trait: "Explosion", value: "V" }
+    ]
+  },
+  {
+    id: 'charm20',
+    name: "Lucky Charm XX",
+    image: "/images/charm-20.png",
     rarity: "legendary",
-    description: "Unleashes a powerful flame attack that damages all enemies in front of you.",
+    category: "resource",
+    description: "A magical charm that brings an extraordinary amount of luck.",
     attributes: [
-      { trait: "Damage", value: "+150%" },
-      { trait: "Area Effect", value: "5 blocks" },
-      { trait: "Cooldown", value: "60s" }
+      { trait: "Luck", value: "+20%" }
     ]
   },
   {
-    id: 2,
-    name: "Diamond Defender",
-    image: "/images/diamond_defender.png",
-    rarity: "rare",
-    description: "Creates a temporary shield that absorbs damage from attacks.",
+    id: 'exp4',
+    name: "Explosion Pickaxe IV",
+    image: "/images/explosion-4.png",
+    rarity: "legendary",
+    category: "tool",
+    description: "Advanced explosion pickaxe with superior mining performance.",
     attributes: [
-      { trait: "Defense", value: "+40%" },
-      { trait: "Duration", value: "15s" },
-      { trait: "Cooldown", value: "45s" }
-    ]
-  },
-  {
-    id: 3,
-    name: "Void Walker",
-    image: "/images/void_walker.png",
-    rarity: "epic",
-    description: "Grants temporary invisibility and increased movement speed.",
-    attributes: [
-      { trait: "Speed", value: "+60%" },
-      { trait: "Duration", value: "10s" },
-      { trait: "Cooldown", value: "90s" }
+      { trait: "Efficiency", value: "V" },
+      { trait: "Fortune", value: "III" },
+      { trait: "Durability", value: "III" },
+      { trait: "Mending", value: "I" },
+      { trait: "Explosion", value: "IV" }
     ]
   }
 ];
@@ -115,19 +135,21 @@ const NFTShowcase = () => {
         </div>
         
         <div className="text-center">
-          <button className="play-now-btn relative px-8 py-3 bg-black text-white font-minecraft tracking-wider hover:scale-105 transition-all duration-300 overflow-hidden group border border-cyan-400/50">
-            <span className="relative z-10 flex items-center justify-center">
-              View All NFTs <EyeIcon className="ml-2 h-4 w-4" />
-            </span>
-            <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-          </button>
+          <Link to="/nfts">
+            <button className="play-now-btn relative px-8 py-3 bg-black text-white font-minecraft tracking-wider hover:scale-105 transition-all duration-300 overflow-hidden group border border-cyan-400/50">
+              <span className="relative z-10 flex items-center justify-center">
+                View All NFTs <EyeIcon className="ml-2 h-4 w-4" />
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            </button>
+          </Link>
         </div>
       </div>
     </section>
   );
 };
 
-const NFTCard = ({ nft }: { nft: typeof FEATURED_NFTS[0] }) => {
+const NFTCard = ({ nft }: { nft: FeaturedNFT }) => {
   return (
     <div className="group">
       <div className="glass-card overflow-hidden transition-all duration-300 group-hover:translate-y-[-4px]">
@@ -154,12 +176,23 @@ const NFTCard = ({ nft }: { nft: typeof FEATURED_NFTS[0] }) => {
         
         <div className="p-4 bg-black/70 backdrop-blur-md border-t border-cyan-400/20">
           <h3 className="font-minecraft text-lg md:text-xl mb-2 text-gradient">{nft.name}</h3>
-          <p className="text-sm text-white/80 mb-4">{nft.description}</p>
+          <p className="text-sm text-white/80 mb-4 h-16 overflow-hidden">{nft.description}</p>
           
           <div className="flex justify-between items-center">
-            <button className="text-sm bg-black px-3 py-1 border border-cyan-400/30 text-cyan-400 hover:bg-cyan-400/10 transition-colors duration-300">
-              View Details
-            </button>
+            <Link to={`/nfts/${nft.id}`}>
+              <button className="text-sm bg-black px-3 py-1 border border-cyan-400/30 text-cyan-400 hover:bg-cyan-400/10 transition-colors duration-300">
+                View Details
+              </button>
+            </Link>
+            <span className={`text-xs font-minecraft px-2 py-1 bg-black/70 uppercase ${
+              nft.rarity === 'mythic' ? 'text-purple-400' : 
+              nft.rarity === 'legendary' ? 'text-rarity-legendary' : 
+              nft.rarity === 'epic' ? 'text-rarity-epic' : 
+              nft.rarity === 'rare' ? 'text-rarity-rare' : 
+              nft.rarity === 'uncommon' ? 'text-rarity-uncommon' : 'text-rarity-common'
+            }`}>
+              {nft.rarity}
+            </span>
           </div>
         </div>
       </div>

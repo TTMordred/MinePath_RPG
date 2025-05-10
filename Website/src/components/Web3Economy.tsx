@@ -80,7 +80,7 @@ const Web3Economy = () => {
         </motion.div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {/* $FARM & $PATH Tokens */}
+          {/* $MINE & $PATH Tokens */}
           <motion.div 
             className="bg-black/40 backdrop-blur-md p-6 border border-cyan-400/30 rounded-lg"
             initial={{ opacity: 0, x: -20 }}
@@ -90,17 +90,17 @@ const Web3Economy = () => {
           >
             <div className="flex items-center mb-4">
               <MinecraftIcon icon={Coins} size="lg" variant="gold" className="mr-4" />
-              <h3 className="font-minecraft text-2xl text-minecraft-gold">$FARM & $PATH TOKENS</h3>
+              <h3 className="font-minecraft text-2xl text-minecraft-gold">$MINE & $PATH TOKENS</h3>
             </div>
             <p className="mb-4 text-white/80">
-              Earn $FARM through gameplay and $PATH via staking, both with real-world value on Raydium DEX.
+              Earn $MINE through gameplay and $PATH via staking, both with real-world value on Raydium DEX.
             </p>
             
             {/* Token image showcases */}
             <div className="flex justify-center mb-4 gap-4">
               <div className="relative">
-                <img src="/images/token_farm.png" alt="FARM Token" className="h-16 w-16 pixelated" />
-                <div className="absolute -top-2 -right-2 bg-minecraft-gold text-xs px-1 font-minecraft">$FARM</div>
+                <img src="/images/token_mine.png" alt="MINE Token" className="h-16 w-16 pixelated" />
+                <div className="absolute -top-2 -right-2 bg-minecraft-gold text-xs px-1 font-minecraft">$MINE</div>
               </div>
               <div className="relative">
                 <img src="/images/token_path.png" alt="PATH Token" className="h-16 w-16 pixelated" />
@@ -110,14 +110,14 @@ const Web3Economy = () => {
             
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="bg-black/50 p-4 text-center border border-cyan-400/20">
-                <div className="font-minecraft text-minecraft-gold text-lg">$FARM</div>
+                <div className="font-minecraft text-minecraft-gold text-lg">$MINE</div>
                 <div className="text-sm text-white/80">Utility Token</div>
-                <div className="mt-2 text-sm text-white/80">Mine, Farm, Battle to earn</div>
+                <div className="mt-2 text-sm text-white/80">Mine, Farm to earn</div>
               </div>
               <div className="bg-black/50 p-4 text-center border border-cyan-400/20">
                 <div className="font-minecraft text-solana-green text-lg">$PATH</div>
                 <div className="text-sm text-white/80">Governance Token</div>
-                <div className="mt-2 text-sm text-white/80">Stake $FARM to earn</div>
+                <div className="mt-2 text-sm text-white/80">Stake $MINE to earn</div>
               </div>
             </div>
           </motion.div>
@@ -180,7 +180,7 @@ const Web3Economy = () => {
               <h3 className="font-minecraft text-2xl text-minecraft-emerald">DEFI STAKING</h3>
             </div>
             <p className="mb-4 text-white/80">
-              Lock $FARM or NFTs to earn $PATH, with APY up to 50% in Phase 3. The longer you stake, the more you earn!
+              Lock $MINE or NFTs to earn $PATH, with APY up to 50% in Phase 3. The longer you stake, the more you earn!
             </p>
             <div className="bg-black/50 p-4 flex justify-between items-center border border-cyan-400/20">
               <div>

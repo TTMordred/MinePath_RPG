@@ -52,123 +52,99 @@
 
   <script src="/js/utils.js"></script>
   <script>
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session');
-    const errorCode = urlParams.get('errorCode');
-    const errorMessage = urlParams.get('errorMessage');
-
-    // Check for error parameters from Phantom
-    if (errorCode || errorMessage) {
-      console.error('Phantom error:', errorCode, errorMessage);
-    }
+    // Parse URL params
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session');
+    const errorCode = params.get('errorCode');
+    const errorMessage = params.get('errorMessage');
 
     // Elements
     const loadingEl = document.getElementById('loading');
     const successEl = document.getElementById('success');
-    const errorEl = document.getElementById('error');
+    const errorEl   = document.getElementById('error');
     const walletAddressEl = document.getElementById('wallet-address');
-    const errorMessageEl = document.getElementById('error-message');
-    const retryButton = document.getElementById('retry-button');
+    const errorMessageEl  = document.getElementById('error-message');
+    const retryButton     = document.getElementById('retry-button');
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
-      console.log('Redirect page loaded with parameters:', { sessionId, errorCode, errorMessage });
-
       if (!sessionId) {
-        console.error('Missing session parameter');
         showError('Missing session parameter. Please try again.');
         return;
       }
-
-      // If there's an error from Phantom, show it
       if (errorCode || errorMessage) {
-        console.error('Phantom error:', { errorCode, errorMessage });
-        showError(`Phantom error: ${errorMessage || 'Unknown error'} (${errorCode || 'No code'})`);
+        showError(`Phantom error: ${errorMessage || 'Unknown'} (${errorCode || 'No code'})`);
         return;
       }
-
       try {
-        // Get session data
-        const sessionResponse = await fetch(`/api/session/${sessionId}`);
-        if (!sessionResponse.ok) {
-          throw new Error('Session not found');
-        }
-
-        const sessionData = await sessionResponse.json();
-        if (sessionData.connected) {
-          showSuccess(sessionData.walletAddress);
+        // Check existing session state
+        const resp = await fetch(`/api/session/${sessionId}`);
+        if (!resp.ok) throw new Error('Session not found');
+        const data = await resp.json();
+        if (data.connected) {
+          showSuccess(data.walletAddress);
           return;
         }
-
-        // Connect to Phantom
-        await connectPhantom(sessionId, sessionData.player);
-      } catch (error) {
-        showError(error.message);
+        // Not yet connected, initiate Phantom connect
+        await connectPhantom();
+      } catch (err) {
+        showError(err.message);
       }
     });
 
-    // Connect to Phantom
-    async function connectPhantom(sessionId, playerId) {
+    // Connect to Phantom and verify
+    async function connectPhantom() {
       try {
-        // Show loading state
         showLoading();
-
-        // Connect to wallet using PhantomUtils
         const publicKey = await PhantomUtils.connect();
 
-        // Get nonce from server
-        const nonceResponse = await fetch(`/api/nonce/${sessionId}`);
-        if (!nonceResponse.ok) {
-          throw new Error('Failed to get nonce');
-        }
+        // Fetch nonce
+        const nonceResp = await fetch(`/api/nonce/${sessionId}`);
+        if (!nonceResp.ok) throw new Error('Failed to get nonce');
+        const { nonce } = await nonceResp.json();
 
-        const { nonce } = await nonceResponse.json();
-
-        // Sign message using PhantomUtils
+        // Sign and verify
         const message = `Verify wallet ownership for Minecraft login. Session: ${sessionId}. Nonce: ${nonce}`;
         const signature = await PhantomUtils.signMessage(message);
-
-        // Verify signature on server
-        const verifyResponse = await fetch('/api/verify', {
+        const verifyResp = await fetch('/api/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session: sessionId,
-            publicKey,
-            signature,
-            message
-          })
+          body: JSON.stringify({ session: sessionId, publicKey, signature, message })
         });
-
-        const result = await verifyResponse.json();
-        if (result.success) {
-          showSuccess(publicKey);
-        } else {
-          showError(result.error || 'Failed to verify wallet. Please try again.');
-        }
-      } catch (error) {
-        showError(error.message);
+        const result = await verifyResp.json();
+        if (result.success) showSuccess(publicKey);
+        else showError(result.error || 'Verification failed.');
+      } catch (e) {
+        showError(e.message);
       }
     }
 
-    // Retry button
-    retryButton.addEventListener('click', () => {
-      window.location.reload();
-    });
+    // Utilities
+    function showSuccess(addr) { UIUtils.showSuccess(addr, successEl, walletAddressEl, loadingEl, null, errorEl); }
+    function showError(msg)    { UIUtils.showError(msg, errorEl, errorMessageEl, loadingEl, null, successEl); }
+    function showLoading()     { UIUtils.showLoading(loadingEl, null, errorEl, successEl); }
 
-    // UI utility functions
-    function showSuccess(walletAddress) {
-      UIUtils.showSuccess(walletAddress, successEl, walletAddressEl, loadingEl, null, errorEl);
+    // Poll /status so plugin sees connected:true
+    async function pollStatus() {
+      try {
+        const res = await fetch(`/status?session=${sessionId}`);
+        if (res.ok) {
+          const { connected, walletAddress } = await res.json();
+          if (connected) {
+            console.log('Status poll: connected!', walletAddress);
+            showSuccess(walletAddress);
+            return;
+          }
+        }
+      } catch (err) { console.error('pollStatus error', err); }
+      setTimeout(pollStatus, 2000);
     }
+    // Wrap showSuccess to start polling
+    const _origShowSuccess = showSuccess;
+    showSuccess = addr => { _origShowSuccess(addr); pollStatus(); };
 
-    function showError(message) {
-      UIUtils.showError(message, errorEl, errorMessageEl, loadingEl, null, successEl);
-    }
-
-    function showLoading() {
-      UIUtils.showLoading(loadingEl, null, errorEl, successEl);
-    }
+    // Retry
+    retryButton.addEventListener('click', () => window.location.reload());
   </script>
 </body>
 </html>

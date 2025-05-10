@@ -5,6 +5,7 @@ import Hero from '@/components/Hero';
 import WhatIs from '@/components/WhatIs';
 import JoinCTA from '@/components/JoinCTA';
 import ScrollToTop from '@/components/ScrollToTop';
+import StatsSection from '@/components/StatsSection';
 
 // Lazy-load components that are further down the page for better initial load performance
 const FeaturesSection = lazy(() => import('@/components/FeaturesSection'));
@@ -22,6 +23,7 @@ const TestimonialSection = lazy(() => import('@/components/TestimonialSection'))
 const Web3Economy = lazy(() => import('@/components/Web3Economy'));
 const CommunitySection = lazy(() => import('@/components/CommunitySection'));
 const ServerStatus = lazy(() => import('@/components/ServerStatus'));
+const TeamMembers = lazy(() => import('@/components/TeamMembers'));
 
 // Simple loading component for Suspense fallback
 const SectionLoader = () => (
@@ -39,16 +41,19 @@ const Index = () => {
         <Hero />
         <JoinCTA />
         <WhatIs />
+
         
         {/* Less critical components loaded lazily */}
         <Suspense fallback={<SectionLoader />}>
           <FeaturesSection />
           <HowToPlay />
           <Web3Economy />
+          <StatsSection />
           <GameModes />
           <GameRewards />
           <NFTDropMechanics />
           <Tokenomics />
+          <TeamMembers />
           <CommunitySection />
           <TestimonialSection />
           <NFTShowcase />
