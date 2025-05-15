@@ -1,0 +1,18 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "src/index.ts",        "use": "@vercel/node"   },
+      { "src": "src/public/**/*",     "use": "@vercel/static" }
+    ],
+    "routes": [
+      {
+        "src": "/public/(.*)",
+        "dest": "/src/public/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/src/index.ts"
+      }
+    ]
+  }
+  
