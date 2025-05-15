@@ -1,187 +1,178 @@
 // server.js
+// Refactored for Netlify Functions + local testing
 
-const express   = require('express');
-const cors      = require('cors');
-const path      = require('path');
-const QRCode    = require('qrcode');
-const nacl      = require('tweetnacl');
-const bs58      = require('bs58');
-const { PublicKey } = require('@solana/web3.js');
+const express      = require('express');
+const cors         = require('cors');
+const path         = require('path');
+const QRCode       = require('qrcode');
+const nacl         = require('tweetnacl');
+const bs58         = require('bs58');
+const { PublicKey }= require('@solana/web3.js');
+const serverless   = require('serverless-http');
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+// Environment flag
+typeof process.env.NODE_ENV === 'string' || (process.env.NODE_ENV = 'development');
+const isProd = process.env.NODE_ENV === 'production';
+const PORT   = process.env.PORT || 3000;
 
-// In-memory storage for sessions and nonces
-// (use Redis or a real database in production)
+// In-memory session store (for demo; swap for Redis in prod)
 const sessions = new Map();
 
-// ─── Middleware ────────────────────────────────────────────────────────────────
-// only allow your front‑end domain to talk to these APIs
-app.use(cors({ origin: 'https://minepath.vercel.app' }));
+// Express setup
+const app = express();
+app.use(cors({ origin: [ 'https://minepath-api.netlify.app', 'http://localhost:3000' ], credentials: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Routes ────────────────────────────────────────────────────────────────────
+// Serve static locally only
+if (!isProd) {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
-// Home / landing page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Login page (with optional QR view)
+// -- LOGIN endpoint: store session, then redirect to static login page --
 app.get('/login', (req, res) => {
   let { session, nonce, player, qr } = req.query;
   console.log('Login request:', { session, nonce, player, qr });
 
-  // If missing params, create a demo session in non‑prod
-  if ((!session || !nonce || !player) && process.env.NODE_ENV !== 'production') {
-    session = session || `demo-${Date.now()}`;
-    nonce   = nonce   || `nonce-${Date.now()}`;
-    player  = player  || 'TestPlayer';
-
-    sessions.set(session, { nonce, player, connected: false, createdAt: Date.now(), isDemo: true });
-    return res.redirect(`/login?session=${session}&nonce=${nonce}&player=${player}${qr === 'true' ? '&qr=true' : ''}`);
-  }
-
+  // Demo session in dev
   if (!session || !nonce || !player) {
+    if (!isProd) {
+      session = session || `demo-${Date.now()}`;
+      nonce   = nonce   || `nonce-${Date.now()}`;
+      player  = player  || 'TestPlayer';
+      sessions.set(session, { nonce, player, connected: false, createdAt: Date.now(), isDemo: true });
+      // redirect back into /login with params
+      return res.redirect(`/login?session=${session}&nonce=${nonce}&player=${player}${qr==='true'? '&qr=true':''}`);
+    }
     return res.status(400).send('Missing required parameters');
   }
 
+  // store session
   sessions.set(session, { nonce, player, connected: false, createdAt: Date.now() });
 
-  if (qr === 'true') {
-    return res.sendFile(path.join(__dirname, 'public', 'qr.html'));
-  }
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  // build static page URL
+  const page = qr==='true' ? 'qr.html' : 'login.html';
+  const query = `?session=${encodeURIComponent(session)}&nonce=${encodeURIComponent(nonce)}&player=${encodeURIComponent(player)}` + (qr==='true'? '&qr=true':'');
+  const redirectUrl = `${isProd ? '' : ''}/${page}${query}`;
+
+  return res.redirect(redirectUrl);
 });
 
-// Fetch session info (hides nonce)
-app.get('/api/session/:sessionId', (req, res) => {
-  const session = sessions.get(req.params.sessionId);
-  if (!session) return res.status(404).json({ error: 'Session not found' });
-  const { nonce, ...data } = session;
-  res.json(data);
-});
-
-// Fetch nonce only
-app.get('/api/nonce/:sessionId', (req, res) => {
-  const session = sessions.get(req.params.sessionId);
-  if (!session) return res.status(404).json({ error: 'Session not found' });
-  res.json({ nonce: session.nonce });
-});
-
-// Generate a Phantom deep‑link QR code
+// -- QR generation endpoint --
 app.get('/api/qr', (req, res) => {
   let { session, nonce, player } = req.query;
+  console.log('QR request:', { session, nonce, player });
 
-  // demo fallback in non‑prod
-  if ((!session || !nonce || !player) && process.env.NODE_ENV !== 'production') {
-    session = session || `demo-${Date.now()}`;
-    nonce   = nonce   || `nonce-${Date.now()}`;
-    player  = player  || 'TestPlayer';
-    sessions.set(session, { nonce, player, connected: false, createdAt: Date.now(), isDemo: true });
-  }
   if (!session || !nonce || !player) {
-    return res.status(400).send('Missing required parameters');
+    if (!isProd) {
+      session = session || `demo-${Date.now()}`;
+      nonce   = nonce   || `nonce-${Date.now()}`;
+      player  = player  || 'TestPlayer';
+      sessions.set(session, { nonce, player, connected: false, createdAt: Date.now(), isDemo: true });
+    } else {
+      return res.status(400).send('Missing parameters');
+    }
   }
 
-  const redirectUrl = `${req.protocol}://${req.get('host')}/phantom-redirect?session=${session}`;
   const cluster     = 'devnet';
+  const redirectUrl = `https://minepath-api.netlify.app/phantom-redirect?session=${encodeURIComponent(session)}`;
   const deepLink    = `https://phantom.app/ul/v1/connect?cluster=${cluster}&redirect_url=${encodeURIComponent(redirectUrl)}`;
 
   QRCode.toDataURL(deepLink, (err, url) => {
-    if (err) return res.status(500).json({ error: 'Failed to generate QR code' });
+    if (err) return res.status(500).json({ error: 'QR generation failed' });
     res.json({ qrCode: url, deepLink });
   });
 });
 
-// Verify signature from the wallet
+// -- Verify signature endpoint --
 app.post('/api/verify', (req, res) => {
   let { session, publicKey, signature, message } = req.body;
-  console.log('Verify request:', { session, publicKey });
+  console.log('Verify request:', { session, publicKey, signature: signature?.slice(0,10), msgLen: message?.length });
 
-  if (!session || !publicKey) {
-    return res.status(400).json({ error: 'Missing session or publicKey' });
-  }
-
-  // ensure session exists
-  if (!sessions.has(session) && process.env.NODE_ENV !== 'production') {
-    sessions.set(session, {
-      nonce:     `demo-nonce-${Date.now()}`,
-      player:    'TestPlayer',
-      connected: false,
-      createdAt: Date.now(),
-      isDemo:    true
-    });
-  }
-  const sessionData = sessions.get(session);
-  if (!sessionData) return res.status(404).json({ error: 'Session not found' });
-
-  // decode signature (bs58 → base64 → hex fallback)
-  let sigBytes;
-  try {
-    sigBytes = bs58.decode(signature);
-  } catch {
-    try {
-      sigBytes = Uint8Array.from(Buffer.from(signature, 'base64'));
-    } catch {
-      const hex = signature.replace(/^0x/, '');
-      const arr = [];
-      for (let i = 0; i < hex.length; i += 2) {
-        arr.push(parseInt(hex.substr(i, 2), 16));
-      }
-      sigBytes = new Uint8Array(arr);
+  if (!session || !publicKey || !signature || !message) {
+    if (!isProd && session && publicKey) {
+      signature = signature || 'dummySig';
+      message   = message   || `Verify ${session}`;
+    } else {
+      return res.status(400).json({ error: 'Missing parameters' });
     }
   }
 
-  // verify
-  const msgBytes = new TextEncoder().encode(message);
-  const pubKey   = new PublicKey(publicKey).toBytes();
-  const ok       = nacl.sign.detached.verify(msgBytes, sigBytes, pubKey);
-
-  if (!ok) {
-    return res.status(400).json({ error: 'Invalid signature' });
+  let data = sessions.get(session);
+  if (!data) {
+    if (!isProd) {
+      data = { nonce: 'demo', player: 'TestPlayer', connected: false, createdAt: Date.now(), isDemo: true };
+      sessions.set(session, data);
+    } else {
+      return res.status(404).json({ error: 'Session not found' });
+    }
   }
 
-  // success → mark connected
-  sessionData.connected     = true;
-  sessionData.walletAddress = publicKey;
-  sessions.set(session, sessionData);
-  res.json({ success: true });
+  try {
+    let sigBytes;
+    try { sigBytes = bs58.decode(signature); } catch { sigBytes = Buffer.from(signature, 'base64'); }
+    const msgBytes = new TextEncoder().encode(message);
+    const pkObj    = new PublicKey(publicKey);
+    const ok       = nacl.sign.detached.verify(msgBytes, sigBytes, pkObj.toBytes());
+
+    if (!ok) return res.status(400).json({ error: 'Invalid signature' });
+
+    data.connected     = true;
+    data.walletAddress = publicKey;
+    data.verifiedAt    = Date.now();
+    sessions.set(session, data);
+
+    return res.json({ success: true });
+  } catch (e) {
+    console.error('Verification error:', e);
+    return res.status(500).json({ error: e.message });
+  }
 });
 
-// Phantom mobile redirect endpoint
+// -- Session info endpoint --
+app.get('/api/session/:id', (req, res) => {
+  const data = sessions.get(req.params.id);
+  if (!data) return res.status(404).json({ error: 'Not found' });
+  const { nonce, ...rest } = data;
+  res.json(rest);
+});
+
+// -- Nonce endpoint --
+app.get('/api/nonce/:id', (req, res) => {
+  const data = sessions.get(req.params.id);
+  if (!data) return res.status(404).json({ error: 'Not found' });
+  res.json({ nonce: data.nonce });
+});
+
+// -- Phantom redirect page (static) --
 app.get('/phantom-redirect', (req, res) => {
   const { session } = req.query;
   if (!session) return res.status(400).send('Missing session');
-  res.sendFile(path.join(__dirname, 'public', 'simple-redirect.html'));
+  // redirect to static simple-redirect.html with query
+  return res.redirect(`/simple-redirect.html?session=${encodeURIComponent(session)}`);
 });
 
-// Check current connection status
+// -- Connection status endpoint --
 app.get('/status', (req, res) => {
-  const session = sessions.get(req.query.session);
-  if (!session) return res.status(404).json({ error: 'Session not found' });
-  res.json({
-    connected:     session.connected,
-    walletAddress: session.walletAddress,
-    player:        session.player
-  });
+  const { session } = req.query;
+  if (!session) return res.status(400).json({ error: 'Missing session' });
+  const data = sessions.get(session);
+  if (!data) return res.status(404).json({ error: 'Not found' });
+  res.json({ connected: data.connected, walletAddress: data.walletAddress, player: data.player });
 });
 
-// cleanup expired sessions every 5 minutes
+// -- Cleanup expired sessions --
 setInterval(() => {
   const now = Date.now();
-  for (const [id, s] of sessions.entries()) {
-    if (now - s.createdAt > 5 * 60 * 1000) sessions.delete(id);
+  for (const [id, s] of sessions) {
+    if (now - s.createdAt > 5*60*1000) sessions.delete(id);
   }
-}, 60 * 1000);
+}, 60*1000);
 
-// ─── Local listen for development ───────────────────────────────────────────────
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🟢 Local server listening on http://localhost:${PORT}`);
-  });
+// Local server start
+if (!isProd) {
+  app.listen(PORT, () => console.log(`Local on http://localhost:${PORT}`));
 }
 
-// ─── Export for Vercel ───────────────────────────────────────────────────────────
+// Export for Netlify Functions
 module.exports = app;
+module.exports.handler = serverless(app);

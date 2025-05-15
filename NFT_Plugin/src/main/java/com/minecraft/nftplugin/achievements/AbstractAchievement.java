@@ -266,7 +266,22 @@ public abstract class AbstractAchievement implements Achievement {
 
         // Set custom model data
         if (reward.has("custom_model_data")) {
-            meta.setCustomModelData(reward.get("custom_model_data").getAsInt());
+            int customModelData = reward.get("custom_model_data").getAsInt();
+            meta.setCustomModelData(customModelData);
+            plugin.getLogger().info("Applied custom model data " + customModelData + " to NFT " + key + " from metadata");
+        } else {
+            // Try to get custom model data from config
+            int configCustomModelData = plugin.getConfigManager().getNftItemCustomModelData(key);
+            if (configCustomModelData != -1) {
+                meta.setCustomModelData(configCustomModelData);
+                plugin.getLogger().info("Applied custom model data " + configCustomModelData + " to NFT " + key + " from config");
+            }
+        }
+
+        // Special case for explosion_pickaxe_5
+        if (key.equals("explosion_pickaxe_5")) {
+            meta.setCustomModelData(7405);
+            plugin.getLogger().info("Forced custom model data 7405 for explosion_pickaxe_5");
         }
 
         // Add item flags

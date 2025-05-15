@@ -1,0 +1,34 @@
+{
+  "name": "Explosion Pickaxe V",
+  "symbol": "EXPICK5",
+  "description": "A magical pickaxe with explosion enchantment level V",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafybeicvwtjw7bohl24uj54jk66toiorx6ufng6bwkn6lftvbhxndoqqfa",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tool"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Mythic"
+    },
+    {
+      "trait_type": "Achievement",
+      "value": "Legendary Explosion Miner"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafybeicvwtjw7bohl24uj54jk66toiorx6ufng6bwkn6lftvbhxndoqqfa",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "seller_fee_basis_points": 0,
+    "collection": {
+      "name": "Explosion Pickaxe MinePath",
+      "family": "NFT MinePath Pickaxe"
+    }
+  }
+}

@@ -261,10 +261,41 @@ public class SolanaService {
 
         Achievement achievement = achievementOpt.get();
 
-        // Get NFT metadata
-        String nftName = achievement.getName();
-        String nftDescription = achievement.getDescription();
-        String nftImageUrl = achievement.getImageUrl();
+        // Check if we have a complete metadata URI
+        String metadataUri = plugin.getConfigManager().getNftMetadataUri(achievementKey);
+        final boolean useMetadataUri = metadataUri != null && !metadataUri.isEmpty();
+
+        // Only log detailed information at debug level
+        if (plugin.getLogger().isLoggable(java.util.logging.Level.FINE)) {
+            if (useMetadataUri) {
+                plugin.getLogger().fine("Using complete metadata URI: " + metadataUri);
+            } else {
+                plugin.getLogger().fine("No metadata URI configured, using individual metadata fields");
+            }
+        }
+
+        // Get NFT metadata directly from metadata file, not from achievement object
+        String nftName = plugin.getMetadataManager().getNftName(achievementKey);
+        String nftSymbol = plugin.getMetadataManager().getNftSymbol(achievementKey);
+        String nftDescription = plugin.getMetadataManager().getNftDescription(achievementKey);
+        String nftImageUrl = plugin.getMetadataManager().getNftImageUrl(achievementKey);
+
+        // Get attributes from metadata
+        com.google.gson.JsonArray attributes = plugin.getMetadataManager().getNftAttributes(achievementKey);
+        final String attributesJson;
+        if (attributes != null) {
+            attributesJson = attributes.toString();
+            plugin.getLogger().info("Found attributes in metadata: " + attributesJson);
+        } else {
+            attributesJson = "[]";
+        }
+
+        plugin.getLogger().info("NFT Metadata for " + achievementKey + ":");
+        plugin.getLogger().info("Name: " + nftName);
+        plugin.getLogger().info("Symbol: " + nftSymbol);
+        plugin.getLogger().info("Description: " + nftDescription);
+        plugin.getLogger().info("Image URL: " + nftImageUrl);
+        plugin.getLogger().info("Attributes: " + attributesJson);
 
         // Check if metadata file exists
         File metadataFile = new File(plugin.getDataFolder(), achievement.getMetadataFilePath());
@@ -295,19 +326,45 @@ public class SolanaService {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 // Prepare the command to run the Node.js script
-                ProcessBuilder pb = new ProcessBuilder(
-                        "node",
-                        nodeJsScriptFile.getAbsolutePath(),
-                        "--network", network,
-                        "--rpc-url", rpcUrl,
-                        "--private-key", privateKey,
-                        "--recipient", walletAddress,
-                        "--name", nftName,
-                        "--description", nftDescription,
-                        "--image", nftImageUrl,
-                        "--player", player.getName(),
-                        "--achievement", achievementKey
-                );
+                ProcessBuilder pb;
+
+                if (useMetadataUri) {
+                    // If we have a metadata URI, use it directly
+                    // But also include name, description, image, and symbol to satisfy the script's validation
+                    // Also include player and achievement for better tracking
+                    pb = new ProcessBuilder(
+                            "node",
+                            nodeJsScriptFile.getAbsolutePath(),
+                            "--network", network,
+                            "--rpc-url", rpcUrl,
+                            "--private-key", privateKey,
+                            "--recipient", walletAddress,
+                            "--metadata-uri", metadataUri,
+                            "--name", nftName,
+                            "--symbol", nftSymbol,
+                            "--description", nftDescription,
+                            "--image", nftImageUrl,
+                            "--player", player.getName(),
+                            "--achievement", achievementKey
+                    );
+                } else {
+                    // Otherwise, use individual metadata fields
+                    pb = new ProcessBuilder(
+                            "node",
+                            nodeJsScriptFile.getAbsolutePath(),
+                            "--network", network,
+                            "--rpc-url", rpcUrl,
+                            "--private-key", privateKey,
+                            "--recipient", walletAddress,
+                            "--name", nftName,
+                            "--symbol", nftSymbol,
+                            "--description", nftDescription,
+                            "--image", nftImageUrl,
+                            "--player", player.getName(),
+                            "--achievement", achievementKey,
+                            "--attributes", attributesJson
+                    );
+                }
 
                 // Set the working directory
                 pb.directory(backendDir);

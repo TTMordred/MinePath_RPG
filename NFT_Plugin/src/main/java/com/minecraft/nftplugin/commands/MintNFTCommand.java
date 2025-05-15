@@ -88,6 +88,14 @@ public class MintNFTCommand implements CommandExecutor {
         player.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW +
                 "Minting NFT for " + targetPlayer.getName() + " using metadata: " + metadataKey + "...");
 
+        // Check if we have a metadata URI for this NFT (only log to console, not to player)
+        String metadataUri = plugin.getConfigManager().getNftMetadataUri(metadataKey);
+        if (metadataUri != null && !metadataUri.isEmpty()) {
+            plugin.getLogger().info("Using metadata URI for " + metadataKey + ": " + metadataUri);
+        } else {
+            plugin.getLogger().info("No metadata URI found for " + metadataKey + ", using local metadata file");
+        }
+
         // Verify NFT metadata exists (but don't store the values to avoid unnecessary operations)
         plugin.getConfigManager().getNftName(metadataKey);
         plugin.getConfigManager().getNftDescription(metadataKey);
@@ -138,4 +146,3 @@ public class MintNFTCommand implements CommandExecutor {
 
         return true;
     }
-}

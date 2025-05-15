@@ -63,7 +63,29 @@ public class SQL {
         }
     }
 
+    public void setupSessionTable(){
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return;
+        }
+        try {
+            PreparedStatement ps = this.connection.prepareStatement("CREATE TABLE IF NOT EXISTS session (UUID VARCHAR(100), SESSION_PUBLICKEY VARCHAR(100), PRIMARY KEY (UUID))"
+            );
+            ps.executeUpdate();
+            String sql =     "CREATE TABLE IF NOT EXISTS session_secret (" +
+            "SESSION_PUBLICKEY VARCHAR(100) PRIMARY KEY, " +
+            "SECRET_B64 TEXT NOT NULL, " +
+            "CREATED_AT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+            ");";
+            PreparedStatement ps2 = this.connection.prepareStatement(sql);
+            ps2.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+
+    
     public boolean addPlayerToBalanceTable(OfflinePlayer player) {
         return addPlayerToBalanceTable(player.getName(), player.getUniqueId());
     }
@@ -218,6 +240,98 @@ public class SQL {
             return false;
         }
     }
+    public String fetchWalletAddress (String uuid) {
+        String walletAddress = null;
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return null;
+        }
+        try {
+            PreparedStatement ps = this.connection.prepareStatement("SELECT wallet_address FROM walletlogin_wallets WHERE uuid = ?");
+            ps.setString(1, uuid);
+            ResultSet results = ps.executeQuery();
+            if (results.next()) {
+                walletAddress = results.getString("wallet_address");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return walletAddress;
+    }
+    public boolean playerExistsInWalletTable(UUID uuid) {
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return false;
+        }
+        try {
+            PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM walletlogin_wallets  WHERE UUID=?");
+            ps.setString(1, uuid.toString());
+            ResultSet results = ps.executeQuery();
+            return results.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean addSession(String uuid, String sessionPublicKey) {
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return false;
+        }
+        String sql = ""
+          + "INSERT INTO session(UUID, SESSION_PUBLICKEY) "
+          + "VALUES ( ?, ?) ";
 
+        try  {
+            PreparedStatement ps = this.connection.prepareStatement(sql);
+            ps.setString(1, uuid);
+            ps.setString(2, sessionPublicKey);
+            ps.executeUpdate();
+            return true;
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
+    public String getSessionPublicKey(String uuid){
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return null;
+        }
+        String sql = "SELECT SESSION_PUBLICKEY FROM session WHERE UUID = ?;";
+        try{
+            PreparedStatement ps = this.connection.prepareStatement(sql);
+            ps.setString(1, uuid);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("SESSION_PUBLICKEY");
+                }
+                return null;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean addPlayerToSessionTable(String uuid) {
+        if (!this.isConnected()) {
+            plugin.getServer().getConsoleSender().sendMessage(plugin.chatPrefix+ChatColor.RED + "SQL not connected, check config.");
+            return false;
+        }
+        String sql = ""
+        + "INSERT INTO session(UUID) "
+        + "VALUES (?) "
+        + "ON CONFLICT (UUID) DO NOTHING;";
+        try {
+            PreparedStatement ps = this.connection.prepareStatement(sql);
+            ps.setString(1, uuid);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to add player UUID to session DB: " + e.getMessage());
+        }
+        return false;
+    }
 }

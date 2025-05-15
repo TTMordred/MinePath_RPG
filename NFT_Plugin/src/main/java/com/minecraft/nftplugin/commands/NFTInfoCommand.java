@@ -77,7 +77,6 @@ public class NFTInfoCommand implements CommandExecutor {
                     // Get achievement name and details
                     String achievementName = getFormattedAchievementName(achievementKey);
                     String description = plugin.getConfigManager().getNftDescription(achievementKey);
-                    String imageUrl = plugin.getConfigManager().getNftImageUrl(achievementKey);
 
                     // Get item details
                     ItemStack item = player.getInventory().getItemInMainHand();
@@ -126,11 +125,13 @@ public class NFTInfoCommand implements CommandExecutor {
                         "tellraw " + player.getName() + " {\"text\":\"§7[§a§lClick to Open Explorer§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + explorerUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to open Solana Explorer\"}}"
                     );
 
-                    // Display image link with only the functional button
-                    if (imageUrl != null && !imageUrl.isEmpty()) {
-                        player.sendMessage("§7Image: ");
+                    // Display detail link with only the functional button
+                    // Get detail link from config manager (falls back to image URL if not configured)
+                    String detailLink = plugin.getConfigManager().getNftDetailLink(achievementKey);
+                    if (detailLink != null && !detailLink.isEmpty()) {
+                        player.sendMessage("§7Detail: ");
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                            "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Image in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + imageUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT image\"}}"
+                            "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Detail in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + detailLink + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT details\"}}"
                         );
                     }
                 }

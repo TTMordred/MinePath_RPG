@@ -20,38 +20,38 @@ public class ResetNFTCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Kiểm tra quyền admin
+        // Check admin permission
         if (!sender.hasPermission("nftplugin.admin")) {
-            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Bạn không có quyền sử dụng lệnh này!");
+            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "You don't have permission to use this command!");
             return true;
         }
 
-        // Kiểm tra lệnh update-dependencies
+        // Check for update-dependencies command
         if (args.length > 0 && args[0].equalsIgnoreCase("update-dependencies")) {
             boolean clean = args.length > 1 && args[1].equalsIgnoreCase("--clean");
-            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW + "Đang cập nhật dependencies" +
+            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW + "Updating dependencies" +
                     (clean ? " (clean install)" : "") + "...");
 
-            // Chạy cập nhật dependencies trong một thread riêng
+            // Run dependency update in a separate thread
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
                     plugin.getSolanaService().updateDependencies(clean);
-                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.GREEN + "Đã cập nhật dependencies thành công!");
+                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.GREEN + "Dependencies updated successfully!");
                 } catch (Exception e) {
-                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Lỗi khi cập nhật dependencies: " + e.getMessage());
+                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Error updating dependencies: " + e.getMessage());
                 }
             });
 
             return true;
         }
 
-        // Kiểm tra số lượng tham số
+        // Check parameter count
         if (args.length < 1) {
-            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Sử dụng: /resetnft <player|update-dependencies> [achievement_key|--clean]");
+            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Usage: /resetnft <player|update-dependencies> [achievement_key|--clean]");
             return true;
         }
 
-        // Lấy tên người chơi
+        // Get player name
         String playerName = args[0];
         Player targetPlayer = Bukkit.getPlayer(playerName);
         UUID playerUUID = null;
@@ -59,44 +59,44 @@ public class ResetNFTCommand implements CommandExecutor {
         if (targetPlayer != null) {
             playerUUID = targetPlayer.getUniqueId();
         } else {
-            // Tìm UUID từ tên người chơi (nếu người chơi offline)
+            // Find UUID from player name (if player is offline)
             try {
                 playerUUID = plugin.getDatabaseManager().getUUIDFromName(playerName);
                 if (playerUUID == null) {
-                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Không tìm thấy người chơi: " + playerName);
+                    sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Player not found: " + playerName);
                     return true;
                 }
             } catch (Exception e) {
-                sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Lỗi khi tìm UUID của người chơi: " + e.getMessage());
+                sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Error finding player UUID: " + e.getMessage());
                 return true;
             }
         }
 
-        // Xác định achievement key
+        // Determine achievement key
         String achievementKey = args.length > 1 ? args[1] : "wood_chopper";
 
-        // Reset NFT và tiến trình
+        // Reset NFT and progress
         try {
             boolean resetNFT = plugin.getDatabaseManager().resetNFT(playerUUID, achievementKey);
             boolean resetProgress = plugin.getDatabaseManager().resetAchievementProgress(playerUUID, achievementKey);
 
             if (resetNFT || resetProgress) {
-                sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.GREEN + "Đã reset NFT và tiến trình của " +
-                        playerName + " cho thành tựu " + achievementKey);
+                sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.GREEN + "Reset NFT and progress for " +
+                        playerName + " for achievement " + achievementKey);
 
-                // Thông báo cho người chơi nếu họ đang online
+                // Notify player if they are online
                 if (targetPlayer != null) {
                     targetPlayer.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW +
-                            "NFT và tiến trình thành tựu " + achievementKey + " của bạn đã được reset bởi admin.");
+                            "Your NFT and achievement progress for " + achievementKey + " has been reset by an admin.");
                 }
             } else {
                 sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.YELLOW +
-                        "Không tìm thấy NFT hoặc tiến trình nào để reset cho " + playerName);
+                        "No NFT or progress found to reset for " + playerName);
             }
 
             return true;
         } catch (Exception e) {
-            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Lỗi khi reset NFT: " + e.getMessage());
+            sender.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Error resetting NFT: " + e.getMessage());
             plugin.getLogger().severe("Error resetting NFT: " + e.getMessage());
             e.printStackTrace();
             return true;

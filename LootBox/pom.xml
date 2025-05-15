@@ -44,6 +44,11 @@
             <version>8.0.33</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.mmorrell</groupId>
+            <artifactId>solanaj</artifactId>
+            <version>1.19.2</version>
+        </dependency>
     </dependencies>
 
     <build>

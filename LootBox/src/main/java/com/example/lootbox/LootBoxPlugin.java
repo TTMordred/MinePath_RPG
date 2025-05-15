@@ -7,17 +7,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.p2p.solanaj.rpc.RpcClient;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.p2p.solanaj.core.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -25,6 +30,10 @@ public class LootBoxPlugin extends JavaPlugin implements Listener {
     private static Economy econ;
     private final Map<String, List<WeightedItem>> weightedRewards = new HashMap<>();
     private Connection connection;
+    protected RpcClient rpcClient = new RpcClient("https://api.devnet.solana.com");
+    protected PublicKey tokenMintAddress = new PublicKey("8ukoz8y6bJxpjUVSE3bEDbGjwyStqXBQZiSyxjhjNx1g");
+    protected String currencySymbol = "MINE";
+    protected int tokenDecimals = 9;
     private static class WeightedItem {
         final ItemStack item;
         final int weight;
@@ -153,7 +162,7 @@ public class LootBoxPlugin extends JavaPlugin implements Listener {
             // Load your driver explicitly if needed:
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, user, password);
-            getLogger().info(ChatColor.GREEN +"Connected to SQL DB at " + url);
+            getLogger().info("Connected to SQL DB at " + url);
         } catch (ClassNotFoundException | SQLException e) {
             getLogger().severe("Could not open SQL database: " + e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
@@ -161,5 +170,31 @@ public class LootBoxPlugin extends JavaPlugin implements Listener {
     }
     public Connection getConnection() {
         return connection;
+    }
+    
+    public enum TELLRAWCOLOR {
+        red,
+        dark_red,
+        yellow,
+        gold,
+        green,
+        dark_green,
+        blue,
+        dark_blue,
+        aqua,
+        dark_aqua,
+        light_purple,
+        dark_purple,
+        gray,
+        dark_gray,
+        white,
+        black
+    }
+        public void sendURLToPlayer(Player player, String message, String url, TELLRAWCOLOR color) {
+        this.getServer().dispatchCommand(
+                this.getServer().getConsoleSender(),
+                "tellraw " + player.getName() +
+                        " {\"text\":\"" + message + "\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" +
+                        url + "\"},\"color\":\""+color.name()+"\",\"underlined\":true,\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[\""+url+"\"]}}");
     }
 }

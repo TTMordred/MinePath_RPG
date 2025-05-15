@@ -15,6 +15,7 @@ const { Connection, Keypair, PublicKey } = require('@solana/web3.js');
 const { Metaplex, keypairIdentity, bundlrStorage } = require('@metaplex-foundation/js');
 const bs58 = require('bs58');
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 // Parse command line arguments
 program
@@ -23,10 +24,13 @@ program
   .option('--private-key <key>', 'Private key of the server wallet (base58 encoded)')
   .option('--recipient <address>', 'Recipient wallet address')
   .option('--name <n>', 'NFT name')
+  .option('--symbol <symbol>', 'NFT symbol', '')
   .option('--description <description>', 'NFT description')
   .option('--image <url>', 'NFT image URL')
   .option('--player <n>', 'Player name')
   .option('--achievement <key>', 'Achievement key')
+  .option('--attributes <json>', 'NFT attributes as JSON array', '[]')
+  .option('--metadata-uri <url>', 'Complete metadata URI (if provided, other metadata options are ignored)')
   .option('--confirmation-timeout <ms>', 'Timeout for transaction confirmation in milliseconds', '60000')
   .option('--retry-count <n>', 'Number of retries for failed operations', '5')
   .parse(process.argv);
@@ -74,8 +78,9 @@ if (!options.recipient) {
   process.exit(1);
 }
 
-if (!options.name || !options.description || !options.image) {
-  console.error('Error: NFT metadata (name, description, image) is required');
+// Check if we have either metadata URI or all required metadata fields
+if (!options.metadataUri && (!options.name || !options.description || !options.image)) {
+  console.error('Error: Either metadata URI or all metadata fields (name, description, image) are required');
   process.exit(1);
 }
 
@@ -125,6 +130,37 @@ async function withRetry(operation, maxRetries = options.retryCount) {
   throw lastError;
 }
 
+// Helper function to download an image from a URL and upload it to Arweave
+async function uploadImageFromUrl(metaplex, imageUrl) {
+  try {
+    console.log(`Downloading image from URL: ${imageUrl}`);
+
+    // Fetch the image
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+    }
+
+    // Get the image as a buffer
+    const imageBuffer = await response.buffer();
+
+    // Get the content type
+    const contentType = response.headers.get('content-type') || 'image/png';
+
+    console.log(`Image downloaded, size: ${imageBuffer.length} bytes, type: ${contentType}`);
+
+    // Upload the image to Arweave
+    console.log('Uploading image to Arweave...');
+    const { uri } = await metaplex.storage().upload(imageBuffer);
+
+    console.log(`Image uploaded to Arweave: ${uri}`);
+    return uri;
+  } catch (error) {
+    console.error('Error uploading image from URL:', error.message);
+    return null;
+  }
+}
+
 // Check Metaplex version
 try {
   const metaplexVersion = require('@metaplex-foundation/js/package.json').version;
@@ -163,43 +199,137 @@ async function mintNft() {
       }));
 
     // Prepare NFT metadata
-    console.log('Uploading metadata...');
-    const { uri } = await withRetry(async () => {
-      return await metaplex.nfts().uploadMetadata({
-        name: options.name,
-        description: options.description,
-        image: options.image,
-        attributes: [
+    console.log('Preparing metadata...');
+    let uri;
+
+    // Check if a complete metadata URI is provided
+    if (options.metadataUri) {
+      console.log(`Using provided metadata URI: ${options.metadataUri}`);
+      uri = options.metadataUri;
+
+      // Log additional metadata information if provided with metadata URI
+      if (options.name) console.log(`NFT Name override: ${options.name}`);
+      if (options.description) console.log(`NFT Description override: ${options.description}`);
+      if (options.image) console.log(`NFT Image override: ${options.image}`);
+      if (options.player) console.log(`Player: ${options.player}`);
+      if (options.achievement) console.log(`Achievement: ${options.achievement}`);
+    } else {
+      // First, try to upload the image to Arweave if it's a URL
+      let imageUri = options.image;
+      try {
+        if (options.image && options.image.startsWith('http')) {
+          console.log('Trying to upload image from URL to Arweave:', options.image);
+
+          // Try to upload the image directly from the URL using our helper function
+          const uploadedImageUri = await withRetry(async () => {
+            return await uploadImageFromUrl(metaplex, options.image);
+          });
+
+          if (uploadedImageUri) {
+            imageUri = uploadedImageUri;
+            console.log('Successfully uploaded image to Arweave:', imageUri);
+          } else {
+            console.log('Failed to upload image to Arweave, using original URL');
+          }
+        }
+      } catch (error) {
+        console.error('Error in image upload process:', error.message);
+        console.log('Continuing with original image URL:', options.image);
+      }
+
+      // Generate and upload metadata
+      console.log('Generating and uploading metadata...');
+      const result = await withRetry(async () => {
+        // Parse attributes from JSON string
+        let customAttributes = [];
+        try {
+          if (options.attributes && options.attributes !== '[]') {
+            customAttributes = JSON.parse(options.attributes);
+            console.log('Parsed custom attributes:', customAttributes);
+          }
+        } catch (error) {
+          console.error('Error parsing attributes JSON:', error.message);
+          console.error('Using default attributes instead');
+          customAttributes = [];
+        }
+
+        // Add default attributes if not present in custom attributes
+        const defaultAttributes = [
           { trait_type: 'Player', value: options.player },
           { trait_type: 'Achievement', value: options.achievement },
           { trait_type: 'Date', value: new Date().toISOString() }
-        ],
-        properties: {
-          files: [
+        ];
+
+        // Combine custom and default attributes, avoiding duplicates
+        const traitTypes = customAttributes.map(attr => attr.trait_type);
+        const combinedAttributes = [
+          ...customAttributes,
+          ...defaultAttributes.filter(attr => !traitTypes.includes(attr.trait_type))
+        ];
+
+        // Create metadata object following Metaplex standards
+        const metadata = {
+          name: options.name,
+          symbol: options.symbol || '',
+          description: options.description,
+          image: imageUri, // Use the potentially uploaded image URI
+          external_url: '', // Optional
+          attributes: combinedAttributes,
+          properties: {
+            files: [
+              {
+                uri: imageUri, // Use the potentially uploaded image URI
+                type: 'image/png'
+              }
+            ],
+            category: 'image'
+          },
+          collection: {
+            name: 'Minecraft NFT Collection',
+            family: 'NFT Plugin'
+          },
+          seller_fee_basis_points: 0, // No royalties (0%)
+          creators: [
             {
-              uri: options.image,
-              type: 'image/png'
+              address: wallet.publicKey.toString(),
+              share: 100
             }
           ]
-        }
+        };
+
+        console.log('Metadata to upload:', JSON.stringify(metadata, null, 2));
+        return await metaplex.nfts().uploadMetadata(metadata);
       });
-    });
+
+      uri = result.uri;
+    }
 
     console.log(`Metadata uploaded: ${uri}`);
 
     // Create the NFT with confirmation
     console.log('Creating NFT...');
     const { nft } = await withRetry(async () => {
-      return await metaplex.nfts().create({
+      const createInput = {
         uri,
         name: options.name,
+        symbol: options.symbol || '',
         sellerFeeBasisPoints: 0, // No royalties
         maxSupply: 1, // Unique NFT
         isMutable: false, // Cannot be changed
         creators: [{ address: wallet.publicKey, share: 100 }],
         tokenOwner: wallet.publicKey, // Use the server wallet as the initial token owner
-        tokenStandard: 0 // Non-fungible token
-      }, { commitment: 'confirmed' }); // Wait for confirmation
+        tokenStandard: 0, // Non-fungible token
+        updateAuthority: wallet, // The wallet that can update the metadata
+        collection: null, // No collection for now
+        uses: null // No uses for now
+      };
+
+      console.log('NFT creation parameters:', JSON.stringify({
+        ...createInput,
+        updateAuthority: wallet.publicKey.toString(),
+      }, null, 2));
+
+      return await metaplex.nfts().create(createInput, { commitment: 'confirmed' }); // Wait for confirmation
     });
 
     // Log NFT details

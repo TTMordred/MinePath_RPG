@@ -433,7 +433,6 @@ public class NFTListCommand implements CommandExecutor, Listener {
         // Get achievement details
         String achievementName = getFormattedAchievementName(nft.getAchievementKey());
         String description = plugin.getConfigManager().getNftDescription(nft.getAchievementKey());
-        String imageUrl = plugin.getConfigManager().getNftImageUrl(nft.getAchievementKey());
 
         // Display detailed NFT information with improved formatting
         player.sendMessage("§8§m-----------------------------------------------------");
@@ -476,7 +475,18 @@ public class NFTListCommand implements CommandExecutor, Listener {
         player.sendMessage("§8§m-----------------------------------------------------");
 
         // Display Solana Explorer link with only the functional button
-        String explorerUrl = "https://explorer.solana.com/address/" + nft.getNftId() + "?cluster=devnet";
+        String explorerUrl;
+        if (nft.getMintAddress() != null && !nft.getMintAddress().isEmpty()) {
+            // Use mint address if available (preferred)
+            explorerUrl = plugin.getConfigManager().getSolanaExplorerAddressUrl(nft.getMintAddress());
+        } else if (nft.getTransactionId() != null && !nft.getTransactionId().isEmpty()) {
+            // Fallback to transaction ID
+            explorerUrl = plugin.getConfigManager().getSolanaExplorerTransactionUrl(nft.getTransactionId());
+        } else {
+            // Last resort, use NFT ID (though this may not work correctly)
+            explorerUrl = plugin.getConfigManager().getSolanaExplorerAddressUrl(nft.getNftId());
+        }
+
         player.sendMessage("§7View on Solana Explorer: ");
 
         // Use Spigot's JSON message API to create clickable links
@@ -484,11 +494,13 @@ public class NFTListCommand implements CommandExecutor, Listener {
             "tellraw " + player.getName() + " {\"text\":\"§7[§a§lClick to Open Explorer§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + explorerUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to open Solana Explorer\"}}"
         );
 
-        // Display image link with only the functional button
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            player.sendMessage("§7Image: ");
+        // Display detail link with only the functional button
+        // Get detail link from config manager (falls back to image URL if not configured)
+        String detailLink = plugin.getConfigManager().getNftDetailLink(nft.getAchievementKey());
+        if (detailLink != null && !detailLink.isEmpty()) {
+            player.sendMessage("§7Detail: ");
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Image in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + imageUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT image\"}}"
+                "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Detail in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + detailLink + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT details\"}}"
             );
         }
 

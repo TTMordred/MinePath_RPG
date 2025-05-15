@@ -2,7 +2,7 @@
   "name": "Lucky Charm I",
   "symbol": "LUCK1",
   "description": "A magical charm that brings a small amount of luck",
-  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+  "image": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafybeieiot6gbstht27uxqqcug5l3ers5mstnrxwr3rronmcs2il5vdr5e",
   "attributes": [
     {
       "trait_type": "Type",
@@ -20,7 +20,7 @@
   "properties": {
     "files": [
       {
-        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreihjbpwxvxz4qgrrjcmctj7xpfxnxrfysjv6qzjyemzwuqm3mpfxqm",
+        "uri": "https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafybeieiot6gbstht27uxqqcug5l3ers5mstnrxwr3rronmcs2il5vdr5e",
         "type": "image/png"
       }
     ]

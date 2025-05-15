@@ -1,18 +1,4 @@
-# Welcome to your Lovable project
-
-## Project info
-
-**URL**: https://lovable.dev/projects/e29524d2-3842-44e3-8a6f-4f23b2875711
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/e29524d2-3842-44e3-8a6f-4f23b2875711) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+**This is our Website for the MinePath project, including roadmap, team members, and other various components.**
 
 **Use your preferred IDE**
 
@@ -24,10 +10,11 @@ Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/TTMordred/MinePath_RPG.git
 
 # Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+cd MinePath_RPG
+cd website
 
 # Step 3: Install the necessary dependencies.
 npm install --legacy-peer-deps
@@ -59,12 +46,6 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e29524d2-3842-44e3-8a6f-4f23b2875711) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
 
 Yes it is!
 

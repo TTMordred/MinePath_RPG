@@ -24,8 +24,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Command to display a paginated NFT inventory
@@ -61,26 +63,121 @@ public class NFTInvCommand implements CommandExecutor, Listener {
         }
 
         Player player = (Player) sender;
-        int page = 1; // Default to first page
 
-        // Check if a page number was specified
-        if (args.length > 0) {
-            try {
-                page = Integer.parseInt(args[0]);
-                if (page < 1) {
-                    page = 1;
-                }
-            } catch (NumberFormatException e) {
-                player.sendMessage(plugin.getConfigManager().getMessage("prefix") + ChatColor.RED + "Invalid page number. Using page 1.");
-            }
-        }
+        // First, ensure the inventory is compacted to prevent duplication
+        compactPlayerInventory(player);
+
+        // Find the first non-full page or create a new one
+        int page = findFirstAvailablePage(player);
 
         // Store the current page for this player
         playerPages.put(player.getName(), page);
 
-        // Open the inventory for the specified page
+        // Open the inventory for the determined page
         openNFTInventory(player, page);
         return true;
+    }
+
+    /**
+     * Find the first page that has available slots or return the first page
+     * @param player The player
+     * @return The page number to open
+     */
+    private int findFirstAvailablePage(Player player) {
+        // Load player's inventory
+        Map<Integer, ItemStack> allItems = storage.loadInventory(player);
+
+        if (allItems.isEmpty()) {
+            return 1; // If no items, return first page
+        }
+
+        // Find the highest page with items
+        int highestPage = 0;
+
+        for (int itemIndex : allItems.keySet()) {
+            int pageOfItem = itemIndex / ITEMS_PER_PAGE + 1;
+            if (pageOfItem > highestPage) {
+                highestPage = pageOfItem;
+            }
+        }
+
+        // Count items per page
+        Map<Integer, Integer> itemsPerPage = new HashMap<>();
+
+        for (int itemIndex : allItems.keySet()) {
+            int pageOfItem = itemIndex / ITEMS_PER_PAGE + 1;
+            itemsPerPage.put(pageOfItem, itemsPerPage.getOrDefault(pageOfItem, 0) + 1);
+        }
+
+        // Check each page starting from 1 up to the highest page
+        for (int page = 1; page <= highestPage; page++) {
+            int itemCount = itemsPerPage.getOrDefault(page, 0);
+
+            // If this page has space, return it
+            if (itemCount < ITEMS_PER_PAGE) {
+                return page;
+            }
+        }
+
+        // If all existing pages are full, return the first page
+        // This will force the player to fill pages in order
+        return 1;
+    }
+
+    /**
+     * Check for and remove duplicate NFTs from a player's inventory
+     * @param player The player
+     */
+    private void compactPlayerInventory(Player player) {
+        // Load the player's inventory
+        Map<Integer, ItemStack> items = storage.loadInventory(player);
+
+        // Check for duplicate items (same NFT ID in multiple slots)
+        Map<String, Integer> nftIdToSlot = new HashMap<>();
+        Set<Integer> slotsToRemove = new HashSet<>();
+
+        for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+            ItemStack item = entry.getValue();
+            int slot = entry.getKey();
+
+            if (item != null && plugin.getItemManager().isNftItem(item)) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    PersistentDataContainer container = meta.getPersistentDataContainer();
+                    String nftId = container.get(plugin.getItemManager().getNftIdKey(), PersistentDataType.STRING);
+
+                    if (nftId != null) {
+                        if (nftIdToSlot.containsKey(nftId)) {
+                            // Found a duplicate NFT
+                            slotsToRemove.add(slot);
+                            plugin.getLogger().warning("Found duplicate NFT " + nftId + " in slot " + slot +
+                                " (already in slot " + nftIdToSlot.get(nftId) + ")");
+                        } else {
+                            nftIdToSlot.put(nftId, slot);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Remove duplicate items
+        if (!slotsToRemove.isEmpty()) {
+            for (int slot : slotsToRemove) {
+                items.remove(slot);
+            }
+
+            // Clear the storage
+            storage.clearInventory(player);
+
+            // Save the cleaned items
+            for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+                storage.setItem(player, entry.getKey(), entry.getValue());
+            }
+
+            // Save to file
+            storage.saveInventory(player);
+            plugin.getLogger().info("Removed " + slotsToRemove.size() + " duplicate NFTs from inventory for " + player.getName());
+        }
     }
 
     /**
@@ -96,32 +193,29 @@ public class NFTInvCommand implements CommandExecutor, Listener {
         // Load NFTs from storage
         Map<Integer, ItemStack> allItems = storage.loadInventory(player);
 
-        // Calculate start index for this page
-        int startIndex = (page - 1) * ITEMS_PER_PAGE;
+        // Count items by page to calculate total pages
+        Map<Integer, Integer> itemsPerPage = new HashMap<>();
+        for (int itemIndex : allItems.keySet()) {
+            int pageOfItem = itemIndex / ITEMS_PER_PAGE + 1;
+            itemsPerPage.put(pageOfItem, itemsPerPage.getOrDefault(pageOfItem, 0) + 1);
+        }
 
         // Add items for this page
         int slot = 0;
-        int itemsAdded = 0;
+
+        // Find items for this specific page
         for (Map.Entry<Integer, ItemStack> entry : allItems.entrySet()) {
-            // Skip items that don't belong on this page
-            if (itemsAdded < startIndex) {
-                itemsAdded++;
-                continue;
-            }
+            int itemIndex = entry.getKey();
+            int itemPage = itemIndex / ITEMS_PER_PAGE + 1;
 
-            // Stop if we've reached the end of this page
-            if (slot >= ITEMS_PER_PAGE) {
-                break;
-            }
+            // Only add items from the current page
+            if (itemPage == page) {
+                // Calculate the slot within this page
+                int pageSlot = itemIndex % ITEMS_PER_PAGE;
 
-            ItemStack item = entry.getValue();
-            inventory.setItem(slot, item);
-            slot++;
-            itemsAdded++;
-
-            // Stop if we've reached the end of all items
-            if (itemsAdded >= allItems.size()) {
-                break;
+                // Add item to inventory
+                inventory.setItem(pageSlot, entry.getValue());
+                slot++;
             }
         }
 
@@ -140,28 +234,42 @@ public class NFTInvCommand implements CommandExecutor, Listener {
      * @param totalItems The total number of items
      */
     private void addNavigationItems(Inventory inventory, int currentPage, int totalItems) {
-        int totalPages = (int) Math.ceil((double) totalItems / ITEMS_PER_PAGE);
-        if (totalPages < 1) totalPages = 1;
+        // Check if the current page is full (has all 45 slots filled)
+        boolean isPageFull = true;
+        for (int i = 0; i < ITEMS_PER_PAGE; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                isPageFull = false;
+                break;
+            }
+        }
 
-        // Previous page button (if not on first page)
-        if (currentPage > 1) {
-            ItemStack prevButton = new ItemStack(Material.ARROW);
-            ItemMeta meta = prevButton.getItemMeta();
-            if (meta != null) {
+        // Previous page button
+        ItemStack prevButton = new ItemStack(Material.ARROW);
+        ItemMeta meta = prevButton.getItemMeta();
+        if (meta != null) {
+            if (currentPage > 1) {
+                // Active previous button
                 meta.setDisplayName(ChatColor.YELLOW + "Previous Page");
                 List<String> lore = new ArrayList<>();
                 lore.add(ChatColor.GRAY + "Click to go to page " + (currentPage - 1));
                 meta.setLore(lore);
-                prevButton.setItemMeta(meta);
+            } else {
+                // Disabled previous button
+                meta.setDisplayName(ChatColor.GRAY + "Previous Page");
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatColor.GRAY + "You are on the first page");
+                meta.setLore(lore);
             }
-            inventory.setItem(PREV_PAGE_SLOT, prevButton);
+            prevButton.setItemMeta(meta);
         }
+        inventory.setItem(PREV_PAGE_SLOT, prevButton);
 
         // Current page indicator
         ItemStack pageIndicator = new ItemStack(Material.PAPER);
-        ItemMeta meta = pageIndicator.getItemMeta();
+        meta = pageIndicator.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.GREEN + "Page " + currentPage + " of " + totalPages);
+            meta.setDisplayName(ChatColor.GREEN + "Page " + currentPage);
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "Total items: " + totalItems);
             meta.setLore(lore);
@@ -169,19 +277,26 @@ public class NFTInvCommand implements CommandExecutor, Listener {
         }
         inventory.setItem(CURRENT_PAGE_SLOT, pageIndicator);
 
-        // Next page button (if not on last page)
-        if (currentPage < totalPages) {
-            ItemStack nextButton = new ItemStack(Material.ARROW);
-            meta = nextButton.getItemMeta();
-            if (meta != null) {
+        // Next page button - only active if current page is full
+        ItemStack nextButton = new ItemStack(Material.ARROW);
+        meta = nextButton.getItemMeta();
+        if (meta != null) {
+            if (isPageFull) {
+                // Active next button
                 meta.setDisplayName(ChatColor.YELLOW + "Next Page");
                 List<String> lore = new ArrayList<>();
                 lore.add(ChatColor.GRAY + "Click to go to page " + (currentPage + 1));
                 meta.setLore(lore);
-                nextButton.setItemMeta(meta);
+            } else {
+                // Disabled next button
+                meta.setDisplayName(ChatColor.GRAY + "Next Page");
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatColor.GRAY + "Fill this page before going to the next");
+                meta.setLore(lore);
             }
-            inventory.setItem(NEXT_PAGE_SLOT, nextButton);
+            nextButton.setItemMeta(meta);
         }
+        inventory.setItem(NEXT_PAGE_SLOT, nextButton);
     }
 
     /**
@@ -206,22 +321,64 @@ public class NFTInvCommand implements CommandExecutor, Listener {
                 if (slot == PREV_PAGE_SLOT || slot == NEXT_PAGE_SLOT) {
                     event.setCancelled(true); // Cancel the click event
 
-                    // Get current page
-                    int currentPage = playerPages.getOrDefault(player.getName(), 1);
-
-                    // Calculate new page
-                    int newPage = currentPage;
-                    if (slot == PREV_PAGE_SLOT && currentPage > 1) {
-                        newPage = currentPage - 1;
-                    } else if (slot == NEXT_PAGE_SLOT) {
-                        newPage = currentPage + 1;
+                    // Get the clicked item to verify it's a navigation button
+                    ItemStack clickedItem = event.getCurrentItem();
+                    if (clickedItem == null || clickedItem.getType() != Material.ARROW) {
+                        return;
                     }
 
-                    // Only change page if it's different
-                    if (newPage != currentPage) {
+                    // Get current page from the title
+                    int currentPage = 1;
+                    try {
+                        // Extract page number from title (format: "NFT Inventory - Page X")
+                        String pageStr = title.substring(title.lastIndexOf("Page") + 5).trim();
+                        currentPage = Integer.parseInt(pageStr);
+                    } catch (Exception e) {
+                        plugin.getLogger().warning("Could not parse page number from title: " + title);
+                    }
+
+                    // Check if the current page is full (has all 45 slots filled)
+                    boolean isPageFull = true;
+                    for (int i = 0; i < ITEMS_PER_PAGE; i++) {
+                        ItemStack item = event.getInventory().getItem(i);
+                        if (item == null || item.getType() == Material.AIR) {
+                            isPageFull = false;
+                            break;
+                        }
+                    }
+
+                    // Calculate new page based on which button was clicked
+                    final int newPage;
+                    if (slot == PREV_PAGE_SLOT && currentPage > 1) {
+                        // Previous page button - go back one page
+                        newPage = currentPage - 1;
+                    } else if (slot == NEXT_PAGE_SLOT && isPageFull) {
+                        // Next page button - go forward one page only if current page is full
+                        newPage = currentPage + 1;
+                    } else {
+                        // No change
+                        newPage = currentPage;
+
+                        // If trying to go to next page but it's not full, show a message
+                        if (slot == NEXT_PAGE_SLOT && !isPageFull) {
+                            player.sendMessage(plugin.getConfigManager().getMessage("prefix") +
+                                ChatColor.YELLOW + "You need to fill this page before going to the next one.");
+                        }
+                    }
+
+                    // Only change page if it's different and valid
+                    if (newPage != currentPage && newPage >= 1) {
+                        // Update player's current page
                         playerPages.put(player.getName(), newPage);
+
+                        // Save the current inventory first to ensure items aren't lost
+                        saveInventoryContents(player, event.getInventory(), currentPage);
+
+                        // Open new page
                         player.closeInventory(); // Close current inventory
-                        openNFTInventory(player, newPage); // Open new page
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            openNFTInventory(player, newPage); // Open new page
+                        }, 2L); // Slight delay to ensure inventory is closed and saved first
                     }
                     return;
                 }
@@ -274,6 +431,63 @@ public class NFTInvCommand implements CommandExecutor, Listener {
     }
 
     /**
+     * Save the contents of an inventory to the player's storage
+     * @param player The player
+     * @param inventory The inventory to save
+     * @param currentPage The current page number
+     */
+    private void saveInventoryContents(Player player, Inventory inventory, int currentPage) {
+        // Calculate start index for this page
+        int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+        // Load existing items
+        Map<Integer, ItemStack> existingItems = storage.loadInventory(player);
+
+        // Create a map to track which slots in the current page have items
+        boolean[] slotHasItem = new boolean[ITEMS_PER_PAGE];
+
+        // First, mark which slots in the current page have items in the inventory
+        for (int slot = 0; slot < ITEMS_PER_PAGE; slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR && plugin.getItemManager().isNftItem(item)) {
+                slotHasItem[slot] = true;
+
+                // Add or update the item in the global inventory
+                int globalIndex = startIndex + slot;
+                existingItems.put(globalIndex, item.clone());
+
+                // Log for debugging
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    PersistentDataContainer container = meta.getPersistentDataContainer();
+                    String nftId = container.get(plugin.getItemManager().getNftIdKey(), PersistentDataType.STRING);
+                    plugin.getLogger().info("Saved NFT " + nftId + " to global index " + globalIndex);
+                }
+            }
+        }
+
+        // Now remove items from slots that are empty in the current page
+        for (int slot = 0; slot < ITEMS_PER_PAGE; slot++) {
+            if (!slotHasItem[slot]) {
+                int globalIndex = startIndex + slot;
+                if (existingItems.containsKey(globalIndex)) {
+                    existingItems.remove(globalIndex);
+                    plugin.getLogger().info("Removed item from global index " + globalIndex + " (empty slot)");
+                }
+            }
+        }
+
+        // Save all items back to storage - DO NOT CLEAR FIRST to prevent data loss
+        for (Map.Entry<Integer, ItemStack> entry : existingItems.entrySet()) {
+            storage.setItem(player, entry.getKey(), entry.getValue());
+        }
+
+        // Save to file
+        storage.saveInventory(player);
+        plugin.getLogger().info("Saved inventory contents for " + player.getName() + " with " + existingItems.size() + " items");
+    }
+
+    /**
      * Handle inventory close events
      */
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -290,46 +504,18 @@ public class NFTInvCommand implements CommandExecutor, Listener {
 
             plugin.getLogger().info("Saving NFT inventory for " + player.getName());
 
-            // Get current page
-            int currentPage = playerPages.getOrDefault(player.getName(), 1);
-            int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-
-            // First clear the storage for this page
-            Map<Integer, ItemStack> existingItems = storage.loadInventory(player);
-            for (int i = 0; i < ITEMS_PER_PAGE; i++) {
-                int globalIndex = startIndex + i;
-                if (existingItems.containsKey(globalIndex)) {
-                    storage.setItem(player, globalIndex, null); // Remove item at this index
-                }
+            // Get current page from the title
+            int currentPage = 1;
+            try {
+                // Extract page number from title (format: "NFT Inventory - Page X")
+                String pageStr = title.substring(title.lastIndexOf("Page") + 5).trim();
+                currentPage = Integer.parseInt(pageStr);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Could not parse page number from title: " + title);
             }
 
-            // Then save all items from this page
-            for (int slot = 0; slot < ITEMS_PER_PAGE; slot++) {
-                ItemStack item = inventory.getItem(slot);
-                if (item != null && item.getType() != Material.AIR) {
-                    if (plugin.getItemManager().isNftItem(item)) {
-                        // Calculate global index for this slot
-                        int globalIndex = startIndex + slot;
-
-                        // Save the item
-                        storage.setItem(player, globalIndex, item);
-
-                        // Log for debugging
-                        ItemMeta meta = item.getItemMeta();
-                        if (meta != null) {
-                            PersistentDataContainer container = meta.getPersistentDataContainer();
-                            String nftId = container.get(plugin.getItemManager().getNftIdKey(), PersistentDataType.STRING);
-                            plugin.getLogger().info("Saved NFT " + nftId + " to global index " + globalIndex);
-                        }
-                    } else {
-                        plugin.getLogger().warning("Found non-NFT item in slot " + slot + ": " + item.getType().name());
-                    }
-                }
-            }
-
-            // Save to file
-            storage.saveInventory(player);
-            plugin.getLogger().info("Finished saving NFT inventory for " + player.getName());
+            // Save the inventory contents
+            saveInventoryContents(player, inventory, currentPage);
         }
     }
 }
