@@ -1,7 +1,7 @@
 # MinePath RPG - Minecraft Server with Solana Blockchain Integration
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/TTMordred/MinePath_RPG/main/assets/NFT_Plugin_Banner.png" alt="NFT Plugin Banner" width="800"/>
+  <img src="https://www.canva.com/design/DAGnOR15ogA/mTiai7Dc8T14c_9BEAC6Aw/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0" alt="MinePath Banner" width="800"/>
 
   <div>
     <img src="https://img.shields.io/badge/SOLANA-black?style=for-the-badge" alt="SOLANA"/>
@@ -16,6 +16,8 @@
 </div>
 
 Server Download: [MinePath_RPG.zip](https://www.mediafire.com/file/mz12iswxqxaz11g/servertien.zip/file)
+
+Pitch Deck: [View Our Pitch Deck](https://www.canva.com/design/DAGnOR15ogA/mTiai7Dc8T14c_9BEAC6Aw/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0)
 
 ## Overview
 
