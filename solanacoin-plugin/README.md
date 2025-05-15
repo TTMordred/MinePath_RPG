@@ -10,9 +10,9 @@ The ultimate bridge between **Minecraft** and **Solana**—now with a unified `/
 2. [Features](#-features)  
 3. [Requirements](#-requirements)  
 4. [Installation](#-installation)  
-5. [Configuration](#-configuration)  
+5. [Configuration](#%EF%B8%8F-configuration)  
 6. [Usage & Commands](#-usage--commands)  
-7. [Troubleshooting](#-troubleshooting)   
+7. [Troubleshooting](#%EF%B8%8F-troubleshooting)   
 
 ---
 
