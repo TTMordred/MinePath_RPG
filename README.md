@@ -18,16 +18,17 @@
   </div>
 </div>
 
-Server Download: [MinePath_RPG.zip](https://www.mediafire.com/file/mz12iswxqxaz11g/servertien.zip/file)
-
-Pitch Deck: [View Our Pitch Deck](https://www.canva.com/design/DAGnOR15ogA/mTiai7Dc8T14c_9BEAC6Aw/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0)
-
 ## Awards & Recognition
 
 <div align="center">
   <img src="assets/award-top1-hackathon.jpg" alt="Top 1 Hackathon Award" width="800" style="image-rendering: high-quality;"/>
   <p><strong>🏆 First Place Winner - SOLANA x SWINBURNE Real World Solutions Hackathon 2025</strong></p>
 </div>
+
+Server Download: [MinePath_RPG.zip](https://www.mediafire.com/file/mz12iswxqxaz11g/servertien.zip/file)
+
+Pitch Deck: [View Our Pitch Deck](https://www.canva.com/design/DAGnOR15ogA/mTiai7Dc8T14c_9BEAC6Aw/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0)
+
 
 ## Overview
 
