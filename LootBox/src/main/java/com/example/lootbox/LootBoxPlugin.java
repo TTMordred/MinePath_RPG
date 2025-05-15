@@ -171,24 +171,7 @@ public class LootBoxPlugin extends JavaPlugin implements Listener {
     public Connection getConnection() {
         return connection;
     }
-    public String fetchWalletAddress (String uuid) {
-        String walletAddress = null;
-        if (connection == null) {
-            getLogger().severe( "SQL not connected, check config.");
-            return null;
-        }
-        try {
-            PreparedStatement ps = this.connection.prepareStatement("SELECT wallet_address FROM walletlogin_wallets WHERE uuid = ?");
-            ps.setString(1, uuid);
-            ResultSet results = ps.executeQuery();
-            if (results.next()) {
-                walletAddress = results.getString("wallet_address");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return walletAddress;
-    }
+    
     public enum TELLRAWCOLOR {
         red,
         dark_red,
@@ -206,21 +189,6 @@ public class LootBoxPlugin extends JavaPlugin implements Listener {
         dark_gray,
         white,
         black
-    }
-    public PublicKey getAssociatedTokenAddress(PublicKey wallet, PublicKey mint) {
-        try {
-            // Use the three seeds: wallet, TokenProgram.PROGRAM_ID, mint
-            return PublicKey.findProgramAddress(
-                    List.of(
-                            wallet.toByteArray(),
-                            org.p2p.solanaj.programs.TokenProgram.PROGRAM_ID.toByteArray(),
-                            mint.toByteArray()
-                    ),
-                    org.p2p.solanaj.programs.AssociatedTokenProgram.PROGRAM_ID
-            ).getAddress();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to compute associated token address", e);
-        }
     }
         public void sendURLToPlayer(Player player, String message, String url, TELLRAWCOLOR color) {
         this.getServer().dispatchCommand(
