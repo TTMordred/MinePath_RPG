@@ -1,7 +1,10 @@
 # MinePath RPG - Minecraft Server with Solana Blockchain Integration
 
 <div align="center">
-  <img src="https://i.ibb.co/BvV0MRm/jo-IFaiv-Imgur.png" alt="MinePath RPG Banner" width="800"/>
+  <picture>
+    <source srcset="https://i.ibb.co/BvV0MRm/jo-IFaiv-Imgur.png" type="image/png">
+    <img src="https://i.ibb.co/BvV0MRm/jo-IFaiv-Imgur.png" alt="MinePath RPG Banner" width="800" style="image-rendering:  high-quality;">
+  </picture>
 
   <div>
     <img src="https://img.shields.io/badge/SOLANA-black?style=for-the-badge" alt="SOLANA"/>
