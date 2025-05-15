@@ -494,13 +494,13 @@ public class NFTListCommand implements CommandExecutor, Listener {
             "tellraw " + player.getName() + " {\"text\":\"§7[§a§lClick to Open Explorer§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + explorerUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to open Solana Explorer\"}}"
         );
 
-        // Display image link with only the functional button
-        // Get image URL from metadata manager to ensure it's the latest
-        String updatedImageUrl = plugin.getConfigManager().getNftImageUrl(nft.getAchievementKey());
-        if (updatedImageUrl != null && !updatedImageUrl.isEmpty()) {
-            player.sendMessage("§7Image: ");
+        // Display detail link with only the functional button
+        // Get detail link from config manager (falls back to image URL if not configured)
+        String detailLink = plugin.getConfigManager().getNftDetailLink(nft.getAchievementKey());
+        if (detailLink != null && !detailLink.isEmpty()) {
+            player.sendMessage("§7Detail: ");
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Image in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + updatedImageUrl + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT image\"}}"
+                "tellraw " + player.getName() + " {\"text\":\"§7[§a§lOpen Detail in Browser§7]\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + detailLink + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"§7Click to view NFT details\"}}"
             );
         }
 

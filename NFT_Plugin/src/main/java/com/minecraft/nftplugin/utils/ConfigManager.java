@@ -470,4 +470,21 @@ public class ConfigManager {
             return "https://explorer.solana.com/tx/" + txId;
         }
     }
+
+    /**
+     * Get the NFT detail link for an achievement
+     * @param achievementKey The achievement key
+     * @return The detail link, or the image URL if not configured
+     */
+    public String getNftDetailLink(String achievementKey) {
+        // Check if there's a specific detail link for this achievement
+        String detailLink = config.getString("achievements." + achievementKey + ".detail_link", null);
+        if (detailLink != null && !detailLink.isEmpty()) {
+            plugin.getLogger().info("Using detail link for " + achievementKey + ": " + detailLink);
+            return detailLink;
+        }
+
+        // If no detail link is configured, return the image URL as fallback
+        return getNftImageUrl(achievementKey);
+    }
 }
