@@ -1,5 +1,20 @@
 # MinePath RPG - Minecraft Server with Solana Blockchain Integration
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/TTMordred/MinePath_RPG/main/assets/NFT_Plugin_Banner.png" alt="NFT Plugin Banner" width="800"/>
+
+  <div>
+    <img src="https://img.shields.io/badge/SOLANA-black?style=for-the-badge" alt="SOLANA"/>
+    <img src="https://img.shields.io/badge/DEVNET-blue?style=for-the-badge" alt="DEVNET"/>
+    <img src="https://img.shields.io/badge/MINECRAFT-brown?style=for-the-badge" alt="MINECRAFT"/>
+    <img src="https://img.shields.io/badge/1.18.2+-green?style=for-the-badge" alt="1.18.2+"/>
+    <img src="https://img.shields.io/badge/IPFS-gray?style=for-the-badge" alt="IPFS"/>
+    <img src="https://img.shields.io/badge/PINATA-orange?style=for-the-badge" alt="PINATA"/>
+    <img src="https://img.shields.io/badge/PAPER-white?style=for-the-badge" alt="PAPER"/>
+    <img src="https://img.shields.io/badge/SPIGOT-yellow?style=for-the-badge" alt="SPIGOT"/>
+  </div>
+</div>
+
 Server Download: [MinePath_RPG.zip](https://www.mediafire.com/file/mz12iswxqxaz11g/servertien.zip/file)
 
 ## Overview
@@ -155,7 +170,7 @@ With a dual-token economy (MINE for in-game activities and PATH as the upcoming 
 3. Configure in `plugins/MinePath/config.yml` as needed
 4. Download web server to handle transaction at (https://github.com/HungPhan-0612/server_handle_request)
 5. Open root folder of the WebServer
-6. Use 
+6. Use
       ```bash
       npm install
       npm run dev
@@ -403,3 +418,29 @@ For issues or questions about the server, please contact the server administrato
 ---
 
 *Note: This server integrates with the Solana blockchain. Please ensure you understand [blockchain technology](https://solana.com/learn) and cryptocurrency before using the token export features.*
+
+## Technologies
+
+<div align="center">
+  <!-- Backend Technologies -->
+  <img src="https://img.shields.io/badge/JAVA-17-red?style=for-the-badge" alt="JAVA 17"/>
+  <img src="https://img.shields.io/badge/PAPER-1.18.2-white?style=for-the-badge" alt="PAPER 1.18.2"/>
+  <img src="https://img.shields.io/badge/MYSQL-8.0-blue?style=for-the-badge" alt="MYSQL 8.0"/>
+  <img src="https://img.shields.io/badge/NODE.JS-14+-green?style=for-the-badge" alt="NODE.JS 14+"/>
+
+  <!-- Blockchain Technologies -->
+  <img src="https://img.shields.io/badge/SOLANA-black?style=for-the-badge" alt="SOLANA"/>
+  <img src="https://img.shields.io/badge/PHANTOM-purple?style=for-the-badge" alt="PHANTOM"/>
+  <img src="https://img.shields.io/badge/METAPLEX-orange?style=for-the-badge" alt="METAPLEX"/>
+  <img src="https://img.shields.io/badge/IPFS-blue?style=for-the-badge" alt="IPFS"/>
+
+  <!-- Web Technologies -->
+  <img src="https://img.shields.io/badge/NEXT.JS-14-black?style=for-the-badge" alt="NEXT.JS 14"/>
+  <img src="https://img.shields.io/badge/REACT-19-blue?style=for-the-badge" alt="REACT 19"/>
+  <img src="https://img.shields.io/badge/TYPESCRIPT-5-blue?style=for-the-badge" alt="TYPESCRIPT 5"/>
+  <img src="https://img.shields.io/badge/TAILWIND-3-teal?style=for-the-badge" alt="TAILWIND 3"/>
+  <img src="https://img.shields.io/badge/EXPRESS-4-gray?style=for-the-badge" alt="EXPRESS 4"/>
+
+  <img src="https://img.shields.io/badge/LICENSE-MIT-yellow?style=for-the-badge" alt="LICENSE MIT"/>
+</div>
+
