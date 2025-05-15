@@ -2,8 +2,8 @@
 
 <div align="center">
   <picture>
-    <source srcset="https://i.ibb.co/BvV0MRm/jo-IFaiv-Imgur.png" type="image/png">
-    <img src="https://i.ibb.co/BvV0MRm/jo-IFaiv-Imgur.png" alt="MinePath RPG Banner" width="800" style="image-rendering:  high-quality;">
+    <source srcset="assets/miner-banner.png" type="image/png">
+    <img src="assets/miner-banner.png" alt="MinePath RPG Banner" width="800" style="image-rendering: high-quality;">
   </picture>
 
   <div>
