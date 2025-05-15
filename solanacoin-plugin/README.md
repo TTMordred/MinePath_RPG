@@ -6,13 +6,13 @@ The ultimate bridge between **Minecraft** and **Solana**—now with a unified `/
 
 ## 🎯 Table of Contents
 
-1. [Introduction](#introduction)  
-2. [Features](#features)  
-3. [Requirements](#requirements)  
-4. [Installation](#installation)  
-5. [Configuration](#configuration)  
-6. [Usage & Commands](#usage--commands)  
-7. [Troubleshooting](#troubleshooting)   
+1. [Introduction](#-introduction)  
+2. [Features](#-features)  
+3. [Requirements](#-requirements)  
+4. [Installation](#-installation)  
+5. [Configuration](#-configuration)  
+6. [Usage & Commands](#-usage--commands)  
+7. [Troubleshooting](#-troubleshooting)   
 
 ---
 
