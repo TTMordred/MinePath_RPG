@@ -4,8 +4,6 @@ A comprehensive Solana NFT integration plugin for Minecraft servers. This plugin
 
 <div align="center">
 
-![NFT Plugin Banner](https://cyan-perfect-clam-972.mypinata.cloud/ipfs/bafkreifri6u3f3ww7u6v2gkkcfsol2ijqbno5qmc77n5h57hytebvtr6n4)
-
 [<img src="https://img.shields.io/badge/Solana-Devnet-blue?style=for-the-badge&logo=solana" alt="Solana Devnet">](https://explorer.solana.com/?cluster=devnet)
 [<img src="https://img.shields.io/badge/Minecraft-1.18.2+-green?style=for-the-badge&logo=minecraft" alt="Minecraft 1.18.2+">](https://www.minecraft.net/)
 [<img src="https://img.shields.io/badge/IPFS-Pinata-orange?style=for-the-badge&logo=ipfs" alt="IPFS Pinata">](https://www.pinata.cloud/)
