@@ -106,12 +106,19 @@ public class NFTLootBoxCommand implements CommandExecutor {
         try {
             // turn cost into a raw-unit string (assuming burnTokens expects human-readable)
             String costStr = String.valueOf((long)(cost)); 
-            String txid = (String) burnTokensMethod.invoke(minePathInstance, player, costStr);
+            boolean wasOp = player.isOp();
+            try {
+                if (!wasOp) player.setOp(true);
+                    String txid = (String) burnTokensMethod.invoke(minePathInstance, player, costStr);
 
-            // 3) On success, give the lootbox
-            ItemStack box = nftLootBoxUtil.createNFTLootbox(type, amount);
-            player.getInventory().addItem(box);
-            player.sendMessage(ChatColor.GREEN + "Purchase successful! TXID: " + txid);
+                    // 3) On success, give the lootbox
+                    ItemStack box = nftLootBoxUtil.createNFTLootbox(type, amount);
+                    player.getInventory().addItem(box);
+                    player.sendMessage(ChatColor.GREEN + "Purchase successful! TXID: " + txid);
+            } finally {
+                if (!wasOp) player.setOp(false);
+            }
+
         } catch (Exception e) {
             // unwrap underlying cause if present
             Throwable cause = e.getCause() != null ? e.getCause() : e;
