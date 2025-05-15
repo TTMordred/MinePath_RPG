@@ -22,6 +22,13 @@ Server Download: [MinePath_RPG.zip](https://www.mediafire.com/file/mz12iswxqxaz1
 
 Pitch Deck: [View Our Pitch Deck](https://www.canva.com/design/DAGnOR15ogA/mTiai7Dc8T14c_9BEAC6Aw/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0)
 
+## Awards & Recognition
+
+<div align="center">
+  <img src="assets/award-top1-hackathon.jpg" alt="Top 1 Hackathon Award" width="800" style="image-rendering: high-quality;"/>
+  <p><strong>🏆 First Place Winner - SOLANA x SWINBURNE Real World Solutions Hackathon 2025</strong></p>
+</div>
+
 ## Overview
 
 MinePath RPG is a revolutionary Minecraft server built on [Paper](https://papermc.io/) 1.18.2 that seamlessly integrates Solana blockchain technology with traditional Minecraft gameplay. This innovative platform transforms the gaming experience by allowing players to earn real cryptocurrency tokens through in-game activities.
