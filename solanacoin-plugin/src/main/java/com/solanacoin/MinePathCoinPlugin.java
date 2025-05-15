@@ -61,10 +61,33 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     protected VaultIntegration vaultIntegration;
     protected String currencySymbol;
     protected int tokenDecimals;
+    protected String ipAddress;
+    protected String port;
+    protected String linkweb;
 
     protected String chatPrefix = ChatColor.GRAY + "["+ChatColor.RESET+"MINEPATH"+ChatColor.GRAY + "]: " + ChatColor.RESET;
 
 
+    public void loadWeb() {
+        // this.ipAddress = config.getString("ipAddress");
+        // if (this.ipAddress == null) {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'ipAddress' missing.");
+        // } else {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + "IP Address: " + this.ipAddress);
+        // }
+        // this.port = config.getString("port");
+        // if (this.port == null) {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'port' missing.");
+        // } else {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + "Port: " + this.port);
+        // }
+        this.linkweb = config.getString("linkweb");
+        if (this.linkweb == null) {
+            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'linkweb' missing.");
+        } else {
+            getServer().getConsoleSender().sendMessage(chatPrefix + "Linkweb: " + this.linkweb);
+        }
+    }
     public void loadSignerAccount() {
         this.chatPrefix = ChatColor.GRAY + "["+ChatColor.RESET+"MINEPATH"+ChatColor.GRAY + "]: " + ChatColor.RESET;
         getServer().getConsoleSender().sendMessage(chatPrefix + "Statring to collecting Signer");
@@ -340,7 +363,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
 //            this.tryHookVault("reload");
 
-
+            this.loadWeb();
             if (config.contains("rpcURL")) {
                 String rpcURL = config.getString("rpcURL");
                 boolean loadClient = true;
@@ -356,7 +379,6 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
                     getServer().getConsoleSender().sendMessage(chatPrefix+ChatColor.RED + "config field 'rpcURL' is blank. Defaulting to \"https://api.mainnet-beta.solana.com\".");
                 }
             }
-
 
             if (config.contains("signer")) {
                 if (this.signer == null ||

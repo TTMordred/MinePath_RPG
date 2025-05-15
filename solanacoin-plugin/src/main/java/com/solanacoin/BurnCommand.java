@@ -33,7 +33,7 @@ public class BurnCommand implements CommandExecutor {
   
       String amount = args[0];
       try {
-        URL url = new URL("http://localhost:3000/session/burn");
+        URL url = new URL(plugin.linkweb+"/session/burn");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);
@@ -63,7 +63,7 @@ public class BurnCommand implements CommandExecutor {
             JSONObject json = (JSONObject) parser.parse(resp);
             String txid = (String) json.get("txid");
 
-            // 5) Thông báo thành công
+            // 5) success
             sender.sendMessage(ChatColor.GREEN + "Burn success TXID: " + txid);
             return true;
         } else {
@@ -90,7 +90,7 @@ public class BurnCommand implements CommandExecutor {
         String userATA = plugin.getAssociatedTokenAddress(pubkey, plugin.tokenMintAddress).toBase58();
 
         // 3) Prepare the HTTP POST
-        URL url = new URL("http://localhost:3000/session/burn");
+        URL url = new URL(plugin.linkweb+"/session/burn");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);
