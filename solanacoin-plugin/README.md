@@ -12,9 +12,7 @@ The ultimate bridge between **Minecraft** and **Solana**—now with a unified `/
 4. [Installation](#installation)  
 5. [Configuration](#configuration)  
 6. [Usage & Commands](#usage--commands)  
-7. [Troubleshooting](#troubleshooting)  
-8. [Credits](#credits)  
-9. [License](#license)  
+7. [Troubleshooting](#troubleshooting)   
 
 ---
 
@@ -29,7 +27,7 @@ Version 2 adds a `/token…` prefix for consistency and requires a companion Nod
 
 - **Balance tracking** – keep player balances synced with Solana  
 - **Account authorization** – link Minecraft UUIDs to Solana wallets (`/tokenauthorize`, admin-only)  
-- **Token burning** – permanently remove tokens from treasury (`/tokenburn`, admin-only)  
+- **Token burning** – permanently remove tokens (`/tokenburn`, admin-only)  
 - **On-chain claim** – credit external deposits to players (`/tokenclaim`, admin-only)  
 - **Database support** – SQLite, MySQL, PostgreSQL via JDBC  
 - **Vault integration** – optional permissions control  
@@ -49,13 +47,13 @@ Version 2 adds a `/token…` prefix for consistency and requires a companion Nod
 
 1. **Clone & build the plugin**  
    ```bash
-   git clone https://github.com/HungPhan-0612/Minecraft-Solana-Coin-Plugin.git
-   cd Minecraft-Solana-Coin-Plugin
+   git clone https://github.com/TTMordred/MinePath_RPG.git
+   cd solanacoin-plugin
    ./gradlew clean shadowJar     # Windows: gradlew.bat clean shadowJar
    
 2. **Deploy the JAR**
 
-- copy build/libs/MinePathCoinPlugin.jar → <your-server>/plugins/
+   - copy build/libs/MinePathCoinPlugin.jar → <your-server>/plugins/
 
 3. **Set up the Solana service**
    ```bash
