@@ -34,12 +34,11 @@ public class AuthorizeCommand implements CommandExecutor {
             new PublicKey(userPubkey), plugin.tokenMintAddress).toBase58();
         String sessionPub = plugin.db.getSessionPublicKey(p.getUniqueId().toString());
         if(sessionPub != null){
-            p.sendMessage(ChatColor.RED + "You have already authorized. Here your sessionID: "+ sessionPub + ". Please confirm with the link above if you havent. If you already confirm then you can ignore this message.");
-            plugin.sendCopyableTextToPlayer(p,null, sessionPub, null);
+            plugin.sendCopyableTextToPlayer(p,"You have already authorized. Here your sessionID: "+ sessionPub, sessionPub, TELLRAWCOLOR.green);
             return true;
         }
         try {
-            URL url = new URL("http://localhost:3000/session/new");
+            URL url = new URL(plugin.linkweb+"/session/new");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setDoOutput(true);
@@ -61,26 +60,26 @@ public class AuthorizeCommand implements CommandExecutor {
             );
             
     
-            // Lưu sessionId cho player
+            // Store sessionId in the database
             plugin.db.addSession(p.getUniqueId().toString(), sessionId);
             // Gửi link để user ký (có thể qua chat)
             String url_send = String.format(
-                  "http://localhost:3000/approve?sessionId=%s&userATA=%s",
+                  plugin.linkweb+"/approve?sessionId=%s&userATA=%s",
             sessionId,
                 URLEncoder.encode(userATA, "UTF-8")
                 );
             plugin.sendURLToPlayer(p,"[Click here to Authorize transfer]", url_send, TELLRAWCOLOR.green
             );
             }else{
-                p.sendMessage(ChatColor.RED + "Server trả về HTTP " + con.getResponseCode());
-                // Đọc và hiển thị luôn body để debug
+                p.sendMessage(ChatColor.RED + "Server return HTTP " + con.getResponseCode());
+                // Read and display the error message
                 String err = new BufferedReader(new InputStreamReader(con.getErrorStream()))
                     .lines().collect(Collectors.joining("\n"));
                 p.sendMessage(ChatColor.RED + err);
                 plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + err);
             }
         } catch (Exception e) {
-            p.sendMessage(ChatColor.RED + "Lỗi khi tạo session: " + e.getMessage());
+            p.sendMessage(ChatColor.RED + "Error creating session: " + e.getMessage());
         }
         return true;
     }
